@@ -2028,6 +2028,782 @@ class SpeciesCareCompanion extends UpdateCompanion<SpeciesCareData> {
   }
 }
 
+class $CareFieldsTable extends CareFields
+    with TableInfo<$CareFieldsTable, CareField> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CareFieldsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _keyMeta = const VerificationMeta('key');
+  @override
+  late final GeneratedColumn<String> key = GeneratedColumn<String>(
+      'key', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 50),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 50),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
+  @override
+  late final GeneratedColumnWithTypeConverter<CareFieldType, String> type =
+      GeneratedColumn<String>('type', aliasedName, false,
+              type: DriftSqlType.string, requiredDuringInsert: true)
+          .withConverter<CareFieldType>($CareFieldsTable.$convertertype);
+  static const VerificationMeta _unitMeta = const VerificationMeta('unit');
+  @override
+  late final GeneratedColumn<String> unit = GeneratedColumn<String>(
+      'unit', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 20),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
+  static const VerificationMeta _optionsMeta =
+      const VerificationMeta('options');
+  @override
+  late final GeneratedColumn<String> options = GeneratedColumn<String>(
+      'options', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 500),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
+  static const VerificationMeta _enabledMeta =
+      const VerificationMeta('enabled');
+  @override
+  late final GeneratedColumn<bool> enabled = GeneratedColumn<bool>(
+      'enabled', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("enabled" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _positionMeta =
+      const VerificationMeta('position');
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+      'position', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, key, name, type, unit, options, enabled, position];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'care_fields';
+  @override
+  VerificationContext validateIntegrity(Insertable<CareField> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('key')) {
+      context.handle(
+          _keyMeta, key.isAcceptableOrUnknown(data['key']!, _keyMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    }
+    if (data.containsKey('unit')) {
+      context.handle(
+          _unitMeta, unit.isAcceptableOrUnknown(data['unit']!, _unitMeta));
+    }
+    if (data.containsKey('options')) {
+      context.handle(_optionsMeta,
+          options.isAcceptableOrUnknown(data['options']!, _optionsMeta));
+    }
+    if (data.containsKey('enabled')) {
+      context.handle(_enabledMeta,
+          enabled.isAcceptableOrUnknown(data['enabled']!, _enabledMeta));
+    }
+    if (data.containsKey('position')) {
+      context.handle(_positionMeta,
+          position.isAcceptableOrUnknown(data['position']!, _positionMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  CareField map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return CareField(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      key: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}key']),
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name']),
+      type: $CareFieldsTable.$convertertype.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}type'])!),
+      unit: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}unit']),
+      options: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}options']),
+      enabled: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}enabled'])!,
+      position: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}position'])!,
+    );
+  }
+
+  @override
+  $CareFieldsTable createAlias(String alias) {
+    return $CareFieldsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<CareFieldType, String, String> $convertertype =
+      const EnumNameConverter<CareFieldType>(CareFieldType.values);
+}
+
+class CareField extends DataClass implements Insertable<CareField> {
+  final int id;
+  final String? key;
+  final String? name;
+  final CareFieldType type;
+  final String? unit;
+  final String? options;
+  final bool enabled;
+  final int position;
+  const CareField(
+      {required this.id,
+      this.key,
+      this.name,
+      required this.type,
+      this.unit,
+      this.options,
+      required this.enabled,
+      required this.position});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || key != null) {
+      map['key'] = Variable<String>(key);
+    }
+    if (!nullToAbsent || name != null) {
+      map['name'] = Variable<String>(name);
+    }
+    {
+      map['type'] =
+          Variable<String>($CareFieldsTable.$convertertype.toSql(type));
+    }
+    if (!nullToAbsent || unit != null) {
+      map['unit'] = Variable<String>(unit);
+    }
+    if (!nullToAbsent || options != null) {
+      map['options'] = Variable<String>(options);
+    }
+    map['enabled'] = Variable<bool>(enabled);
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CareFieldsCompanion toCompanion(bool nullToAbsent) {
+    return CareFieldsCompanion(
+      id: Value(id),
+      key: key == null && nullToAbsent ? const Value.absent() : Value(key),
+      name: name == null && nullToAbsent ? const Value.absent() : Value(name),
+      type: Value(type),
+      unit: unit == null && nullToAbsent ? const Value.absent() : Value(unit),
+      options: options == null && nullToAbsent
+          ? const Value.absent()
+          : Value(options),
+      enabled: Value(enabled),
+      position: Value(position),
+    );
+  }
+
+  factory CareField.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return CareField(
+      id: serializer.fromJson<int>(json['id']),
+      key: serializer.fromJson<String?>(json['key']),
+      name: serializer.fromJson<String?>(json['name']),
+      type: $CareFieldsTable.$convertertype
+          .fromJson(serializer.fromJson<String>(json['type'])),
+      unit: serializer.fromJson<String?>(json['unit']),
+      options: serializer.fromJson<String?>(json['options']),
+      enabled: serializer.fromJson<bool>(json['enabled']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'key': serializer.toJson<String?>(key),
+      'name': serializer.toJson<String?>(name),
+      'type': serializer
+          .toJson<String>($CareFieldsTable.$convertertype.toJson(type)),
+      'unit': serializer.toJson<String?>(unit),
+      'options': serializer.toJson<String?>(options),
+      'enabled': serializer.toJson<bool>(enabled),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  CareField copyWith(
+          {int? id,
+          Value<String?> key = const Value.absent(),
+          Value<String?> name = const Value.absent(),
+          CareFieldType? type,
+          Value<String?> unit = const Value.absent(),
+          Value<String?> options = const Value.absent(),
+          bool? enabled,
+          int? position}) =>
+      CareField(
+        id: id ?? this.id,
+        key: key.present ? key.value : this.key,
+        name: name.present ? name.value : this.name,
+        type: type ?? this.type,
+        unit: unit.present ? unit.value : this.unit,
+        options: options.present ? options.value : this.options,
+        enabled: enabled ?? this.enabled,
+        position: position ?? this.position,
+      );
+  CareField copyWithCompanion(CareFieldsCompanion data) {
+    return CareField(
+      id: data.id.present ? data.id.value : this.id,
+      key: data.key.present ? data.key.value : this.key,
+      name: data.name.present ? data.name.value : this.name,
+      type: data.type.present ? data.type.value : this.type,
+      unit: data.unit.present ? data.unit.value : this.unit,
+      options: data.options.present ? data.options.value : this.options,
+      enabled: data.enabled.present ? data.enabled.value : this.enabled,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CareField(')
+          ..write('id: $id, ')
+          ..write('key: $key, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('unit: $unit, ')
+          ..write('options: $options, ')
+          ..write('enabled: $enabled, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, key, name, type, unit, options, enabled, position);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is CareField &&
+          other.id == this.id &&
+          other.key == this.key &&
+          other.name == this.name &&
+          other.type == this.type &&
+          other.unit == this.unit &&
+          other.options == this.options &&
+          other.enabled == this.enabled &&
+          other.position == this.position);
+}
+
+class CareFieldsCompanion extends UpdateCompanion<CareField> {
+  final Value<int> id;
+  final Value<String?> key;
+  final Value<String?> name;
+  final Value<CareFieldType> type;
+  final Value<String?> unit;
+  final Value<String?> options;
+  final Value<bool> enabled;
+  final Value<int> position;
+  const CareFieldsCompanion({
+    this.id = const Value.absent(),
+    this.key = const Value.absent(),
+    this.name = const Value.absent(),
+    this.type = const Value.absent(),
+    this.unit = const Value.absent(),
+    this.options = const Value.absent(),
+    this.enabled = const Value.absent(),
+    this.position = const Value.absent(),
+  });
+  CareFieldsCompanion.insert({
+    this.id = const Value.absent(),
+    this.key = const Value.absent(),
+    this.name = const Value.absent(),
+    required CareFieldType type,
+    this.unit = const Value.absent(),
+    this.options = const Value.absent(),
+    this.enabled = const Value.absent(),
+    this.position = const Value.absent(),
+  }) : type = Value(type);
+  static Insertable<CareField> custom({
+    Expression<int>? id,
+    Expression<String>? key,
+    Expression<String>? name,
+    Expression<String>? type,
+    Expression<String>? unit,
+    Expression<String>? options,
+    Expression<bool>? enabled,
+    Expression<int>? position,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (key != null) 'key': key,
+      if (name != null) 'name': name,
+      if (type != null) 'type': type,
+      if (unit != null) 'unit': unit,
+      if (options != null) 'options': options,
+      if (enabled != null) 'enabled': enabled,
+      if (position != null) 'position': position,
+    });
+  }
+
+  CareFieldsCompanion copyWith(
+      {Value<int>? id,
+      Value<String?>? key,
+      Value<String?>? name,
+      Value<CareFieldType>? type,
+      Value<String?>? unit,
+      Value<String?>? options,
+      Value<bool>? enabled,
+      Value<int>? position}) {
+    return CareFieldsCompanion(
+      id: id ?? this.id,
+      key: key ?? this.key,
+      name: name ?? this.name,
+      type: type ?? this.type,
+      unit: unit ?? this.unit,
+      options: options ?? this.options,
+      enabled: enabled ?? this.enabled,
+      position: position ?? this.position,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (key.present) {
+      map['key'] = Variable<String>(key.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (type.present) {
+      map['type'] =
+          Variable<String>($CareFieldsTable.$convertertype.toSql(type.value));
+    }
+    if (unit.present) {
+      map['unit'] = Variable<String>(unit.value);
+    }
+    if (options.present) {
+      map['options'] = Variable<String>(options.value);
+    }
+    if (enabled.present) {
+      map['enabled'] = Variable<bool>(enabled.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CareFieldsCompanion(')
+          ..write('id: $id, ')
+          ..write('key: $key, ')
+          ..write('name: $name, ')
+          ..write('type: $type, ')
+          ..write('unit: $unit, ')
+          ..write('options: $options, ')
+          ..write('enabled: $enabled, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $SpeciesCareValuesTable extends SpeciesCareValues
+    with TableInfo<$SpeciesCareValuesTable, SpeciesCareValue> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SpeciesCareValuesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _speciesMeta =
+      const VerificationMeta('species');
+  @override
+  late final GeneratedColumn<int> species = GeneratedColumn<int>(
+      'species', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES species (id) ON DELETE CASCADE'));
+  static const VerificationMeta _fieldMeta = const VerificationMeta('field');
+  @override
+  late final GeneratedColumn<int> field = GeneratedColumn<int>(
+      'field', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES care_fields (id) ON DELETE CASCADE'));
+  static const VerificationMeta _valueMeta = const VerificationMeta('value');
+  @override
+  late final GeneratedColumn<double> value = GeneratedColumn<double>(
+      'value', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _maxValueMeta =
+      const VerificationMeta('maxValue');
+  @override
+  late final GeneratedColumn<double> maxValue = GeneratedColumn<double>(
+      'max_value', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _textValueMeta =
+      const VerificationMeta('textValue');
+  @override
+  late final GeneratedColumn<String> textValue = GeneratedColumn<String>(
+      'text_value', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 1000),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
+  static const VerificationMeta _estimatedMeta =
+      const VerificationMeta('estimated');
+  @override
+  late final GeneratedColumn<bool> estimated = GeneratedColumn<bool>(
+      'estimated', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("estimated" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  @override
+  List<GeneratedColumn> get $columns =>
+      [species, field, value, maxValue, textValue, estimated];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'species_care_values';
+  @override
+  VerificationContext validateIntegrity(Insertable<SpeciesCareValue> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('species')) {
+      context.handle(_speciesMeta,
+          species.isAcceptableOrUnknown(data['species']!, _speciesMeta));
+    } else if (isInserting) {
+      context.missing(_speciesMeta);
+    }
+    if (data.containsKey('field')) {
+      context.handle(
+          _fieldMeta, field.isAcceptableOrUnknown(data['field']!, _fieldMeta));
+    } else if (isInserting) {
+      context.missing(_fieldMeta);
+    }
+    if (data.containsKey('value')) {
+      context.handle(
+          _valueMeta, value.isAcceptableOrUnknown(data['value']!, _valueMeta));
+    }
+    if (data.containsKey('max_value')) {
+      context.handle(_maxValueMeta,
+          maxValue.isAcceptableOrUnknown(data['max_value']!, _maxValueMeta));
+    }
+    if (data.containsKey('text_value')) {
+      context.handle(_textValueMeta,
+          textValue.isAcceptableOrUnknown(data['text_value']!, _textValueMeta));
+    }
+    if (data.containsKey('estimated')) {
+      context.handle(_estimatedMeta,
+          estimated.isAcceptableOrUnknown(data['estimated']!, _estimatedMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {species, field};
+  @override
+  SpeciesCareValue map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SpeciesCareValue(
+      species: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}species'])!,
+      field: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}field'])!,
+      value: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}value']),
+      maxValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}max_value']),
+      textValue: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}text_value']),
+      estimated: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}estimated'])!,
+    );
+  }
+
+  @override
+  $SpeciesCareValuesTable createAlias(String alias) {
+    return $SpeciesCareValuesTable(attachedDatabase, alias);
+  }
+}
+
+class SpeciesCareValue extends DataClass
+    implements Insertable<SpeciesCareValue> {
+  final int species;
+  final int field;
+  final double? value;
+  final double? maxValue;
+  final String? textValue;
+  final bool estimated;
+  const SpeciesCareValue(
+      {required this.species,
+      required this.field,
+      this.value,
+      this.maxValue,
+      this.textValue,
+      required this.estimated});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['species'] = Variable<int>(species);
+    map['field'] = Variable<int>(field);
+    if (!nullToAbsent || value != null) {
+      map['value'] = Variable<double>(value);
+    }
+    if (!nullToAbsent || maxValue != null) {
+      map['max_value'] = Variable<double>(maxValue);
+    }
+    if (!nullToAbsent || textValue != null) {
+      map['text_value'] = Variable<String>(textValue);
+    }
+    map['estimated'] = Variable<bool>(estimated);
+    return map;
+  }
+
+  SpeciesCareValuesCompanion toCompanion(bool nullToAbsent) {
+    return SpeciesCareValuesCompanion(
+      species: Value(species),
+      field: Value(field),
+      value:
+          value == null && nullToAbsent ? const Value.absent() : Value(value),
+      maxValue: maxValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxValue),
+      textValue: textValue == null && nullToAbsent
+          ? const Value.absent()
+          : Value(textValue),
+      estimated: Value(estimated),
+    );
+  }
+
+  factory SpeciesCareValue.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SpeciesCareValue(
+      species: serializer.fromJson<int>(json['species']),
+      field: serializer.fromJson<int>(json['field']),
+      value: serializer.fromJson<double?>(json['value']),
+      maxValue: serializer.fromJson<double?>(json['maxValue']),
+      textValue: serializer.fromJson<String?>(json['textValue']),
+      estimated: serializer.fromJson<bool>(json['estimated']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'species': serializer.toJson<int>(species),
+      'field': serializer.toJson<int>(field),
+      'value': serializer.toJson<double?>(value),
+      'maxValue': serializer.toJson<double?>(maxValue),
+      'textValue': serializer.toJson<String?>(textValue),
+      'estimated': serializer.toJson<bool>(estimated),
+    };
+  }
+
+  SpeciesCareValue copyWith(
+          {int? species,
+          int? field,
+          Value<double?> value = const Value.absent(),
+          Value<double?> maxValue = const Value.absent(),
+          Value<String?> textValue = const Value.absent(),
+          bool? estimated}) =>
+      SpeciesCareValue(
+        species: species ?? this.species,
+        field: field ?? this.field,
+        value: value.present ? value.value : this.value,
+        maxValue: maxValue.present ? maxValue.value : this.maxValue,
+        textValue: textValue.present ? textValue.value : this.textValue,
+        estimated: estimated ?? this.estimated,
+      );
+  SpeciesCareValue copyWithCompanion(SpeciesCareValuesCompanion data) {
+    return SpeciesCareValue(
+      species: data.species.present ? data.species.value : this.species,
+      field: data.field.present ? data.field.value : this.field,
+      value: data.value.present ? data.value.value : this.value,
+      maxValue: data.maxValue.present ? data.maxValue.value : this.maxValue,
+      textValue: data.textValue.present ? data.textValue.value : this.textValue,
+      estimated: data.estimated.present ? data.estimated.value : this.estimated,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SpeciesCareValue(')
+          ..write('species: $species, ')
+          ..write('field: $field, ')
+          ..write('value: $value, ')
+          ..write('maxValue: $maxValue, ')
+          ..write('textValue: $textValue, ')
+          ..write('estimated: $estimated')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(species, field, value, maxValue, textValue, estimated);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SpeciesCareValue &&
+          other.species == this.species &&
+          other.field == this.field &&
+          other.value == this.value &&
+          other.maxValue == this.maxValue &&
+          other.textValue == this.textValue &&
+          other.estimated == this.estimated);
+}
+
+class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
+  final Value<int> species;
+  final Value<int> field;
+  final Value<double?> value;
+  final Value<double?> maxValue;
+  final Value<String?> textValue;
+  final Value<bool> estimated;
+  final Value<int> rowid;
+  const SpeciesCareValuesCompanion({
+    this.species = const Value.absent(),
+    this.field = const Value.absent(),
+    this.value = const Value.absent(),
+    this.maxValue = const Value.absent(),
+    this.textValue = const Value.absent(),
+    this.estimated = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SpeciesCareValuesCompanion.insert({
+    required int species,
+    required int field,
+    this.value = const Value.absent(),
+    this.maxValue = const Value.absent(),
+    this.textValue = const Value.absent(),
+    this.estimated = const Value.absent(),
+    this.rowid = const Value.absent(),
+  })  : species = Value(species),
+        field = Value(field);
+  static Insertable<SpeciesCareValue> custom({
+    Expression<int>? species,
+    Expression<int>? field,
+    Expression<double>? value,
+    Expression<double>? maxValue,
+    Expression<String>? textValue,
+    Expression<bool>? estimated,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (species != null) 'species': species,
+      if (field != null) 'field': field,
+      if (value != null) 'value': value,
+      if (maxValue != null) 'max_value': maxValue,
+      if (textValue != null) 'text_value': textValue,
+      if (estimated != null) 'estimated': estimated,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SpeciesCareValuesCompanion copyWith(
+      {Value<int>? species,
+      Value<int>? field,
+      Value<double?>? value,
+      Value<double?>? maxValue,
+      Value<String?>? textValue,
+      Value<bool>? estimated,
+      Value<int>? rowid}) {
+    return SpeciesCareValuesCompanion(
+      species: species ?? this.species,
+      field: field ?? this.field,
+      value: value ?? this.value,
+      maxValue: maxValue ?? this.maxValue,
+      textValue: textValue ?? this.textValue,
+      estimated: estimated ?? this.estimated,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (species.present) {
+      map['species'] = Variable<int>(species.value);
+    }
+    if (field.present) {
+      map['field'] = Variable<int>(field.value);
+    }
+    if (value.present) {
+      map['value'] = Variable<double>(value.value);
+    }
+    if (maxValue.present) {
+      map['max_value'] = Variable<double>(maxValue.value);
+    }
+    if (textValue.present) {
+      map['text_value'] = Variable<String>(textValue.value);
+    }
+    if (estimated.present) {
+      map['estimated'] = Variable<bool>(estimated.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SpeciesCareValuesCompanion(')
+          ..write('species: $species, ')
+          ..write('field: $field, ')
+          ..write('value: $value, ')
+          ..write('maxValue: $maxValue, ')
+          ..write('textValue: $textValue, ')
+          ..write('estimated: $estimated, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $EventsTable extends Events with TableInfo<$EventsTable, Event> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -3746,6 +4522,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SpeciesSynonymsTable speciesSynonyms =
       $SpeciesSynonymsTable(this);
   late final $SpeciesCareTable speciesCare = $SpeciesCareTable(this);
+  late final $CareFieldsTable careFields = $CareFieldsTable(this);
+  late final $SpeciesCareValuesTable speciesCareValues =
+      $SpeciesCareValuesTable(this);
   late final $EventsTable events = $EventsTable(this);
   late final $RemindersTable reminders = $RemindersTable(this);
   late final $ImagesTable images = $ImagesTable(this);
@@ -3762,6 +4541,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         plants,
         speciesSynonyms,
         speciesCare,
+        careFields,
+        speciesCareValues,
         events,
         reminders,
         images,
@@ -3790,6 +4571,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
                 limitUpdateKind: UpdateKind.delete),
             result: [
               TableUpdate('species_care', kind: UpdateKind.delete),
+            ],
+          ),
+          WritePropagation(
+            on: TableUpdateQuery.onTableName('species',
+                limitUpdateKind: UpdateKind.delete),
+            result: [
+              TableUpdate('species_care_values', kind: UpdateKind.delete),
+            ],
+          ),
+          WritePropagation(
+            on: TableUpdateQuery.onTableName('care_fields',
+                limitUpdateKind: UpdateKind.delete),
+            result: [
+              TableUpdate('species_care_values', kind: UpdateKind.delete),
             ],
           ),
           WritePropagation(
@@ -4248,6 +5043,23 @@ final class $$SpeciesTableReferences
         manager.$state.copyWith(prefetchedData: cache));
   }
 
+  static MultiTypedResultKey<$SpeciesCareValuesTable, List<SpeciesCareValue>>
+      _speciesCareValuesRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.speciesCareValues,
+              aliasName: $_aliasNameGenerator(
+                  db.species.id, db.speciesCareValues.species));
+
+  $$SpeciesCareValuesTableProcessedTableManager get speciesCareValuesRefs {
+    final manager =
+        $$SpeciesCareValuesTableTableManager($_db, $_db.speciesCareValues)
+            .filter((f) => f.species.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_speciesCareValuesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
   static MultiTypedResultKey<$ImagesTable, List<Image>> _imagesRefsTable(
           _$AppDatabase db) =>
       MultiTypedResultKey.fromTable(db.images,
@@ -4364,6 +5176,27 @@ class $$SpeciesTableFilterComposer
             $$SpeciesCareTableFilterComposer(
               $db: $db,
               $table: $db.speciesCare,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> speciesCareValuesRefs(
+      Expression<bool> Function($$SpeciesCareValuesTableFilterComposer f) f) {
+    final $$SpeciesCareValuesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.speciesCareValues,
+        getReferencedColumn: (t) => t.species,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SpeciesCareValuesTableFilterComposer(
+              $db: $db,
+              $table: $db.speciesCareValues,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -4546,6 +5379,28 @@ class $$SpeciesTableAnnotationComposer
     return f(composer);
   }
 
+  Expression<T> speciesCareValuesRefs<T extends Object>(
+      Expression<T> Function($$SpeciesCareValuesTableAnnotationComposer a) f) {
+    final $$SpeciesCareValuesTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.speciesCareValues,
+            getReferencedColumn: (t) => t.species,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$SpeciesCareValuesTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.speciesCareValues,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
+
   Expression<T> imagesRefs<T extends Object>(
       Expression<T> Function($$ImagesTableAnnotationComposer a) f) {
     final $$ImagesTableAnnotationComposer composer = $composerBuilder(
@@ -4583,6 +5438,7 @@ class $$SpeciesTableTableManager extends RootTableManager<
         {bool plantsRefs,
         bool speciesSynonymsRefs,
         bool speciesCareRefs,
+        bool speciesCareValuesRefs,
         bool imagesRefs})> {
   $$SpeciesTableTableManager(_$AppDatabase db, $SpeciesTable table)
       : super(TableManagerState(
@@ -4654,6 +5510,7 @@ class $$SpeciesTableTableManager extends RootTableManager<
               {plantsRefs = false,
               speciesSynonymsRefs = false,
               speciesCareRefs = false,
+              speciesCareValuesRefs = false,
               imagesRefs = false}) {
             return PrefetchHooks(
               db: db,
@@ -4661,6 +5518,7 @@ class $$SpeciesTableTableManager extends RootTableManager<
                 if (plantsRefs) db.plants,
                 if (speciesSynonymsRefs) db.speciesSynonyms,
                 if (speciesCareRefs) db.speciesCare,
+                if (speciesCareValuesRefs) db.speciesCareValues,
                 if (imagesRefs) db.images
               ],
               addJoins: null,
@@ -4703,6 +5561,19 @@ class $$SpeciesTableTableManager extends RootTableManager<
                                 referencedItems) =>
                             referencedItems.where((e) => e.species == item.id),
                         typedResults: items),
+                  if (speciesCareValuesRefs)
+                    await $_getPrefetchedData<Specy, $SpeciesTable,
+                            SpeciesCareValue>(
+                        currentTable: table,
+                        referencedTable: $$SpeciesTableReferences
+                            ._speciesCareValuesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$SpeciesTableReferences(db, table, p0)
+                                .speciesCareValuesRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.species == item.id),
+                        typedResults: items),
                   if (imagesRefs)
                     await $_getPrefetchedData<Specy, $SpeciesTable, Image>(
                         currentTable: table,
@@ -4736,6 +5607,7 @@ typedef $$SpeciesTableProcessedTableManager = ProcessedTableManager<
         {bool plantsRefs,
         bool speciesSynonymsRefs,
         bool speciesCareRefs,
+        bool speciesCareValuesRefs,
         bool imagesRefs})>;
 typedef $$PlantsTableCreateCompanionBuilder = PlantsCompanion Function({
   Value<int> id,
@@ -5830,6 +6702,674 @@ typedef $$SpeciesCareTableProcessedTableManager = ProcessedTableManager<
     (SpeciesCareData, $$SpeciesCareTableReferences),
     SpeciesCareData,
     PrefetchHooks Function({bool species})>;
+typedef $$CareFieldsTableCreateCompanionBuilder = CareFieldsCompanion Function({
+  Value<int> id,
+  Value<String?> key,
+  Value<String?> name,
+  required CareFieldType type,
+  Value<String?> unit,
+  Value<String?> options,
+  Value<bool> enabled,
+  Value<int> position,
+});
+typedef $$CareFieldsTableUpdateCompanionBuilder = CareFieldsCompanion Function({
+  Value<int> id,
+  Value<String?> key,
+  Value<String?> name,
+  Value<CareFieldType> type,
+  Value<String?> unit,
+  Value<String?> options,
+  Value<bool> enabled,
+  Value<int> position,
+});
+
+final class $$CareFieldsTableReferences
+    extends BaseReferences<_$AppDatabase, $CareFieldsTable, CareField> {
+  $$CareFieldsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$SpeciesCareValuesTable, List<SpeciesCareValue>>
+      _speciesCareValuesRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.speciesCareValues,
+              aliasName: $_aliasNameGenerator(
+                  db.careFields.id, db.speciesCareValues.field));
+
+  $$SpeciesCareValuesTableProcessedTableManager get speciesCareValuesRefs {
+    final manager =
+        $$SpeciesCareValuesTableTableManager($_db, $_db.speciesCareValues)
+            .filter((f) => f.field.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_speciesCareValuesRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$CareFieldsTableFilterComposer
+    extends Composer<_$AppDatabase, $CareFieldsTable> {
+  $$CareFieldsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get key => $composableBuilder(
+      column: $table.key, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnWithTypeConverterFilters<CareFieldType, CareFieldType, String>
+      get type => $composableBuilder(
+          column: $table.type,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
+
+  ColumnFilters<String> get unit => $composableBuilder(
+      column: $table.unit, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get options => $composableBuilder(
+      column: $table.options, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get enabled => $composableBuilder(
+      column: $table.enabled, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> speciesCareValuesRefs(
+      Expression<bool> Function($$SpeciesCareValuesTableFilterComposer f) f) {
+    final $$SpeciesCareValuesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.speciesCareValues,
+        getReferencedColumn: (t) => t.field,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SpeciesCareValuesTableFilterComposer(
+              $db: $db,
+              $table: $db.speciesCareValues,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$CareFieldsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CareFieldsTable> {
+  $$CareFieldsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get key => $composableBuilder(
+      column: $table.key, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get type => $composableBuilder(
+      column: $table.type, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get unit => $composableBuilder(
+      column: $table.unit, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get options => $composableBuilder(
+      column: $table.options, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get enabled => $composableBuilder(
+      column: $table.enabled, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnOrderings(column));
+}
+
+class $$CareFieldsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CareFieldsTable> {
+  $$CareFieldsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get key =>
+      $composableBuilder(column: $table.key, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<CareFieldType, String> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<String> get unit =>
+      $composableBuilder(column: $table.unit, builder: (column) => column);
+
+  GeneratedColumn<String> get options =>
+      $composableBuilder(column: $table.options, builder: (column) => column);
+
+  GeneratedColumn<bool> get enabled =>
+      $composableBuilder(column: $table.enabled, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  Expression<T> speciesCareValuesRefs<T extends Object>(
+      Expression<T> Function($$SpeciesCareValuesTableAnnotationComposer a) f) {
+    final $$SpeciesCareValuesTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.speciesCareValues,
+            getReferencedColumn: (t) => t.field,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$SpeciesCareValuesTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.speciesCareValues,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
+}
+
+class $$CareFieldsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $CareFieldsTable,
+    CareField,
+    $$CareFieldsTableFilterComposer,
+    $$CareFieldsTableOrderingComposer,
+    $$CareFieldsTableAnnotationComposer,
+    $$CareFieldsTableCreateCompanionBuilder,
+    $$CareFieldsTableUpdateCompanionBuilder,
+    (CareField, $$CareFieldsTableReferences),
+    CareField,
+    PrefetchHooks Function({bool speciesCareValuesRefs})> {
+  $$CareFieldsTableTableManager(_$AppDatabase db, $CareFieldsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CareFieldsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CareFieldsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CareFieldsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String?> key = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            Value<CareFieldType> type = const Value.absent(),
+            Value<String?> unit = const Value.absent(),
+            Value<String?> options = const Value.absent(),
+            Value<bool> enabled = const Value.absent(),
+            Value<int> position = const Value.absent(),
+          }) =>
+              CareFieldsCompanion(
+            id: id,
+            key: key,
+            name: name,
+            type: type,
+            unit: unit,
+            options: options,
+            enabled: enabled,
+            position: position,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String?> key = const Value.absent(),
+            Value<String?> name = const Value.absent(),
+            required CareFieldType type,
+            Value<String?> unit = const Value.absent(),
+            Value<String?> options = const Value.absent(),
+            Value<bool> enabled = const Value.absent(),
+            Value<int> position = const Value.absent(),
+          }) =>
+              CareFieldsCompanion.insert(
+            id: id,
+            key: key,
+            name: name,
+            type: type,
+            unit: unit,
+            options: options,
+            enabled: enabled,
+            position: position,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$CareFieldsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({speciesCareValuesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (speciesCareValuesRefs) db.speciesCareValues
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (speciesCareValuesRefs)
+                    await $_getPrefetchedData<CareField, $CareFieldsTable,
+                            SpeciesCareValue>(
+                        currentTable: table,
+                        referencedTable: $$CareFieldsTableReferences
+                            ._speciesCareValuesRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$CareFieldsTableReferences(db, table, p0)
+                                .speciesCareValuesRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.field == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$CareFieldsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CareFieldsTable,
+    CareField,
+    $$CareFieldsTableFilterComposer,
+    $$CareFieldsTableOrderingComposer,
+    $$CareFieldsTableAnnotationComposer,
+    $$CareFieldsTableCreateCompanionBuilder,
+    $$CareFieldsTableUpdateCompanionBuilder,
+    (CareField, $$CareFieldsTableReferences),
+    CareField,
+    PrefetchHooks Function({bool speciesCareValuesRefs})>;
+typedef $$SpeciesCareValuesTableCreateCompanionBuilder
+    = SpeciesCareValuesCompanion Function({
+  required int species,
+  required int field,
+  Value<double?> value,
+  Value<double?> maxValue,
+  Value<String?> textValue,
+  Value<bool> estimated,
+  Value<int> rowid,
+});
+typedef $$SpeciesCareValuesTableUpdateCompanionBuilder
+    = SpeciesCareValuesCompanion Function({
+  Value<int> species,
+  Value<int> field,
+  Value<double?> value,
+  Value<double?> maxValue,
+  Value<String?> textValue,
+  Value<bool> estimated,
+  Value<int> rowid,
+});
+
+final class $$SpeciesCareValuesTableReferences extends BaseReferences<
+    _$AppDatabase, $SpeciesCareValuesTable, SpeciesCareValue> {
+  $$SpeciesCareValuesTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $SpeciesTable _speciesTable(_$AppDatabase db) =>
+      db.species.createAlias(
+          $_aliasNameGenerator(db.speciesCareValues.species, db.species.id));
+
+  $$SpeciesTableProcessedTableManager get species {
+    final $_column = $_itemColumn<int>('species')!;
+
+    final manager = $$SpeciesTableTableManager($_db, $_db.species)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_speciesTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $CareFieldsTable _fieldTable(_$AppDatabase db) =>
+      db.careFields.createAlias(
+          $_aliasNameGenerator(db.speciesCareValues.field, db.careFields.id));
+
+  $$CareFieldsTableProcessedTableManager get field {
+    final $_column = $_itemColumn<int>('field')!;
+
+    final manager = $$CareFieldsTableTableManager($_db, $_db.careFields)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_fieldTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$SpeciesCareValuesTableFilterComposer
+    extends Composer<_$AppDatabase, $SpeciesCareValuesTable> {
+  $$SpeciesCareValuesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<double> get value => $composableBuilder(
+      column: $table.value, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get maxValue => $composableBuilder(
+      column: $table.maxValue, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get textValue => $composableBuilder(
+      column: $table.textValue, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get estimated => $composableBuilder(
+      column: $table.estimated, builder: (column) => ColumnFilters(column));
+
+  $$SpeciesTableFilterComposer get species {
+    final $$SpeciesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.species,
+        referencedTable: $db.species,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SpeciesTableFilterComposer(
+              $db: $db,
+              $table: $db.species,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$CareFieldsTableFilterComposer get field {
+    final $$CareFieldsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.field,
+        referencedTable: $db.careFields,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CareFieldsTableFilterComposer(
+              $db: $db,
+              $table: $db.careFields,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SpeciesCareValuesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SpeciesCareValuesTable> {
+  $$SpeciesCareValuesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<double> get value => $composableBuilder(
+      column: $table.value, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get maxValue => $composableBuilder(
+      column: $table.maxValue, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get textValue => $composableBuilder(
+      column: $table.textValue, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get estimated => $composableBuilder(
+      column: $table.estimated, builder: (column) => ColumnOrderings(column));
+
+  $$SpeciesTableOrderingComposer get species {
+    final $$SpeciesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.species,
+        referencedTable: $db.species,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SpeciesTableOrderingComposer(
+              $db: $db,
+              $table: $db.species,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$CareFieldsTableOrderingComposer get field {
+    final $$CareFieldsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.field,
+        referencedTable: $db.careFields,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CareFieldsTableOrderingComposer(
+              $db: $db,
+              $table: $db.careFields,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SpeciesCareValuesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SpeciesCareValuesTable> {
+  $$SpeciesCareValuesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<double> get value =>
+      $composableBuilder(column: $table.value, builder: (column) => column);
+
+  GeneratedColumn<double> get maxValue =>
+      $composableBuilder(column: $table.maxValue, builder: (column) => column);
+
+  GeneratedColumn<String> get textValue =>
+      $composableBuilder(column: $table.textValue, builder: (column) => column);
+
+  GeneratedColumn<bool> get estimated =>
+      $composableBuilder(column: $table.estimated, builder: (column) => column);
+
+  $$SpeciesTableAnnotationComposer get species {
+    final $$SpeciesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.species,
+        referencedTable: $db.species,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$SpeciesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.species,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$CareFieldsTableAnnotationComposer get field {
+    final $$CareFieldsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.field,
+        referencedTable: $db.careFields,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CareFieldsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.careFields,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$SpeciesCareValuesTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SpeciesCareValuesTable,
+    SpeciesCareValue,
+    $$SpeciesCareValuesTableFilterComposer,
+    $$SpeciesCareValuesTableOrderingComposer,
+    $$SpeciesCareValuesTableAnnotationComposer,
+    $$SpeciesCareValuesTableCreateCompanionBuilder,
+    $$SpeciesCareValuesTableUpdateCompanionBuilder,
+    (SpeciesCareValue, $$SpeciesCareValuesTableReferences),
+    SpeciesCareValue,
+    PrefetchHooks Function({bool species, bool field})> {
+  $$SpeciesCareValuesTableTableManager(
+      _$AppDatabase db, $SpeciesCareValuesTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SpeciesCareValuesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SpeciesCareValuesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SpeciesCareValuesTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> species = const Value.absent(),
+            Value<int> field = const Value.absent(),
+            Value<double?> value = const Value.absent(),
+            Value<double?> maxValue = const Value.absent(),
+            Value<String?> textValue = const Value.absent(),
+            Value<bool> estimated = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SpeciesCareValuesCompanion(
+            species: species,
+            field: field,
+            value: value,
+            maxValue: maxValue,
+            textValue: textValue,
+            estimated: estimated,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int species,
+            required int field,
+            Value<double?> value = const Value.absent(),
+            Value<double?> maxValue = const Value.absent(),
+            Value<String?> textValue = const Value.absent(),
+            Value<bool> estimated = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              SpeciesCareValuesCompanion.insert(
+            species: species,
+            field: field,
+            value: value,
+            maxValue: maxValue,
+            textValue: textValue,
+            estimated: estimated,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$SpeciesCareValuesTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({species = false, field = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (species) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.species,
+                    referencedTable:
+                        $$SpeciesCareValuesTableReferences._speciesTable(db),
+                    referencedColumn:
+                        $$SpeciesCareValuesTableReferences._speciesTable(db).id,
+                  ) as T;
+                }
+                if (field) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.field,
+                    referencedTable:
+                        $$SpeciesCareValuesTableReferences._fieldTable(db),
+                    referencedColumn:
+                        $$SpeciesCareValuesTableReferences._fieldTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$SpeciesCareValuesTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SpeciesCareValuesTable,
+    SpeciesCareValue,
+    $$SpeciesCareValuesTableFilterComposer,
+    $$SpeciesCareValuesTableOrderingComposer,
+    $$SpeciesCareValuesTableAnnotationComposer,
+    $$SpeciesCareValuesTableCreateCompanionBuilder,
+    $$SpeciesCareValuesTableUpdateCompanionBuilder,
+    (SpeciesCareValue, $$SpeciesCareValuesTableReferences),
+    SpeciesCareValue,
+    PrefetchHooks Function({bool species, bool field})>;
 typedef $$EventsTableCreateCompanionBuilder = EventsCompanion Function({
   Value<int> id,
   required int type,
@@ -7268,6 +8808,10 @@ class $AppDatabaseManager {
       $$SpeciesSynonymsTableTableManager(_db, _db.speciesSynonyms);
   $$SpeciesCareTableTableManager get speciesCare =>
       $$SpeciesCareTableTableManager(_db, _db.speciesCare);
+  $$CareFieldsTableTableManager get careFields =>
+      $$CareFieldsTableTableManager(_db, _db.careFields);
+  $$SpeciesCareValuesTableTableManager get speciesCareValues =>
+      $$SpeciesCareValuesTableTableManager(_db, _db.speciesCareValues);
   $$EventsTableTableManager get events =>
       $$EventsTableTableManager(_db, _db.events);
   $$RemindersTableTableManager get reminders =>

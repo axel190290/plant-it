@@ -73,6 +73,39 @@ class SpeciesCare extends Table {
   Set<Column<Object>> get primaryKey => {species};
 }
 
+enum CareFieldType { number, range, text, choice }
+
+/// A kind of care information, built in (identified by [key]) or created by
+/// the user (with a [name]). Their values are stored per species in
+/// [SpeciesCareValues].
+class CareFields extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get key => text().withLength(max: 50).nullable().unique()();
+  TextColumn get name => text().withLength(max: 50).nullable()();
+  TextColumn get type => textEnum<CareFieldType>()();
+  TextColumn get unit => text().withLength(max: 20).nullable()();
+  // Choices of a choice field, separated by "|"
+  TextColumn get options => text().withLength(max: 500).nullable()();
+  BoolColumn get enabled => boolean().withDefault(const Constant(true))();
+  IntColumn get position => integer().withDefault(const Constant(0))();
+}
+
+class SpeciesCareValues extends Table {
+  IntColumn get species =>
+      integer().references(Species, #id, onDelete: KeyAction.cascade)();
+  IntColumn get field =>
+      integer().references(CareFields, #id, onDelete: KeyAction.cascade)();
+  // Number fields use value, range fields value (min) and maxValue
+  RealColumn get value => real().nullable()();
+  RealColumn get maxValue => real().nullable()();
+  TextColumn get textValue => text().withLength(max: 1000).nullable()();
+  // Set when the value was estimated by an AI and not edited since
+  BoolColumn get estimated => boolean().withDefault(const Constant(false))();
+
+  @override
+  Set<Column<Object>> get primaryKey => {species, field};
+}
+
 class Events extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get type =>
@@ -149,6 +182,8 @@ class NotificationTranslations extends Table {
   Species,
   SpeciesSynonyms,
   SpeciesCare,
+  CareFields,
+  SpeciesCareValues,
   Events,
   Reminders,
   Images,
@@ -158,8 +193,10 @@ class NotificationTranslations extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  AppDatabase.forTesting(super.executor);
+
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -181,8 +218,18 @@ class AppDatabase extends _$AppDatabase {
       onCreate: (m) async {
         await m.createAll();
         await initEventTypes();
+        await initHealthEventTypes();
+        await initCareFields();
         if ("dev" == environment) {
           await initDummyData();
+        }
+      },
+      onUpgrade: (m, from, to) async {
+        if (from < 2) {
+          await m.createTable(careFields);
+          await m.createTable(speciesCareValues);
+          await initHealthEventTypes();
+          await initCareFields();
         }
       },
       beforeOpen: (details) async {
@@ -224,6 +271,68 @@ class AppDatabase extends _$AppDatabase {
       icon: 'scissors',
       color: '#C4C2C2',
     ));
+  }
+
+  /// Event types to record the pests and diseases of a plant and their
+  /// treatments in its history.
+  Future<void> initHealthEventTypes() async {
+    for (EventTypesCompanion type in [
+      EventTypesCompanion.insert(
+        name: 'pest',
+        icon: 'bug',
+        color: '#E57373',
+      ),
+      EventTypesCompanion.insert(
+        name: 'treatment',
+        icon: 'spray_can',
+        color: '#81C784',
+      ),
+    ]) {
+      int existing = await managers.eventTypes
+          .filter((t) => t.name.equals(type.name.value))
+          .count();
+      if (existing == 0) {
+        await into(eventTypes).insert(type);
+      }
+    }
+  }
+
+  /// The built-in care fields. Their names are translated in the app from
+  /// their key.
+  static const List<(String, CareFieldType, String?)> builtInCareFields = [
+    ('light_lux', CareFieldType.range, 'lux'),
+    ('light_hours', CareFieldType.number, 'h'),
+    ('env_humidity', CareFieldType.range, '%'),
+    ('watering_summer', CareFieldType.number, 'days'),
+    ('watering_winter', CareFieldType.number, 'days'),
+    ('soil_moisture', CareFieldType.range, '%'),
+    ('conductivity', CareFieldType.range, 'µS/cm'),
+    ('water_type', CareFieldType.text, null),
+    ('watering_method', CareFieldType.text, null),
+    ('substrate', CareFieldType.text, null),
+    ('fertilizer', CareFieldType.text, null),
+    ('pruning', CareFieldType.text, null),
+    ('repotting', CareFieldType.text, null),
+    ('flowering_season', CareFieldType.text, null),
+    ('dormancy_season', CareFieldType.text, null),
+    ('common_pests', CareFieldType.text, null),
+    ('diseases', CareFieldType.text, null),
+    ('toxicity', CareFieldType.text, null),
+  ];
+
+  Future<void> initCareFields() async {
+    for (int i = 0; i < builtInCareFields.length; i++) {
+      (String, CareFieldType, String?) field = builtInCareFields[i];
+      await into(careFields).insert(
+        CareFieldsCompanion.insert(
+          key: Value(field.$1),
+          type: field.$2,
+          unit: Value(field.$3),
+          position: Value(i),
+        ),
+        mode: InsertMode.insertOrIgnore,
+      );
+    }
   }
 
   Future<void> initDummyData() async {

@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:plant_it/data/repository/user_setting_repository.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/user_settings_keys.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -40,7 +41,7 @@ class OpenPlantbookClient {
 
   /// Care for the given scientific name. Fails with [PlantNotFoundException]
   /// if the plant is unknown to Open Plantbook.
-  Future<Result<SpeciesCareCompanion>> getCare(String scientificName) async {
+  Future<Result<CareData>> getCare(String scientificName) async {
     Result<String> token = await _getToken();
     if (token.isError()) {
       return Failure(token.exceptionOrNull()!);
@@ -64,7 +65,9 @@ class OpenPlantbookClient {
         return Failure(Exception(
             "Error while loading care from Open Plantbook (${response.statusCode})"));
       }
-      return Success(toCare(json.decode(utf8.decode(response.bodyBytes))));
+      Map<String, dynamic> detail =
+          json.decode(utf8.decode(response.bodyBytes));
+      return Success(CareData(toCare(detail), toExtraCare(detail)));
     } catch (e) {
       return Failure(
           Exception("Error while loading care from Open Plantbook: $e"));
@@ -128,6 +131,25 @@ class OpenPlantbookClient {
       phMin: const Value(null),
       phMax: const Value(null),
     );
+  }
+
+  /// The measured ranges as built-in care fields, in their own units.
+  static Map<String, CareValue> toExtraCare(Map<String, dynamic> detail) {
+    Map<String, CareValue> result = {};
+    void range(String key, String minField, String maxField) {
+      num? min = detail[minField];
+      num? max = detail[maxField];
+      if (min != null || max != null) {
+        result[key] =
+            CareValue(value: min?.toDouble(), maxValue: max?.toDouble());
+      }
+    }
+
+    range('light_lux', 'min_light_lux', 'max_light_lux');
+    range('env_humidity', 'min_env_humid', 'max_env_humid');
+    range('soil_moisture', 'min_soil_moist', 'max_soil_moist');
+    range('conductivity', 'min_soil_ec', 'max_soil_ec');
+    return result;
   }
 
   static double? _middle(num? a, num? b, {bool geometric = false}) {

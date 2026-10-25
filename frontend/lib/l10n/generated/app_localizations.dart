@@ -1668,6 +1668,234 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Show less'**
   String get showLess;
+
+  /// No description provided for @careFieldLightLux.
+  ///
+  /// In en, this message translates to:
+  /// **'Light (lux)'**
+  String get careFieldLightLux;
+
+  /// No description provided for @careFieldLightHours.
+  ///
+  /// In en, this message translates to:
+  /// **'Hours of light per day'**
+  String get careFieldLightHours;
+
+  /// No description provided for @careFieldEnvHumidity.
+  ///
+  /// In en, this message translates to:
+  /// **'Ambient humidity'**
+  String get careFieldEnvHumidity;
+
+  /// No description provided for @careFieldWateringSummer.
+  ///
+  /// In en, this message translates to:
+  /// **'Watering in summer'**
+  String get careFieldWateringSummer;
+
+  /// No description provided for @careFieldWateringWinter.
+  ///
+  /// In en, this message translates to:
+  /// **'Watering in winter'**
+  String get careFieldWateringWinter;
+
+  /// No description provided for @careFieldSoilMoisture.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil moisture'**
+  String get careFieldSoilMoisture;
+
+  /// No description provided for @careFieldConductivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Conductivity (EC)'**
+  String get careFieldConductivity;
+
+  /// No description provided for @careFieldWaterType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type of water'**
+  String get careFieldWaterType;
+
+  /// No description provided for @careFieldWateringMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Watering method'**
+  String get careFieldWateringMethod;
+
+  /// No description provided for @careFieldSubstrate.
+  ///
+  /// In en, this message translates to:
+  /// **'Substrate'**
+  String get careFieldSubstrate;
+
+  /// No description provided for @careFieldFertilizer.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizer'**
+  String get careFieldFertilizer;
+
+  /// No description provided for @careFieldPruning.
+  ///
+  /// In en, this message translates to:
+  /// **'Pruning'**
+  String get careFieldPruning;
+
+  /// No description provided for @careFieldRepotting.
+  ///
+  /// In en, this message translates to:
+  /// **'Repotting'**
+  String get careFieldRepotting;
+
+  /// No description provided for @careFieldFloweringSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Flowering'**
+  String get careFieldFloweringSeason;
+
+  /// No description provided for @careFieldDormancySeason.
+  ///
+  /// In en, this message translates to:
+  /// **'Dormancy'**
+  String get careFieldDormancySeason;
+
+  /// No description provided for @careFieldCommonPests.
+  ///
+  /// In en, this message translates to:
+  /// **'Common pests'**
+  String get careFieldCommonPests;
+
+  /// No description provided for @careFieldDiseases.
+  ///
+  /// In en, this message translates to:
+  /// **'Diseases'**
+  String get careFieldDiseases;
+
+  /// No description provided for @careFieldToxicity.
+  ///
+  /// In en, this message translates to:
+  /// **'Toxicity'**
+  String get careFieldToxicity;
+
+  /// No description provided for @everyNDays.
+  ///
+  /// In en, this message translates to:
+  /// **'every {days} days'**
+  String everyNDays(String days);
+
+  /// No description provided for @moreCare.
+  ///
+  /// In en, this message translates to:
+  /// **'More care'**
+  String get moreCare;
+
+  /// No description provided for @noMoreCare.
+  ///
+  /// In en, this message translates to:
+  /// **'No data yet. Tap the pencil to add it.'**
+  String get noMoreCare;
+
+  /// No description provided for @editMoreCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit more care'**
+  String get editMoreCare;
+
+  /// No description provided for @careSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Care saved'**
+  String get careSaved;
+
+  /// No description provided for @careFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Care fields'**
+  String get careFields;
+
+  /// No description provided for @manageCareFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose which care to show and create your own'**
+  String get manageCareFields;
+
+  /// No description provided for @careFieldsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enabled fields are shown and can be edited on every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.'**
+  String get careFieldsDescription;
+
+  /// No description provided for @addCareField.
+  ///
+  /// In en, this message translates to:
+  /// **'New field'**
+  String get addCareField;
+
+  /// No description provided for @careFieldUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit (optional)'**
+  String get careFieldUnit;
+
+  /// No description provided for @careFieldOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Options, separated by commas'**
+  String get careFieldOptions;
+
+  /// No description provided for @careFieldType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get careFieldType;
+
+  /// No description provided for @careFieldTypeNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get careFieldTypeNumber;
+
+  /// No description provided for @careFieldTypeRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Range (min - max)'**
+  String get careFieldTypeRange;
+
+  /// No description provided for @careFieldTypeText.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get careFieldTypeText;
+
+  /// No description provided for @careFieldTypeChoice.
+  ///
+  /// In en, this message translates to:
+  /// **'List of options'**
+  String get careFieldTypeChoice;
+
+  /// No description provided for @customCareField.
+  ///
+  /// In en, this message translates to:
+  /// **'Created by you'**
+  String get customCareField;
+
+  /// No description provided for @areYouSureYouWantToDeleteThisCareField.
+  ///
+  /// In en, this message translates to:
+  /// **'Its values will be deleted from every species.'**
+  String get areYouSureYouWantToDeleteThisCareField;
+
+  /// No description provided for @estimatedByAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated by AI'**
+  String get estimatedByAi;
+
+  /// No description provided for @noCareFieldsEnabled.
+  ///
+  /// In en, this message translates to:
+  /// **'No care fields are enabled. Enable them in Settings > Care fields.'**
+  String get noCareFieldsEnabled;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

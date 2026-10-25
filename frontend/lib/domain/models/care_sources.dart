@@ -54,7 +54,8 @@ class CareSources {
     List<String> parts = [
       if (species != null) "species=$species",
       if (care != null) "care=$care",
-      if (hasAiEstimate) "ai=$aiProvider:${aiFields.join(',')}",
+      // Kept without fields too: the AI may have filled only care fields
+      if (aiProvider != null) "ai=$aiProvider:${aiFields.join(',')}",
     ];
     return "$_prefix${parts.join(';')}";
   }

@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 //import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:plant_it/data/repository/care_field_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
@@ -15,8 +16,10 @@ import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/repository/reminder_occurrence_repository.dart';
 import 'package:plant_it/data/repository/reminder_repository.dart';
 import 'package:plant_it/data/repository/species_care_repository.dart';
+import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/database/database.dart' as db;
+import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/reminder_occurrence.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -30,7 +33,11 @@ class PlantViewModel extends ChangeNotifier {
     required EventTypeRepository eventTypeRepository,
     required ReminderRepository reminderRepository,
     required ReminderOccurrenceRepository reminderOccurrenceRepository,
-  })  : _plantRepository = plantRepository,
+    required CareFieldRepository careFieldRepository,
+    required SpeciesCareValueRepository speciesCareValueRepository,
+  })  : _careFieldRepository = careFieldRepository,
+        _speciesCareValueRepository = speciesCareValueRepository,
+        _plantRepository = plantRepository,
         _speciesRepository = speciesRepository,
         _speciesCareRepository = speciesCareRepository,
         _imageRepository = imageRepository,
@@ -85,6 +92,10 @@ class PlantViewModel extends ChangeNotifier {
   }
 
   //final Logger _log = Logger('PlantViewModel');
+  final CareFieldRepository _careFieldRepository;
+  final SpeciesCareValueRepository _speciesCareValueRepository;
+  List<db.CareField> _careFields = [];
+  Map<int, CareValue> _careValues = {};
   final PlantRepository _plantRepository;
   final SpeciesRepository _speciesRepository;
   final SpeciesCareRepository _speciesCareRepository;
@@ -109,6 +120,8 @@ class PlantViewModel extends ChangeNotifier {
   List<db.Image> get galleryImage => _galleryImage;
   db.Specy get species => _species;
   db.SpeciesCareData get care => _care;
+  List<db.CareField> get careFields => _careFields;
+  Map<int, CareValue> get careValues => _careValues;
   db.Plant get plant => _plant;
   List<db.EventType> get eventType => _eventType;
   List<db.Event> get events => _events;
@@ -154,6 +167,10 @@ class PlantViewModel extends ChangeNotifier {
     final loadCareResult = await _loadCare(plantId);
     if (loadCareResult.isError()) {
       return loadCareResult.exceptionOrNull()!.toFailure();
+    }
+    final loadCareValuesResult = await _loadCareValues();
+    if (loadCareValuesResult.isError()) {
+      return loadCareValuesResult.exceptionOrNull()!.toFailure();
     }
     final loadEventTypeResult = await _loadEventType();
     if (loadEventTypeResult.isError()) {
@@ -248,6 +265,21 @@ class PlantViewModel extends ChangeNotifier {
       return care.exceptionOrNull()!.toFailure();
     }
     _care = care.getOrThrow();
+    return Success("ok");
+  }
+
+  Future<Result<void>> _loadCareValues() async {
+    Result<List<db.CareField>> fields = await _careFieldRepository.getAll();
+    if (fields.isError()) {
+      return fields.exceptionOrNull()!.toFailure();
+    }
+    _careFields = fields.getOrThrow();
+    Result<Map<int, CareValue>> values =
+        await _speciesCareValueRepository.getBySpecies(_species.id);
+    if (values.isError()) {
+      return values.exceptionOrNull()!.toFailure();
+    }
+    _careValues = values.getOrThrow();
     return Success("ok");
   }
 

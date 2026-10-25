@@ -1,5 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:plant_it/routing/routes.dart';
+import 'package:plant_it/ui/settings/view_models/care_fields_viewmodel.dart';
+import 'package:plant_it/ui/settings/widgets/care_fields_screen.dart';
+import 'package:plant_it/ui/species/view_models/edit_care_values_viewmodel.dart';
+import 'package:plant_it/ui/species/widgets/edit/edit_care_values_screen.dart';
 import 'package:plant_it/ui/calendar/view_models/calendar_viewmodel.dart';
 import 'package:plant_it/ui/calendar/widgets/filter/activity_filter.dart';
 import 'package:plant_it/ui/event/view_models/edit_event_viewmodel.dart';
@@ -124,6 +128,8 @@ GoRouter router() => GoRouter(
                     eventTypeRepository: context.read(),
                     reminderRepository: context.read(),
                     reminderOccurrenceRepository: context.read(),
+                    careFieldRepository: context.read(),
+                    speciesCareValueRepository: context.read(),
                   );
                   viewModel.load.execute(id);
                   return PlantScreen(
@@ -152,6 +158,7 @@ GoRouter router() => GoRouter(
                     speciesSynonymsRepository: context.read(),
                     imageRepository: context.read(),
                     appCache: context.read(),
+                    speciesCareValueRepository: context.read(),
                   );
                   viewModel.load.execute(input);
                   return AddPlantScreen(
@@ -250,6 +257,17 @@ GoRouter router() => GoRouter(
                   return AiCareScreen(
                     viewModel: state.extra as SettingsViewModel,
                   );
+                },
+              ),
+              GoRoute(
+                path: Routes.settingsCareFields,
+                builder: (context, state) {
+                  CareFieldsViewModel viewModel = CareFieldsViewModel(
+                    careFieldRepository: context.read(),
+                    streamController: context.read(),
+                  );
+                  viewModel.load.execute();
+                  return CareFieldsScreen(viewModel: viewModel);
                 },
               ),
               GoRoute(
@@ -411,6 +429,8 @@ GoRouter router() => GoRouter(
               imageRepository: context.read(),
               appCache: context.read(),
               speciesSearcherFacade: context.read(),
+              careFieldRepository: context.read(),
+              speciesCareValueRepository: context.read(),
             );
             viewModel.load.execute(idOrExternal);
 
@@ -418,6 +438,19 @@ GoRouter router() => GoRouter(
               viewModel: viewModel,
               streamController: context.read(),
             );
+          },
+        ),
+        GoRoute(
+          path: '${Routes.species}/:id/care',
+          builder: (context, state) {
+            int id = int.parse(state.pathParameters['id']!);
+            EditCareValuesViewModel viewModel = EditCareValuesViewModel(
+              careFieldRepository: context.read(),
+              speciesCareValueRepository: context.read(),
+              streamController: context.read(),
+            );
+            viewModel.load.execute(id);
+            return EditCareValuesScreen(viewModel: viewModel);
           },
         ),
         GoRoute(

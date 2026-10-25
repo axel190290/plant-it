@@ -20,6 +20,7 @@ abstract final class Routes {
   static String settingsOpenPlantbook = '/settings-dataSources/openPlantbook';
   static String settingsAiCare = '/settings-dataSources/aiCare';
   static String settingsDatabaseAndCache = '/settings-databaseAndCache';
+  static String settingsCareFields = '/settings-careFields';
 
   static final String _eventTypeRelative = 'eventType';
   static final String _eventTypesRelative = 'eventTypes';
@@ -37,4 +38,5 @@ abstract final class Routes {
   static String species = '/$_speciesRelative';
   static String speciesWithIdOrExternal = '/${_speciesRelative}_view';
   static String speciesWithId(int id) => '/$_speciesRelative/$id';
+  static String speciesCareWithId(int id) => '/$_speciesRelative/$id/care';
 }

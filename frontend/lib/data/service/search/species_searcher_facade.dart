@@ -12,6 +12,7 @@ import 'package:plant_it/data/service/search/gbif_searcher.dart';
 import 'package:plant_it/data/service/search/local_searcher.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
+import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/species_searcher_result.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -139,17 +140,20 @@ class SpeciesSearcherFacade {
 
   Future<SpeciesSearcherResult> _withCare(SpeciesSearcherResult details) async {
     SpeciesCompanion species = details.speciesCompanion;
-    (SpeciesCareCompanion, CareSources) enriched = await _careEnricher.enrich(
+    (SpeciesCareCompanion, Map<String, CareValue>, CareSources) enriched =
+        await _careEnricher.enrich(
       scientificName: species.scientificName.value,
       family: species.family.value,
       care: details.speciesCareCompanion,
+      extra: details.careValues,
       sources: CareSources(species: species.dataSource.value.name),
     );
     return SpeciesSearcherResult(
       speciesCompanion:
-          species.copyWith(bibliography: Value(enriched.$2.encode())),
+          species.copyWith(bibliography: Value(enriched.$3.encode())),
       speciesCareCompanion: enriched.$1,
       speciesSynonymsCompanion: details.speciesSynonymsCompanion,
+      careValues: enriched.$2,
     );
   }
 

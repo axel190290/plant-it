@@ -1175,4 +1175,124 @@ class LIt extends L {
 
   @override
   String get showLess => 'Mostra meno';
+
+  @override
+  String get careFieldLightLux => 'Luce (lux)';
+
+  @override
+  String get careFieldLightHours => 'Ore di luce al giorno';
+
+  @override
+  String get careFieldEnvHumidity => 'Umidità ambientale';
+
+  @override
+  String get careFieldWateringSummer => 'Annaffiatura in estate';
+
+  @override
+  String get careFieldWateringWinter => 'Annaffiatura in inverno';
+
+  @override
+  String get careFieldSoilMoisture => 'Umidità del terreno';
+
+  @override
+  String get careFieldConductivity => 'Conducibilità (EC)';
+
+  @override
+  String get careFieldWaterType => 'Tipo di acqua';
+
+  @override
+  String get careFieldWateringMethod => 'Metodo di annaffiatura';
+
+  @override
+  String get careFieldSubstrate => 'Substrato';
+
+  @override
+  String get careFieldFertilizer => 'Concime';
+
+  @override
+  String get careFieldPruning => 'Potatura';
+
+  @override
+  String get careFieldRepotting => 'Rinvaso';
+
+  @override
+  String get careFieldFloweringSeason => 'Fioritura';
+
+  @override
+  String get careFieldDormancySeason => 'Riposo vegetativo';
+
+  @override
+  String get careFieldCommonPests => 'Parassiti comuni';
+
+  @override
+  String get careFieldDiseases => 'Malattie';
+
+  @override
+  String get careFieldToxicity => 'Tossicità';
+
+  @override
+  String everyNDays(String days) {
+    return 'ogni $days giorni';
+  }
+
+  @override
+  String get moreCare => 'Altre cure';
+
+  @override
+  String get noMoreCare =>
+      'Ancora nessun dato. Tocca la matita per aggiungerli.';
+
+  @override
+  String get editMoreCare => 'Modifica altre cure';
+
+  @override
+  String get careSaved => 'Cure salvate';
+
+  @override
+  String get careFields => 'Campi di cura';
+
+  @override
+  String get manageCareFields => 'Scegli quali cure mostrare e crea le tue';
+
+  @override
+  String get careFieldsDescription =>
+      'I campi attivi sono mostrati e modificabili su ogni specie e pianta. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.';
+
+  @override
+  String get addCareField => 'Nuovo campo';
+
+  @override
+  String get careFieldUnit => 'Unità (facoltativa)';
+
+  @override
+  String get careFieldOptions => 'Opzioni, separate da virgole';
+
+  @override
+  String get careFieldType => 'Tipo';
+
+  @override
+  String get careFieldTypeNumber => 'Numero';
+
+  @override
+  String get careFieldTypeRange => 'Intervallo (min - max)';
+
+  @override
+  String get careFieldTypeText => 'Testo';
+
+  @override
+  String get careFieldTypeChoice => 'Elenco di opzioni';
+
+  @override
+  String get customCareField => 'Creato da te';
+
+  @override
+  String get areYouSureYouWantToDeleteThisCareField =>
+      'I suoi valori saranno eliminati da tutte le specie.';
+
+  @override
+  String get estimatedByAi => 'Stimato dall\'IA';
+
+  @override
+  String get noCareFieldsEnabled =>
+      'Nessun campo di cura attivo. Attivali in Impostazioni > Campi di cura.';
 }

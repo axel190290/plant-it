@@ -9,6 +9,7 @@ import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
+import 'package:plant_it/ui/core/ui/care_values_section.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/plant/widgets/grid_widget.dart';
 import 'package:plant_it/ui/search/widgets/species_card.dart';
@@ -31,6 +32,28 @@ class ViewSpeciesScreen extends StatefulWidget {
 }
 
 class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
+  late final StreamSubscription<StreamCode> _subscription;
+
+  @override
+  void initState() {
+    super.initState();
+    // Show the changes made in the edit screens opened from this page
+    _subscription = widget.streamController.stream.listen((code) {
+      if (mounted &&
+          code == StreamCode.editSpecies &&
+          !widget.viewModel.isExternal &&
+          widget.viewModel.id != null) {
+        widget.viewModel.load.execute(widget.viewModel.id);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
   Future<void> deleteWithConfirm() async {
     await showDialog(
       context: context,
@@ -132,6 +155,8 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
                                         'species': widget.viewModel.speciesObj,
                                         'care': widget.viewModel.care,
                                         'synonyms': widget.viewModel.synonyms,
+                                        'careValues':
+                                            widget.viewModel.externalCareValues,
                                       }
                                     : null,
                                 'speciesId': widget.viewModel.id?.toString(),
@@ -176,6 +201,37 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
                             appLocalizations: appLocalizations,
                           ),
                           ..._getCareSources(appLocalizations),
+                          const SizedBox(height: 16),
+
+                          // More care
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                appLocalizations.moreCare,
+                                style:
+                                    Theme.of(context).textTheme.headlineSmall,
+                              ),
+                              if (!widget.viewModel.isExternal)
+                                IconButton(
+                                  icon: Icon(LucideIcons.pencil,
+                                      size: 18,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  tooltip: appLocalizations.editMoreCare,
+                                  onPressed: () => context.push(
+                                      Routes.speciesCareWithId(
+                                          widget.viewModel.id!)),
+                                ),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          CareValuesSection(
+                            fields: widget.viewModel.careFields,
+                            values: widget.viewModel.careValues,
+                            emptyText: appLocalizations.noMoreCare,
+                          ),
                           const SizedBox(height: 16),
 
                           // Synonyms

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:plant_it/data/repository/care_field_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
@@ -9,6 +10,7 @@ import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/repository/reminder_occurrence_repository.dart';
 import 'package:plant_it/data/repository/reminder_repository.dart';
 import 'package:plant_it/data/repository/species_care_repository.dart';
+import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/data/repository/species_synonym_repository.dart';
 import 'package:plant_it/data/repository/user_setting_repository.dart';
@@ -63,6 +65,12 @@ List<SingleChildWidget> get providersLocal {
     ),
     Provider(
       create: (context) => SpeciesRepository(db: context.read()),
+    ),
+    Provider(
+      create: (context) => CareFieldRepository(db: context.read()),
+    ),
+    Provider(
+      create: (context) => SpeciesCareValueRepository(db: context.read()),
     ),
     Provider(
       create: (context) => SpeciesSynonymsRepository(db: context.read()),

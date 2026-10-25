@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:plant_it/database/database.dart' as db;
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
+import 'package:plant_it/ui/core/ui/care_values_section.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/core/ui/event_card.dart';
 import 'package:plant_it/ui/plant/view_models/plant_view_model.dart';
@@ -115,6 +116,13 @@ class _PlantScreenState extends State<PlantScreen> {
       SnackBar(content: Text(L.of(context).editCareSharedWarning)),
     );
     context.push(Routes.speciesWithId(widget.viewModel.species.id));
+  }
+
+  void _editMoreCare() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(L.of(context).editCareSharedWarning)),
+    );
+    context.push(Routes.speciesCareWithId(widget.viewModel.species.id));
   }
 
   Future<void> _deleteEventWithConfirm(db.Event event) async {
@@ -354,6 +362,19 @@ class _PlantScreenState extends State<PlantScreen> {
                             care: widget.viewModel.care.toCompanion(true),
                             maxNum: 4,
                             appLocalizations: appLocalizations,
+                          ),
+                          const SizedBox(height: 16),
+
+                          // More care
+                          _sectionTitle(
+                            appLocalizations.moreCare,
+                            onEdit: _editMoreCare,
+                            tooltip: appLocalizations.editMoreCare,
+                          ),
+                          CareValuesSection(
+                            fields: widget.viewModel.careFields,
+                            values: widget.viewModel.careValues,
+                            emptyText: appLocalizations.noMoreCare,
                           ),
                           const SizedBox(height: 16),
 

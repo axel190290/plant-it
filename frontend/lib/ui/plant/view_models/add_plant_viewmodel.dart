@@ -5,10 +5,12 @@ import 'package:logging/logging.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/repository/species_care_repository.dart';
+import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/data/repository/species_synonym_repository.dart';
 import 'package:plant_it/data/service/search/cache/app_cache.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_value.dart';
 import 'package:result_dart/result_dart.dart';
 
 class AddPlantViewModel extends ChangeNotifier {
@@ -19,8 +21,10 @@ class AddPlantViewModel extends ChangeNotifier {
     required SpeciesSynonymsRepository speciesSynonymsRepository,
     required ImageRepository imageRepository,
     required AppCache appCache,
+    required SpeciesCareValueRepository speciesCareValueRepository,
     Map<String, Object?>? speciesToCreate,
-  })  : _plantRepository = plantRepository,
+  })  : _speciesCareValueRepository = speciesCareValueRepository,
+        _plantRepository = plantRepository,
         _speciesToCreate = speciesToCreate,
         _speciesRepository = speciesRepository,
         _speciesCareRepository = speciesCareRepository,
@@ -41,6 +45,7 @@ class AddPlantViewModel extends ChangeNotifier {
 
   final PlantRepository _plantRepository;
   final Map<String, Object?>? _speciesToCreate;
+  final SpeciesCareValueRepository _speciesCareValueRepository;
   final SpeciesRepository _speciesRepository;
   final SpeciesCareRepository _speciesCareRepository;
   final SpeciesSynonymsRepository _speciesSynonymsRepository;
@@ -134,6 +139,17 @@ class AddPlantViewModel extends ChangeNotifier {
       }
     }
     _log.fine("Species synonyms saved");
+
+    Object? careValues = _speciesToCreate['careValues'];
+    if (careValues is Map<String, CareValue> && careValues.isNotEmpty) {
+      Result<void> saved = await _speciesCareValueRepository.saveByKeys(
+          speciesId.getOrThrow(), careValues);
+      if (saved.isError()) {
+        await _speciesRepository.delete(speciesId.getOrThrow());
+        return Failure(saved.exceptionOrNull()!);
+      }
+      _log.fine("Species care values saved");
+    }
 
     if (species.externalAvatarUrl.present &&
         species.externalAvatarUrl.value != null) {

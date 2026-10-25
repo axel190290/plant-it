@@ -8,14 +8,18 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
+import 'package:plant_it/data/repository/care_field_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
 import 'package:plant_it/data/repository/species_care_repository.dart';
+import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/data/repository/species_synonym_repository.dart';
 import 'package:plant_it/data/service/search/cache/app_cache.dart';
 import 'package:plant_it/data/service/search/species_searcher_facade.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
+import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/ui/core/ui/care_values_section.dart';
 import 'package:plant_it/domain/models/species_searcher_result.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -27,7 +31,11 @@ class ViewSpeciesViewModel extends ChangeNotifier {
     required ImageRepository imageRepository,
     required AppCache appCache,
     required SpeciesSearcherFacade speciesSearcherFacade,
-  })  : _speciesRepository = speciesRepository,
+    required CareFieldRepository careFieldRepository,
+    required SpeciesCareValueRepository speciesCareValueRepository,
+  })  : _careFieldRepository = careFieldRepository,
+        _speciesCareValueRepository = speciesCareValueRepository,
+        _speciesRepository = speciesRepository,
         _speciesCareRepository = speciesCareRepository,
         _speciesSynonymsRepository = speciesSynonymsRepository,
         _imageRepository = imageRepository,
@@ -65,6 +73,12 @@ class ViewSpeciesViewModel extends ChangeNotifier {
   final ImageRepository _imageRepository;
   final AppCache _appCache;
   final SpeciesSearcherFacade _speciesSearcherFacade;
+  final CareFieldRepository _careFieldRepository;
+  final SpeciesCareValueRepository _speciesCareValueRepository;
+  List<CareField> _careFields = [];
+  Map<int, CareValue> _careValues = {};
+  // Care field values of an external species, to save it in the collection
+  Map<String, CareValue> _externalCareValues = {};
   final _log = Logger('ViewSpeciesViewModel');
 
   late final Command<dynamic, void> load;
@@ -97,6 +111,9 @@ class ViewSpeciesViewModel extends ChangeNotifier {
   SpeciesCareCompanion get care => _speciesCare;
   SpeciesDataSource get source => _species.dataSource.value;
   SpeciesCompanion get speciesObj => _species;
+  List<CareField> get careFields => _careFields;
+  Map<int, CareValue> get careValues => _careValues;
+  Map<String, CareValue> get externalCareValues => _externalCareValues;
   CareSources? get careSources => CareSources.decode(
       _species.bibliography.present ? _species.bibliography.value : null);
 
@@ -123,6 +140,17 @@ class ViewSpeciesViewModel extends ChangeNotifier {
     _speciesSynonyms =
         synonyms.getOrThrow().map((s) => s.toCompanion(true)).toList();
     _log.fine("Species synonyms loaded");
+
+    Result<void> careFields = await _loadCareFields();
+    if (careFields.isError()) {
+      return careFields;
+    }
+    Result<Map<int, CareValue>> careValues =
+        await _speciesCareValueRepository.getBySpecies(speciesId);
+    if (careValues.isError()) {
+      return Failure(careValues.exceptionOrNull()!);
+    }
+    _careValues = careValues.getOrThrow();
 
     Result<String>? speciesImageBase64 =
         await _imageRepository.getSpeciesImageBase64(_species.id.value);
@@ -155,6 +183,14 @@ class ViewSpeciesViewModel extends ChangeNotifier {
     _speciesSynonyms = details.getOrThrow().speciesSynonymsCompanion;
     _log.fine("External species synonyms loaded");
 
+    Result<void> careFields = await _loadCareFields();
+    if (careFields.isError()) {
+      return careFields;
+    }
+    _externalCareValues = details.getOrThrow().careValues;
+    _careValues =
+        CareValuesSection.valuesByKey(_careFields, _externalCareValues);
+
     String? url =
         details.getOrThrow().speciesCompanion.externalAvatarUrl.present
             ? details.getOrThrow().speciesCompanion.externalAvatarUrl.value
@@ -174,6 +210,15 @@ class ViewSpeciesViewModel extends ChangeNotifier {
       }
     }
 
+    return Success("ok");
+  }
+
+  Future<Result<void>> _loadCareFields() async {
+    Result<List<CareField>> fields = await _careFieldRepository.getAll();
+    if (fields.isError()) {
+      return Failure(fields.exceptionOrNull()!);
+    }
+    _careFields = fields.getOrThrow();
     return Success("ok");
   }
 

@@ -1074,4 +1074,125 @@ class LFr extends L {
 
   @override
   String get showLess => 'Afficher moins';
+
+  @override
+  String get careFieldLightLux => 'Lumière (lux)';
+
+  @override
+  String get careFieldLightHours => 'Heures de lumière par jour';
+
+  @override
+  String get careFieldEnvHumidity => 'Humidité ambiante';
+
+  @override
+  String get careFieldWateringSummer => 'Arrosage en été';
+
+  @override
+  String get careFieldWateringWinter => 'Arrosage en hiver';
+
+  @override
+  String get careFieldSoilMoisture => 'Humidité du sol';
+
+  @override
+  String get careFieldConductivity => 'Conductivité (EC)';
+
+  @override
+  String get careFieldWaterType => 'Type d\'eau';
+
+  @override
+  String get careFieldWateringMethod => 'Méthode d\'arrosage';
+
+  @override
+  String get careFieldSubstrate => 'Substrat';
+
+  @override
+  String get careFieldFertilizer => 'Engrais';
+
+  @override
+  String get careFieldPruning => 'Taille';
+
+  @override
+  String get careFieldRepotting => 'Rempotage';
+
+  @override
+  String get careFieldFloweringSeason => 'Floraison';
+
+  @override
+  String get careFieldDormancySeason => 'Dormance';
+
+  @override
+  String get careFieldCommonPests => 'Ravageurs courants';
+
+  @override
+  String get careFieldDiseases => 'Maladies';
+
+  @override
+  String get careFieldToxicity => 'Toxicité';
+
+  @override
+  String everyNDays(String days) {
+    return 'tous les $days jours';
+  }
+
+  @override
+  String get moreCare => 'Plus d\'entretien';
+
+  @override
+  String get noMoreCare =>
+      'Pas encore de données. Touchez le crayon pour les ajouter.';
+
+  @override
+  String get editMoreCare => 'Modifier plus d\'entretien';
+
+  @override
+  String get careSaved => 'Entretien enregistré';
+
+  @override
+  String get careFields => 'Champs d\'entretien';
+
+  @override
+  String get manageCareFields =>
+      'Choisissez l\'entretien à afficher et créez le vôtre';
+
+  @override
+  String get careFieldsDescription =>
+      'Les champs activés sont affichés et modifiables sur chaque espèce et plante. Les ravageurs et traitements d\'une plante précise sont enregistrés comme événements (types « pest » et « treatment ») dans son historique.';
+
+  @override
+  String get addCareField => 'Nouveau champ';
+
+  @override
+  String get careFieldUnit => 'Unité (facultative)';
+
+  @override
+  String get careFieldOptions => 'Options, séparées par des virgules';
+
+  @override
+  String get careFieldType => 'Type';
+
+  @override
+  String get careFieldTypeNumber => 'Nombre';
+
+  @override
+  String get careFieldTypeRange => 'Plage (min - max)';
+
+  @override
+  String get careFieldTypeText => 'Texte';
+
+  @override
+  String get careFieldTypeChoice => 'Liste d\'options';
+
+  @override
+  String get customCareField => 'Créé par vous';
+
+  @override
+  String get areYouSureYouWantToDeleteThisCareField =>
+      'Ses valeurs seront supprimées de toutes les espèces.';
+
+  @override
+  String get estimatedByAi => 'Estimé par l\'IA';
+
+  @override
+  String get noCareFieldsEnabled =>
+      'Aucun champ d\'entretien activé. Activez-les dans Paramètres > Champs d\'entretien.';
 }

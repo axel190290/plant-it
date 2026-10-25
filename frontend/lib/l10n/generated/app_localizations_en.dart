@@ -1068,4 +1068,124 @@ class LEn extends L {
 
   @override
   String get showLess => 'Show less';
+
+  @override
+  String get careFieldLightLux => 'Light (lux)';
+
+  @override
+  String get careFieldLightHours => 'Hours of light per day';
+
+  @override
+  String get careFieldEnvHumidity => 'Ambient humidity';
+
+  @override
+  String get careFieldWateringSummer => 'Watering in summer';
+
+  @override
+  String get careFieldWateringWinter => 'Watering in winter';
+
+  @override
+  String get careFieldSoilMoisture => 'Soil moisture';
+
+  @override
+  String get careFieldConductivity => 'Conductivity (EC)';
+
+  @override
+  String get careFieldWaterType => 'Type of water';
+
+  @override
+  String get careFieldWateringMethod => 'Watering method';
+
+  @override
+  String get careFieldSubstrate => 'Substrate';
+
+  @override
+  String get careFieldFertilizer => 'Fertilizer';
+
+  @override
+  String get careFieldPruning => 'Pruning';
+
+  @override
+  String get careFieldRepotting => 'Repotting';
+
+  @override
+  String get careFieldFloweringSeason => 'Flowering';
+
+  @override
+  String get careFieldDormancySeason => 'Dormancy';
+
+  @override
+  String get careFieldCommonPests => 'Common pests';
+
+  @override
+  String get careFieldDiseases => 'Diseases';
+
+  @override
+  String get careFieldToxicity => 'Toxicity';
+
+  @override
+  String everyNDays(String days) {
+    return 'every $days days';
+  }
+
+  @override
+  String get moreCare => 'More care';
+
+  @override
+  String get noMoreCare => 'No data yet. Tap the pencil to add it.';
+
+  @override
+  String get editMoreCare => 'Edit more care';
+
+  @override
+  String get careSaved => 'Care saved';
+
+  @override
+  String get careFields => 'Care fields';
+
+  @override
+  String get manageCareFields =>
+      'Choose which care to show and create your own';
+
+  @override
+  String get careFieldsDescription =>
+      'Enabled fields are shown and can be edited on every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.';
+
+  @override
+  String get addCareField => 'New field';
+
+  @override
+  String get careFieldUnit => 'Unit (optional)';
+
+  @override
+  String get careFieldOptions => 'Options, separated by commas';
+
+  @override
+  String get careFieldType => 'Type';
+
+  @override
+  String get careFieldTypeNumber => 'Number';
+
+  @override
+  String get careFieldTypeRange => 'Range (min - max)';
+
+  @override
+  String get careFieldTypeText => 'Text';
+
+  @override
+  String get careFieldTypeChoice => 'List of options';
+
+  @override
+  String get customCareField => 'Created by you';
+
+  @override
+  String get areYouSureYouWantToDeleteThisCareField =>
+      'Its values will be deleted from every species.';
+
+  @override
+  String get estimatedByAi => 'Estimated by AI';
+
+  @override
+  String get noCareFieldsEnabled =>
+      'No care fields are enabled. Enable them in Settings > Care fields.';
 }

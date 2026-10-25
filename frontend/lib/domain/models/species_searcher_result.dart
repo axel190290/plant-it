@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_value.dart';
 
 class SpeciesSearcherPartialResult {
   final SpeciesCompanion speciesCompanion;
@@ -57,11 +58,14 @@ class SpeciesSearcherResult {
   final SpeciesCompanion speciesCompanion;
   final SpeciesCareCompanion speciesCareCompanion;
   final List<SpeciesSynonymsCompanion> speciesSynonymsCompanion;
+  // Values of built-in care fields by key
+  final Map<String, CareValue> careValues;
 
   SpeciesSearcherResult({
     required this.speciesCompanion,
     required this.speciesCareCompanion,
     required this.speciesSynonymsCompanion,
+    this.careValues = const {},
   });
 
   Map<String, dynamic> toJson() {
@@ -92,6 +96,8 @@ class SpeciesSearcherResult {
         'phMin': speciesCareCompanion.phMin.value,
         'phMax': speciesCareCompanion.phMax.value,
       },
+      'careValues':
+          careValues.map((key, value) => MapEntry(key, value.toJson())),
       'speciesSynonymsCompanion': speciesSynonymsCompanion
           .map((synonym) => {
                 'id': synonym.id.value,
@@ -127,6 +133,8 @@ class SpeciesSearcherResult {
         phMin: Value(json['speciesCareCompanion']['phMin']),
         phMax: Value(json['speciesCareCompanion']['phMax']),
       ),
+      careValues: ((json['careValues'] ?? {}) as Map<String, dynamic>)
+          .map((key, value) => MapEntry(key, CareValue.fromJson(value))),
       speciesSynonymsCompanion: (json['speciesSynonymsCompanion'] as List)
           .map((synonymJson) => SpeciesSynonymsCompanion(
                 id: Value(synonymJson['id']),

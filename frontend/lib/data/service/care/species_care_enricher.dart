@@ -4,6 +4,7 @@ import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/data/service/care/open_plantbook_client.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
+import 'package:plant_it/domain/models/care_value.dart';
 import 'package:result_dart/result_dart.dart';
 
 /// Completes the care of an external species: first with the measured
@@ -21,52 +22,73 @@ class SpeciesCareEnricher {
         _aiCareEstimator = aiCareEstimator;
 
   /// Never fails: a source that is not configured or not reachable is
-  /// skipped and the values it would give stay empty.
-  Future<(SpeciesCareCompanion, CareSources)> enrich({
+  /// skipped and the values it would give stay empty. Returns the basic
+  /// care, the values of built-in care fields by key, and the sources used.
+  Future<(SpeciesCareCompanion, Map<String, CareValue>, CareSources)> enrich({
     required String scientificName,
     String? family,
     required SpeciesCareCompanion care,
+    Map<String, CareValue> extra = const {},
     required CareSources sources,
   }) async {
-    if (_missingFields(care).isNotEmpty &&
-        await _openPlantbookClient.isConfigured()) {
-      Result<SpeciesCareCompanion> plantbook =
+    Map<String, CareValue> values = Map.of(extra);
+
+    if (await _openPlantbookClient.isConfigured()) {
+      Result<CareData> plantbook =
           await _openPlantbookClient.getCare(scientificName);
       if (plantbook.isError()) {
         _log.info(plantbook.exceptionOrNull());
       } else {
         SpeciesCareCompanion before = care;
-        care = _fillMissing(care, plantbook.getOrThrow());
-        if (_missingFields(before).length != _missingFields(care).length) {
+        int valuesBefore = values.length;
+        care = _fillMissing(care, plantbook.getOrThrow().care);
+        _fillMissingExtra(values, plantbook.getOrThrow().extra);
+        if (_missingFields(before).length != _missingFields(care).length ||
+            values.length != valuesBefore) {
           sources = sources.copyWith(care: CareSources.openPlantbook);
         }
       }
     }
 
     List<String> missing = _missingFields(care);
-    if (missing.isEmpty) {
-      return (care, sources);
+    bool missingExtra = [
+      ...AiCareEstimator.numberFields,
+      ...AiCareEstimator.textFields
+    ].any((key) => !values.containsKey(key));
+    if (missing.isEmpty && !missingExtra) {
+      return (care, values, sources);
     }
     AiProvider provider = await _aiCareEstimator.configuredProvider();
     if (provider == AiProvider.none) {
-      return (care, sources);
+      return (care, values, sources);
     }
-    Result<SpeciesCareCompanion> estimate =
+    Result<CareData> estimate =
         await _aiCareEstimator.estimate(provider, scientificName, family);
     if (estimate.isError()) {
       _log.warning(estimate.exceptionOrNull());
-      return (care, sources);
+      return (care, values, sources);
     }
-    care = _fillMissing(care, estimate.getOrThrow());
+    care = _fillMissing(care, estimate.getOrThrow().care);
+    int valuesBefore = values.length;
+    _fillMissingExtra(values, estimate.getOrThrow().extra);
     List<String> estimated =
         missing.where((f) => !_missingFields(care).contains(f)).toList();
-    if (estimated.isNotEmpty) {
+    if (estimated.isNotEmpty || values.length != valuesBefore) {
       sources = sources.copyWith(
         aiProvider: provider.key,
         aiFields: CareSources.groupFields(estimated),
       );
     }
-    return (care, sources);
+    return (care, values, sources);
+  }
+
+  static void _fillMissingExtra(
+      Map<String, CareValue> values, Map<String, CareValue> other) {
+    other.forEach((key, value) {
+      if (!values.containsKey(key) && !value.isEmpty) {
+        values[key] = value;
+      }
+    });
   }
 
   static List<String> _missingFields(SpeciesCareCompanion care) {

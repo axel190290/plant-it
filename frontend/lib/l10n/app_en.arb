@@ -444,5 +444,50 @@
       }
     }
   },
-  "showLess": "Show less"
+  "showLess": "Show less",
+  "careFieldLightLux": "Light (lux)",
+  "careFieldLightHours": "Hours of light per day",
+  "careFieldEnvHumidity": "Ambient humidity",
+  "careFieldWateringSummer": "Watering in summer",
+  "careFieldWateringWinter": "Watering in winter",
+  "careFieldSoilMoisture": "Soil moisture",
+  "careFieldConductivity": "Conductivity (EC)",
+  "careFieldWaterType": "Type of water",
+  "careFieldWateringMethod": "Watering method",
+  "careFieldSubstrate": "Substrate",
+  "careFieldFertilizer": "Fertilizer",
+  "careFieldPruning": "Pruning",
+  "careFieldRepotting": "Repotting",
+  "careFieldFloweringSeason": "Flowering",
+  "careFieldDormancySeason": "Dormancy",
+  "careFieldCommonPests": "Common pests",
+  "careFieldDiseases": "Diseases",
+  "careFieldToxicity": "Toxicity",
+  "everyNDays": "every {days} days",
+  "@everyNDays": {
+    "placeholders": {
+      "days": {
+        "type": "String"
+      }
+    }
+  },
+  "moreCare": "More care",
+  "noMoreCare": "No data yet. Tap the pencil to add it.",
+  "editMoreCare": "Edit more care",
+  "careSaved": "Care saved",
+  "careFields": "Care fields",
+  "manageCareFields": "Choose which care to show and create your own",
+  "careFieldsDescription": "Enabled fields are shown and can be edited on every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.",
+  "addCareField": "New field",
+  "careFieldUnit": "Unit (optional)",
+  "careFieldOptions": "Options, separated by commas",
+  "careFieldType": "Type",
+  "careFieldTypeNumber": "Number",
+  "careFieldTypeRange": "Range (min - max)",
+  "careFieldTypeText": "Text",
+  "careFieldTypeChoice": "List of options",
+  "customCareField": "Created by you",
+  "areYouSureYouWantToDeleteThisCareField": "Its values will be deleted from every species.",
+  "estimatedByAi": "Estimated by AI",
+  "noCareFieldsEnabled": "No care fields are enabled. Enable them in Settings > Care fields."
 }

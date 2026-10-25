@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:drift/drift.dart';
 import 'package:http/http.dart' as http;
 import 'package:plant_it/data/repository/user_setting_repository.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/user_settings_keys.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -72,7 +74,7 @@ class AiCareEstimator {
     return (await _apiKey(provider)).isEmpty ? AiProvider.none : provider;
   }
 
-  Future<Result<SpeciesCareCompanion>> estimate(
+  Future<Result<CareData>> estimate(
       AiProvider provider, String scientificName, String? family) async {
     String apiKey = await _apiKey(provider);
     String model = (await _userSettingRepository.getOrDefault(
@@ -100,7 +102,12 @@ class AiCareEstimator {
     if (answer.isError()) {
       return Failure(answer.exceptionOrNull()!);
     }
-    return parseCare(answer.getOrThrow());
+    Result<SpeciesCareCompanion> care = parseCare(answer.getOrThrow());
+    if (care.isError()) {
+      return Failure(care.exceptionOrNull()!);
+    }
+    return Success(
+        CareData(care.getOrThrow(), parseExtraCare(answer.getOrThrow())));
   }
 
   Future<String> _apiKey(AiProvider provider) async {
@@ -113,21 +120,67 @@ class AiCareEstimator {
         .trim();
   }
 
+  /// Built-in care fields the AI can estimate: numbers, then texts.
+  static const List<String> numberFields = [
+    'light_hours',
+    'watering_summer',
+    'watering_winter',
+  ];
+  static const List<String> textFields = [
+    'water_type',
+    'watering_method',
+    'substrate',
+    'fertilizer',
+    'pruning',
+    'repotting',
+    'flowering_season',
+    'dormancy_season',
+    'common_pests',
+    'diseases',
+    'toxicity',
+  ];
+
+  static String _language() {
+    const Map<String, String> names = {
+      'es': 'Spanish',
+      'en': 'English',
+      'it': 'Italian',
+      'fr': 'French',
+      'de': 'German',
+      'pt': 'Portuguese',
+    };
+    return names[PlatformDispatcher.instance.locale.languageCode] ?? 'English';
+  }
+
   static String _prompt(String scientificName, String? family) {
     String familyText = family == null ? "" : " (family $family)";
     return "Estimate the typical cultivation requirements of the plant "
         "species $scientificName$familyText, as grown at home or in a garden. "
-        "Answer only with a JSON object with these integer fields:\n"
-        "- light: from 1 (deep shade) to 10 (full direct sun all day)\n"
-        "- humidity: ideal ambient relative humidity in percent divided by "
-        "10, from 0 to 10\n"
-        "- tempMin, tempMax: tolerated temperature range in °C, between -30 "
-        "and 50\n"
-        "- phMin, phMax: preferred soil pH range, between 0 and 14\n"
+        "Answer only with a JSON object with these fields:\n"
+        "- light: integer from 1 (deep shade) to 10 (full direct sun all day)\n"
+        "- humidity: integer, ideal ambient relative humidity in percent "
+        "divided by 10, from 0 to 10\n"
+        "- tempMin, tempMax: integers, tolerated temperature range in °C, "
+        "between -30 and 50\n"
+        "- phMin, phMax: integers, preferred soil pH range, between 0 and 14\n"
+        "- light_hours: number, hours of light per day it needs\n"
+        "- watering_summer, watering_winter: numbers, days between waterings "
+        "in summer and in winter\n"
+        "- water_type: the kind of water it prefers\n"
+        "- watering_method: how to water it\n"
+        "- substrate: the soil or mix it needs\n"
+        "- fertilizer: kind of fertilizer and how often\n"
+        "- pruning: when and how to prune it\n"
+        "- repotting: how often and when to repot it\n"
+        "- flowering_season, dormancy_season: months or seasons\n"
+        "- common_pests: its usual pests\n"
+        "- diseases: its usual diseases\n"
+        "- toxicity: whether it is toxic for pets or people\n"
+        "Write the text fields in ${_language()}, in one short sentence each. "
         "Use null for any value you do not know with reasonable confidence.";
   }
 
-  static const Map<String, dynamic> _schema = {
+  static final Map<String, dynamic> _schema = {
     'type': 'object',
     'properties': {
       'light': {
@@ -148,8 +201,16 @@ class AiCareEstimator {
       'phMax': {
         'type': ['integer', 'null']
       },
+      for (String f in numberFields)
+        f: {
+          'type': ['number', 'null']
+        },
+      for (String f in textFields)
+        f: {
+          'type': ['string', 'null']
+        },
     },
-    'required': fields,
+    'required': [...fields, ...numberFields, ...textFields],
     'additionalProperties': false,
   };
 
@@ -168,7 +229,7 @@ class AiCareEstimator {
     };
     Map<String, dynamic> body = {
       'model': model,
-      'max_tokens': 4096,
+      'max_tokens': 8000,
       'output_config': {
         'effort': 'low',
         'format': {'type': 'json_schema', 'schema': _schema},
@@ -306,5 +367,40 @@ class AiCareEstimator {
       phMin: Value(read('phMin', 0, 14)),
       phMax: Value(read('phMax', 0, 14)),
     ));
+  }
+
+  /// Reads the built-in care fields of the model answer. Every value is
+  /// marked as estimated.
+  static Map<String, CareValue> parseExtraCare(String answer) {
+    int start = answer.indexOf('{');
+    int end = answer.lastIndexOf('}');
+    if (start < 0 || end <= start) {
+      return {};
+    }
+    Map<String, dynamic> values;
+    try {
+      values = json.decode(answer.substring(start, end + 1));
+    } catch (e) {
+      return {};
+    }
+    Map<String, CareValue> result = {};
+    for (String field in numberFields) {
+      dynamic v = values[field];
+      double? number =
+          v is num ? v.toDouble() : (v is String ? double.tryParse(v) : null);
+      if (number != null && number >= 0) {
+        result[field] = CareValue(value: number, estimated: true);
+      }
+    }
+    for (String field in textFields) {
+      dynamic v = values[field];
+      if (v is String && v.trim().isNotEmpty) {
+        String text = v.trim();
+        result[field] = CareValue(
+            text: text.length > 1000 ? text.substring(0, 1000) : text,
+            estimated: true);
+      }
+    }
+    return result;
   }
 }

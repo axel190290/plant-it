@@ -31,6 +31,7 @@ import 'package:plant_it/ui/settings/widgets/info_screen.dart';
 import 'package:plant_it/ui/settings/widgets/notifications_screen.dart';
 import 'package:plant_it/ui/settings/widgets/reminder/create/add_reminder_screen.dart';
 import 'package:plant_it/ui/settings/widgets/reminder/edit/edit_reminder_screen.dart';
+import 'package:plant_it/ui/settings/widgets/reminder/reminder_screen.dart';
 import 'package:plant_it/ui/species/view_models/add_species_viewmodel.dart';
 import 'package:plant_it/ui/species/view_models/edit_species_viewmodel.dart';
 import 'package:plant_it/ui/species/view_models/view_species_viewmodel.dart';
@@ -77,14 +78,6 @@ GoRouter router() => GoRouter(
                 calendarViewModel.load.execute();
               }
 
-              ReminderViewModel reminderViewModel = ReminderViewModel(
-                eventTypeRepository: context.read(),
-                reminderRepository: context.read(),
-                plantRepository: context.read(),
-                streamController: context.read(),
-              );
-              reminderViewModel.load.execute();
-
               SearchViewModel searchViewModel = SearchViewModel(
                 speciesSearcherFacade: context.read(),
                 imageRepository: context.read(),
@@ -109,7 +102,6 @@ GoRouter router() => GoRouter(
               return AppMainView(
                 homeViewModel: homeViewModel,
                 calendarViewModel: calendarViewModel,
-                reminderViewModel: reminderViewModel,
                 searchViewModel: searchViewModel,
                 settingsViewModel: settingsViewModel,
                 selectedView: selectedView,
@@ -296,6 +288,19 @@ GoRouter router() => GoRouter(
                   );
                   viewModel.load.execute(id);
                   return EditEventTypeScreen(viewModel: viewModel);
+                },
+              ),
+              GoRoute(
+                path: Routes.reminders,
+                builder: (context, state) {
+                  ReminderViewModel viewModel = ReminderViewModel(
+                    eventTypeRepository: context.read(),
+                    reminderRepository: context.read(),
+                    plantRepository: context.read(),
+                    streamController: context.read(),
+                  );
+                  viewModel.load.execute();
+                  return ReminderScreen(viewModel: viewModel);
                 },
               ),
               GoRoute(

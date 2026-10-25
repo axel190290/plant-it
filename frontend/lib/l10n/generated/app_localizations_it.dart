@@ -1175,11 +1175,4 @@ class LIt extends L {
 
   @override
   String get showLess => 'Mostra meno';
-
-  @override
-  String get newReminder => 'Nuovo';
-
-  @override
-  String get noRemindersYet =>
-      'Ancora nessun promemoria. Creane uno per ricevere un avviso quando una pianta ha bisogno di cure.';
 }

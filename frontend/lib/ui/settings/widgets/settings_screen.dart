@@ -50,6 +50,14 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
+                      onTap: () => context.push(Routes.reminders),
+                      child: ListTile(
+                        title: Text(L.of(context).reminders),
+                        subtitle: Text(L.of(context).manageTheReminders),
+                        leading: Icon(LucideIcons.clock),
+                      ),
+                    ),
+                    GestureDetector(
                       onTap: () => context.push(Routes.settingsDataSources,
                           extra: viewModel),
                       child: ListTile(

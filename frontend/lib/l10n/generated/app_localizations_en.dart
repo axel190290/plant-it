@@ -1068,11 +1068,4 @@ class LEn extends L {
 
   @override
   String get showLess => 'Show less';
-
-  @override
-  String get newReminder => 'New';
-
-  @override
-  String get noRemindersYet =>
-      'No reminders yet. Create one to be notified when a plant needs care.';
 }

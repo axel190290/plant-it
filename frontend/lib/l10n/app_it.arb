@@ -419,7 +419,5 @@
   "allEvents": "Cronologia",
   "noEventsYet": "Ancora nessun evento",
   "showAllEvents": "Mostra tutti ({count})",
-  "showLess": "Mostra meno",
-  "newReminder": "Nuovo",
-  "noRemindersYet": "Ancora nessun promemoria. Creane uno per ricevere un avviso quando una pianta ha bisogno di cure."
+  "showLess": "Mostra meno"
 }

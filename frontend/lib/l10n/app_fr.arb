@@ -406,7 +406,5 @@
   "allEvents": "Historique",
   "noEventsYet": "Pas encore d'événements",
   "showAllEvents": "Tout afficher ({count})",
-  "showLess": "Afficher moins",
-  "newReminder": "Nouveau",
-  "noRemindersYet": "Pas encore de rappels. Créez-en un pour être averti quand une plante a besoin de soins."
+  "showLess": "Afficher moins"
 }

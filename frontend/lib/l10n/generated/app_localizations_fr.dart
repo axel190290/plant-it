@@ -1074,11 +1074,4 @@ class LFr extends L {
 
   @override
   String get showLess => 'Afficher moins';
-
-  @override
-  String get newReminder => 'Nouveau';
-
-  @override
-  String get noRemindersYet =>
-      'Pas encore de rappels. Créez-en un pour être averti quand une plante a besoin de soins.';
 }

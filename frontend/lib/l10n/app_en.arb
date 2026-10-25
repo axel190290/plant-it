@@ -444,7 +444,5 @@
       }
     }
   },
-  "showLess": "Show less",
-  "newReminder": "New",
-  "noRemindersYet": "No reminders yet. Create one to be notified when a plant needs care."
+  "showLess": "Show less"
 }

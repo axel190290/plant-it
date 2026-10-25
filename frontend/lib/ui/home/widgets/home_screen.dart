@@ -6,7 +6,7 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
-import 'package:plant_it/ui/home/widgets/carousel.dart';
+import 'package:plant_it/ui/home/widgets/plant_card_list.dart';
 import 'package:plant_it/ui/home/widgets/homescreen_empty_data.dart';
 import 'package:plant_it/utils/stream_code.dart';
 
@@ -92,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                   ),
                 ),
-                Carousel(
+                PlantCardList(
                   viewModel: widget.viewModel,
                   filter: _filter,
                 ),

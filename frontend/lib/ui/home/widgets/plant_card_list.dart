@@ -5,65 +5,46 @@ import 'package:go_router/go_router.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 
-class Carousel extends StatefulWidget {
+/// The plants of the collection as full-width cards, one below the other,
+/// scrolling with the rest of the home page.
+class PlantCardList extends StatelessWidget {
   final HomeViewModel viewModel;
   final String filter;
 
-  const Carousel({
+  const PlantCardList({
     super.key,
     required this.viewModel,
     required this.filter,
   });
 
   @override
-  State<Carousel> createState() => _CarouselState();
-}
-
-class _CarouselState extends State<Carousel> {
-  final CarouselController controller = CarouselController();
-
-  @override
-  void dispose() {
-    super.dispose();
-    controller.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final Iterable<int> plantIds =
-        widget.viewModel.plantMap.keys.toList().where((id) {
-      return widget.viewModel.plantMap[id]!.name
+    final List<int> plantIds = viewModel.plantMap.keys.where((id) {
+      return viewModel.plantMap[id]!.name
           .toLowerCase()
-          .contains(widget.filter.toLowerCase());
+          .contains(filter.toLowerCase());
     }).toList();
-    final List<int> plantIdsList = plantIds.toList();
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height * .3,
-      child: ListView(
-        children: <Widget>[
-          ConstrainedBox(
-            constraints: BoxConstraints(
-                maxHeight: 250), // MediaQuery.sizeOf(context).height / 2
-            child: CarouselView.weighted(
-              controller: controller,
-              itemSnapping: true,
-              flexWeights: const <int>[
-                6,
-                3,
-                1
-              ], // [1, 7, 1],  [7, 2, 2], [6, 4, 1]
-              onTap: (index) =>
-                  context.push(Routes.plantWithId(plantIdsList[index])),
-              children: plantIds.map((int plantId) {
-                return HeroLayoutCard(
-                  plantId: plantId,
-                  viewModel: widget.viewModel,
-                );
-              }).toList(),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      child: Column(
+        children: plantIds.map((int plantId) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28),
+              child: Material(
+                child: InkWell(
+                  onTap: () => context.push(Routes.plantWithId(plantId)),
+                  child: HeroLayoutCard(
+                    plantId: plantId,
+                    viewModel: viewModel,
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+          );
+        }).toList(),
       ),
     );
   }
@@ -81,13 +62,12 @@ class HeroLayoutCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double width = MediaQuery.sizeOf(context).width;
     return Stack(
       alignment: AlignmentDirectional.bottomStart,
       children: <Widget>[
         SizedBox(
-          width: width * 7 / 8,
-          height: 250,
+          width: double.infinity,
+          height: 200,
           child: Image(
             fit: BoxFit.cover,
             image: viewModel.imagesBase64[plantId] == null

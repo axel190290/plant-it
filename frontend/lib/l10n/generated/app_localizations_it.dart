@@ -1142,4 +1142,37 @@ class LIt extends L {
   String aiEstimatedCare(String provider, String fields) {
     return 'Stimato dall\'IA ($provider): $fields. Controlla questi valori e modificali se necessario.';
   }
+
+  @override
+  String get notes => 'Note';
+
+  @override
+  String get noNotesTapToAdd => 'Ancora nessuna nota. Tocca per scriverne una.';
+
+  @override
+  String get editNotes => 'Modifica note';
+
+  @override
+  String get notesSaved => 'Note salvate';
+
+  @override
+  String get editCare => 'Modifica cura';
+
+  @override
+  String get editCareSharedWarning =>
+      'La cura appartiene alla specie, quindi la modifica vale anche per le altre tue piante di questa specie.';
+
+  @override
+  String get allEvents => 'Cronologia';
+
+  @override
+  String get noEventsYet => 'Ancora nessun evento';
+
+  @override
+  String showAllEvents(String count) {
+    return 'Mostra tutti ($count)';
+  }
+
+  @override
+  String get showLess => 'Mostra meno';
 }

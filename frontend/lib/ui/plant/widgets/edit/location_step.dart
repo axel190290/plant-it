@@ -24,7 +24,7 @@ class LocationStep extends StepSection<EditPlantViewModel> {
 
   @override
   void confirm() {
-    viewModel.setLocation(_ongoingSelection.value!);
+    viewModel.setLocation(_ongoingSelection.value);
     _selectedLocation.value = _ongoingSelection.value;
   }
 

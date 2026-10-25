@@ -24,7 +24,7 @@ class PriceStep extends StepSection<EditPlantViewModel> {
 
   @override
   void confirm() {
-    viewModel.setPrice(_ongoingSelection.value!);
+    viewModel.setPrice(_ongoingSelection.value);
     _selectedPrice.value = _ongoingSelection.value;
   }
 

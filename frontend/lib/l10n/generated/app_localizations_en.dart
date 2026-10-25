@@ -1035,4 +1035,37 @@ class LEn extends L {
   String aiEstimatedCare(String provider, String fields) {
     return 'Estimated by AI ($provider): $fields. Check these values and edit them if needed.';
   }
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get noNotesTapToAdd => 'No notes yet. Tap to write one.';
+
+  @override
+  String get editNotes => 'Edit notes';
+
+  @override
+  String get notesSaved => 'Notes saved';
+
+  @override
+  String get editCare => 'Edit care';
+
+  @override
+  String get editCareSharedWarning =>
+      'Care belongs to the species, so the change also applies to your other plants of this species.';
+
+  @override
+  String get allEvents => 'History';
+
+  @override
+  String get noEventsYet => 'No events yet';
+
+  @override
+  String showAllEvents(String count) {
+    return 'Show all ($count)';
+  }
+
+  @override
+  String get showLess => 'Show less';
 }

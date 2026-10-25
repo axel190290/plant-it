@@ -1047,4 +1047,37 @@ class LEs extends L {
   String aiEstimatedCare(String provider, String fields) {
     return 'Estimado por IA ($provider): $fields. Revisa estos valores y edítalos si hace falta.';
   }
+
+  @override
+  String get notes => 'Notas';
+
+  @override
+  String get noNotesTapToAdd => 'Aún no hay notas. Toca para escribir una.';
+
+  @override
+  String get editNotes => 'Editar notas';
+
+  @override
+  String get notesSaved => 'Notas guardadas';
+
+  @override
+  String get editCare => 'Editar cuidados';
+
+  @override
+  String get editCareSharedWarning =>
+      'Los cuidados pertenecen a la especie, así que el cambio también se aplica a tus otras plantas de esta especie.';
+
+  @override
+  String get allEvents => 'Historial';
+
+  @override
+  String get noEventsYet => 'Aún no hay eventos';
+
+  @override
+  String showAllEvents(String count) {
+    return 'Ver todos ($count)';
+  }
+
+  @override
+  String get showLess => 'Ver menos';
 }

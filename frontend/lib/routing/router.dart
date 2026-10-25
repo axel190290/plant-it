@@ -365,6 +365,7 @@ GoRouter router() => GoRouter(
               plantRepository: context.read(),
               eventTypeRepository: context.read(),
               speciesRepository: context.read(),
+              streamController: context.read(),
             );
             viewModel.load.execute(id);
             return EditEventScreen(

@@ -1608,6 +1608,66 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Estimated by AI ({provider}): {fields}. Check these values and edit them if needed.'**
   String aiEstimatedCare(String provider, String fields);
+
+  /// No description provided for @notes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get notes;
+
+  /// No description provided for @noNotesTapToAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'No notes yet. Tap to write one.'**
+  String get noNotesTapToAdd;
+
+  /// No description provided for @editNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit notes'**
+  String get editNotes;
+
+  /// No description provided for @notesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes saved'**
+  String get notesSaved;
+
+  /// No description provided for @editCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit care'**
+  String get editCare;
+
+  /// No description provided for @editCareSharedWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Care belongs to the species, so the change also applies to your other plants of this species.'**
+  String get editCareSharedWarning;
+
+  /// No description provided for @allEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get allEvents;
+
+  /// No description provided for @noEventsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No events yet'**
+  String get noEventsYet;
+
+  /// No description provided for @showAllEvents.
+  ///
+  /// In en, this message translates to:
+  /// **'Show all ({count})'**
+  String showAllEvents(String count);
+
+  /// No description provided for @showLess.
+  ///
+  /// In en, this message translates to:
+  /// **'Show less'**
+  String get showLess;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

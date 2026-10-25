@@ -409,5 +409,15 @@
   "plantNetKeyMissing": "Per identificare le piante da foto, aggiungi la tua chiave API di Pl@ntNet in Impostazioni > Sorgenti dei dati.",
   "identificationConfidence": "{percent}% di corrispondenza",
   "careSources": "Fonti: {sources}",
-  "aiEstimatedCare": "Stimato dall'IA ({provider}): {fields}. Controlla questi valori e modificali se necessario."
+  "aiEstimatedCare": "Stimato dall'IA ({provider}): {fields}. Controlla questi valori e modificali se necessario.",
+  "notes": "Note",
+  "noNotesTapToAdd": "Ancora nessuna nota. Tocca per scriverne una.",
+  "editNotes": "Modifica note",
+  "notesSaved": "Note salvate",
+  "editCare": "Modifica cura",
+  "editCareSharedWarning": "La cura appartiene alla specie, quindi la modifica vale anche per le altre tue piante di questa specie.",
+  "allEvents": "Cronologia",
+  "noEventsYet": "Ancora nessun evento",
+  "showAllEvents": "Mostra tutti ({count})",
+  "showLess": "Mostra meno"
 }

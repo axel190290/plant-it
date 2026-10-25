@@ -65,6 +65,18 @@ class PlantViewModel extends ChangeNotifier {
       if (result.isError()) throw result.exceptionOrNull()!;
       return;
     }, initialValue: null);
+    updateNote = Command.createAsync((String? note) async {
+      Result<void> result = await _updateNote(note);
+      if (result.isError()) throw result.exceptionOrNull()!;
+      return;
+    }, initialValue: null);
+    deleteEvent = Command.createAsync((db.Event event) async {
+      Result<void> result = await _eventRepository.delete(event.id);
+      if (result.isError()) throw result.exceptionOrNull()!;
+      _allEvents.removeWhere((e) => e.id == event.id);
+      await _loadLastEvent(_plant.id);
+      return;
+    }, initialValue: null);
     downloadPhoto = Command.createAsync((int id) async {
       Result<void> result = await _downloadPhoto(id);
       if (result.isError()) throw result.exceptionOrNull()!;
@@ -88,6 +100,7 @@ class PlantViewModel extends ChangeNotifier {
   late db.Plant _plant;
   late List<db.EventType> _eventType;
   late List<db.Event> _events;
+  List<db.Event> _allEvents = [];
   late List<db.Reminder> _reminders;
   late List<ReminderOccurrence> _remindersOccurrences;
   late List<String> _thumbnails;
@@ -99,6 +112,9 @@ class PlantViewModel extends ChangeNotifier {
   db.Plant get plant => _plant;
   List<db.EventType> get eventType => _eventType;
   List<db.Event> get events => _events;
+
+  /// Every event of the plant, newest first
+  List<db.Event> get allEvents => _allEvents;
   List<db.Reminder> get reminders => _reminders;
   List<ReminderOccurrence> get remindersOccurrences => _remindersOccurrences;
   List<String> get thumbnails => _thumbnails;
@@ -111,6 +127,8 @@ class PlantViewModel extends ChangeNotifier {
   late final Command<int, void> deletePhoto;
   late final Command<int?, void> toggleAvatar;
   late final Command<int, void> downloadPhoto;
+  late final Command<String?, void> updateNote;
+  late final Command<db.Event, void> deleteEvent;
 
   EventRepository get eventRepository => _eventRepository;
 
@@ -309,8 +327,29 @@ class PlantViewModel extends ChangeNotifier {
       return event.exceptionOrNull()!.toFailure();
     }
     _events = event.getOrThrow();
+
+    Result<List<db.Event>> allEvents =
+        await _eventRepository.getFiltered([plantId], null);
+    if (allEvents.isError()) {
+      notifyListeners();
+      return allEvents.exceptionOrNull()!.toFailure();
+    }
+    _allEvents = allEvents.getOrThrow();
     notifyListeners();
     return Success("ok");
+  }
+
+  Future<Result<void>> _updateNote(String? note) async {
+    String? trimmed = note?.trim();
+    Result<bool> updated = await _plantRepository.update(_plant
+        .toCompanion(true)
+        .copyWith(
+            note: drift.Value(
+                trimmed == null || trimmed.isEmpty ? null : trimmed)));
+    if (updated.isError()) {
+      return updated.exceptionOrNull()!.toFailure();
+    }
+    return _loadPlant(_plant.id);
   }
 
   Future<Result<void>> _loadReminders(int plantId) async {

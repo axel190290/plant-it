@@ -1040,4 +1040,38 @@ class LFr extends L {
   String aiEstimatedCare(String provider, String fields) {
     return 'Estimé par l\'IA ($provider) : $fields. Vérifiez ces valeurs et modifiez-les si nécessaire.';
   }
+
+  @override
+  String get notes => 'Notes';
+
+  @override
+  String get noNotesTapToAdd =>
+      'Pas encore de notes. Touchez pour en écrire une.';
+
+  @override
+  String get editNotes => 'Modifier les notes';
+
+  @override
+  String get notesSaved => 'Notes enregistrées';
+
+  @override
+  String get editCare => 'Modifier l\'entretien';
+
+  @override
+  String get editCareSharedWarning =>
+      'L\'entretien appartient à l\'espèce, la modification s\'applique donc aussi à vos autres plantes de cette espèce.';
+
+  @override
+  String get allEvents => 'Historique';
+
+  @override
+  String get noEventsYet => 'Pas encore d\'événements';
+
+  @override
+  String showAllEvents(String count) {
+    return 'Tout afficher ($count)';
+  }
+
+  @override
+  String get showLess => 'Afficher moins';
 }

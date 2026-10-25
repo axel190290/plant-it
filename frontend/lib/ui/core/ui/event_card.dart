@@ -14,6 +14,8 @@ class EventCard extends StatelessWidget {
   final EventType eventType;
   final Plant plant;
   final Function(Event event) removeEvent;
+  // On the plant page the plant is known: show the event type and note
+  final bool showPlantName;
 
   const EventCard({
     super.key,
@@ -21,6 +23,7 @@ class EventCard extends StatelessWidget {
     required this.removeEvent,
     required this.eventType,
     required this.plant,
+    this.showPlantName = true,
   });
 
   @override
@@ -30,14 +33,18 @@ class EventCard extends StatelessWidget {
       child: ListTile(
         contentPadding: EdgeInsets.all(0),
         title: Text(
-          plant.name,
+          showPlantName ? plant.name : eventType.name,
           style: Theme.of(context)
               .textTheme
               .bodyLarge!
               .copyWith(fontWeight: FontWeight.w500),
         ),
         subtitle: Text(
-          timeDiffStr(event.date, L.of(context)),
+          !showPlantName && (event.note ?? "").isNotEmpty
+              ? "${timeDiffStr(event.date, L.of(context))}\n${event.note}"
+              : timeDiffStr(event.date, L.of(context)),
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context)
               .textTheme
               .bodyLarge!

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:command_it/command_it.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/utils/stream_code.dart';
 import 'package:result_dart/result_dart.dart';
 
 class EditEventFormViewModel extends ChangeNotifier {
@@ -15,10 +18,12 @@ class EditEventFormViewModel extends ChangeNotifier {
     required PlantRepository plantRepository,
     required EventTypeRepository eventTypeRepository,
     required SpeciesRepository speciesRepository,
+    required StreamController<StreamCode> streamController,
   })  : _eventRepository = eventRepository,
         _plantRepository = plantRepository,
         _eventTypeRepository = eventTypeRepository,
-        _speciesRepository = speciesRepository {
+        _speciesRepository = speciesRepository,
+        _streamController = streamController {
     load = Command.createAsync((int eventId) async {
       Result<void> result = await _load(eventId);
       if (result.isError()) throw result.exceptionOrNull()!;
@@ -27,6 +32,7 @@ class EditEventFormViewModel extends ChangeNotifier {
     update = Command.createAsyncNoParam(() async {
       Result<void> result = await updateEvent();
       if (result.isError()) throw result.exceptionOrNull()!;
+      _streamController.add(StreamCode.editEvent);
       return "ok";
     }, initialValue: "not started");
   }
@@ -35,6 +41,7 @@ class EditEventFormViewModel extends ChangeNotifier {
   final PlantRepository _plantRepository;
   final EventTypeRepository _eventTypeRepository;
   final SpeciesRepository _speciesRepository;
+  final StreamController<StreamCode> _streamController;
   final _log = Logger('EditEventFormViewModel');
 
   late final Command<int, void> load;

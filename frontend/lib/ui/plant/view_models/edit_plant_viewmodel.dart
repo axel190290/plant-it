@@ -42,15 +42,15 @@ class EditPlantViewModel extends ChangeNotifier {
     _plant = _plant.copyWith(note: Value(note));
   }
 
-  setLocation(String location) {
+  setLocation(String? location) {
     _plant = _plant.copyWith(location: Value(location));
   }
 
-  setSeller(String seller) {
+  setSeller(String? seller) {
     _plant = _plant.copyWith(seller: Value(seller));
   }
 
-  setPrice(double price) {
+  setPrice(double? price) {
     _plant = _plant.copyWith(price: Value(price));
   }
 

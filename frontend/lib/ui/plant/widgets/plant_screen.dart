@@ -5,9 +5,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:plant_it/database/database.dart' as db;
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
+import 'package:plant_it/ui/core/ui/event_card.dart';
 import 'package:plant_it/ui/plant/view_models/plant_view_model.dart';
 import 'package:plant_it/ui/plant/widgets/grid_widget.dart';
 import 'package:plant_it/ui/plant/widgets/plant_avatar.dart';
@@ -29,7 +31,181 @@ class PlantScreen extends StatefulWidget {
 }
 
 class _PlantScreenState extends State<PlantScreen> {
+  static const int _collapsedEventCount = 5;
   final ImagePicker _picker = ImagePicker();
+  late final StreamSubscription<StreamCode> _subscription;
+  bool _showAllEvents = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Show the changes made in the edit screens opened from this page
+    _subscription = widget.streamController.stream.listen((code) {
+      if (!mounted) return;
+      if (const [
+        StreamCode.editPlant,
+        StreamCode.editSpecies,
+        StreamCode.insertEvent,
+        StreamCode.editEvent,
+        StreamCode.deleteEvent,
+      ].contains(code)) {
+        widget.viewModel.load.execute(widget.viewModel.id);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
+
+  Future<void> _editNotes() async {
+    final TextEditingController controller =
+        TextEditingController(text: widget.viewModel.plant.note ?? "");
+    final String? result = await showDialog<String>(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(L.of(context).editNotes),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              labelText: L.of(context).notes,
+              border: const OutlineInputBorder(),
+            ),
+            minLines: 4,
+            maxLines: 12,
+            maxLength: 8500,
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(L.of(context).cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: Text(L.of(context).save),
+            ),
+          ],
+        );
+      },
+    );
+    if (result == null || !mounted) return;
+
+    String message;
+    try {
+      await widget.viewModel.updateNote.executeWithFuture(result);
+      if (!mounted) return;
+      message = L.of(context).notesSaved;
+    } catch (e) {
+      if (!mounted) return;
+      message = L.of(context).errorWithMessage(e.toString());
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+    setState(() {});
+  }
+
+  void _editCare() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(L.of(context).editCareSharedWarning)),
+    );
+    context.push(Routes.speciesWithId(widget.viewModel.species.id));
+  }
+
+  Future<void> _deleteEventWithConfirm(db.Event event) async {
+    bool? confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(L.of(context).confirmDelete),
+        content: Text(L.of(context).areYouSureYouWantToDeleteThisEvent),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: Text(L.of(context).cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: Text(L.of(context).delete),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    String message;
+    try {
+      await widget.viewModel.deleteEvent.executeWithFuture(event);
+      // Also refreshes the calendar and the home page
+      widget.streamController.add(StreamCode.deleteEvent);
+      if (!mounted) return;
+      message = L.of(context).eventDeleted;
+    } catch (e) {
+      if (!mounted) return;
+      message = L.of(context).errorWithMessage(e.toString());
+    }
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+    setState(() {});
+  }
+
+  Widget _sectionTitle(String title, {VoidCallback? onEdit, String? tooltip}) {
+    Text text = Text(title, style: Theme.of(context).textTheme.headlineSmall);
+    if (onEdit == null) {
+      return text;
+    }
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        text,
+        IconButton(
+          icon: Icon(LucideIcons.pencil,
+              size: 18, color: Theme.of(context).colorScheme.primary),
+          tooltip: tooltip,
+          onPressed: onEdit,
+        ),
+      ],
+    );
+  }
+
+  List<Widget> _eventHistory(L appLocalizations) {
+    List<db.Event> events = widget.viewModel.allEvents;
+    Map<int, db.EventType> types = {
+      for (db.EventType t in widget.viewModel.eventType) t.id: t
+    };
+    List<db.Event> shown =
+        _showAllEvents ? events : events.take(_collapsedEventCount).toList();
+    return [
+      Text(appLocalizations.allEvents,
+          style: Theme.of(context).textTheme.titleMedium),
+      if (events.isEmpty)
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(appLocalizations.noEventsYet,
+              style: Theme.of(context).textTheme.bodyLarge),
+        ),
+      ...shown.where((e) => types.containsKey(e.type)).map((e) => EventCard(
+            key: ValueKey(e.id),
+            event: e,
+            eventType: types[e.type]!,
+            plant: widget.viewModel.plant,
+            removeEvent: _deleteEventWithConfirm,
+            showPlantName: false,
+          )),
+      if (events.length > _collapsedEventCount)
+        TextButton(
+          onPressed: () => setState(() => _showAllEvents = !_showAllEvents),
+          child: Text(_showAllEvents
+              ? appLocalizations.showLess
+              : appLocalizations.showAllEvents(events.length.toString())),
+        ),
+    ];
+  }
 
   Future<void> _uploadNewPhoto() async {
     final XFile? pickedFile =
@@ -168,9 +344,10 @@ class _PlantScreenState extends State<PlantScreen> {
                           const SizedBox(height: 16),
 
                           // Care
-                          Text(
+                          _sectionTitle(
                             appLocalizations.care,
-                            style: Theme.of(context).textTheme.headlineSmall,
+                            onEdit: _editCare,
+                            tooltip: appLocalizations.editCare,
                           ),
                           const SizedBox(height: 8),
                           SpeciesCareInfoGridWidget(
@@ -218,6 +395,28 @@ class _PlantScreenState extends State<PlantScreen> {
                             maxNum: 4,
                             care: widget.viewModel.care.toCompanion(true),
                             appLocalizations: appLocalizations,
+                          ),
+                          const SizedBox(height: 8),
+                          ..._eventHistory(appLocalizations),
+                          const SizedBox(height: 16),
+
+                          // Notes
+                          _sectionTitle(
+                            appLocalizations.notes,
+                            onEdit: _editNotes,
+                            tooltip: appLocalizations.editNotes,
+                          ),
+                          GestureDetector(
+                            onTap: _editNotes,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                (widget.viewModel.plant.note ?? "").isEmpty
+                                    ? appLocalizations.noNotesTapToAdd
+                                    : widget.viewModel.plant.note!,
+                                style: Theme.of(context).textTheme.bodyLarge!,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 16),
 
@@ -329,6 +528,18 @@ class _PlantScreenState extends State<PlantScreen> {
                             ),
                           ),
                           PopupMenuItem(
+                            value: 'editCare',
+                            textStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                            child: ListTile(
+                              leading: Icon(
+                                LucideIcons.sprout,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              title: Text(appLocalizations.editCare),
+                            ),
+                          ),
+                          PopupMenuItem(
                             value: 'duplicate',
                             textStyle: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface),
@@ -357,6 +568,8 @@ class _PlantScreenState extends State<PlantScreen> {
                         if (value == 'edit') {
                           context.push(
                               Routes.editPlantWithId(widget.viewModel.id));
+                        } else if (value == 'editCare') {
+                          _editCare();
                         } else if (value == 'duplicate') {
                           Command<void, void> command =
                               widget.viewModel.duplicatePlant;

@@ -427,5 +427,22 @@
         "type": "String"
       }
     }
-  }
+  },
+  "notes": "Notes",
+  "noNotesTapToAdd": "No notes yet. Tap to write one.",
+  "editNotes": "Edit notes",
+  "notesSaved": "Notes saved",
+  "editCare": "Edit care",
+  "editCareSharedWarning": "Care belongs to the species, so the change also applies to your other plants of this species.",
+  "allEvents": "History",
+  "noEventsYet": "No events yet",
+  "showAllEvents": "Show all ({count})",
+  "@showAllEvents": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "showLess": "Show less"
 }

@@ -24,7 +24,7 @@ class SellerStep extends StepSection<EditPlantViewModel> {
 
   @override
   void confirm() {
-    viewModel.setSeller(_ongoingSelection.value!);
+    viewModel.setSeller(_ongoingSelection.value);
     _selectedSeller.value = _ongoingSelection.value;
   }
 

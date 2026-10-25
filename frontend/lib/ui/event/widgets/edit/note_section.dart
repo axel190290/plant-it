@@ -42,7 +42,7 @@ class NoteSection extends StepSection<EditEventFormViewModel> {
 
   @override
   void confirm() {
-    if (_selectedNote.value == null) {
+    if (_ongoingSelection.value == null) {
       return;
     }
     viewModel.setNote(_ongoingSelection.value!);

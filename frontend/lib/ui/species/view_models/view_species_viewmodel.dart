@@ -19,7 +19,7 @@ import 'package:plant_it/data/service/search/species_searcher_facade.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/care_value.dart';
-import 'package:plant_it/ui/core/ui/care_values_section.dart';
+import 'package:plant_it/ui/core/ui/care_field_format.dart';
 import 'package:plant_it/domain/models/species_searcher_result.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -189,7 +189,7 @@ class ViewSpeciesViewModel extends ChangeNotifier {
     }
     _externalCareValues = details.getOrThrow().careValues;
     _careValues =
-        CareValuesSection.valuesByKey(_careFields, _externalCareValues);
+        careValuesByFieldId(_careFields, _externalCareValues);
 
     String? url =
         details.getOrThrow().speciesCompanion.externalAvatarUrl.present

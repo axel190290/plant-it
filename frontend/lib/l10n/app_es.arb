@@ -426,14 +426,12 @@
   "careFieldDiseases": "Enfermedades",
   "careFieldToxicity": "Toxicidad",
   "everyNDays": "cada {days} días",
-  "moreCare": "Más cuidados",
-  "noMoreCare": "Aún no hay datos. Toca el lápiz para añadirlos.",
   "editMoreCare": "Editar más cuidados",
   "careSaved": "Cuidados guardados",
-  "careFields": "Campos de cuidado",
+  "careFields": "Categorías de cuidado",
   "manageCareFields": "Elige qué cuidados mostrar y crea los tuyos",
-  "careFieldsDescription": "Los campos activados se muestran y se pueden editar en todas las especies y plantas. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.",
-  "addCareField": "Nuevo campo",
+  "careFieldsDescription": "Las categorías activadas se muestran y se pueden editar en la sección Cuidados de todas las especies y plantas. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.",
+  "addCareField": "Nueva categoría",
   "careFieldUnit": "Unidad (opcional)",
   "careFieldOptions": "Opciones, separadas por comas",
   "careFieldType": "Tipo",
@@ -444,5 +442,9 @@
   "customCareField": "Creado por ti",
   "areYouSureYouWantToDeleteThisCareField": "Se borrarán sus valores en todas las especies.",
   "estimatedByAi": "Estimado por IA",
-  "noCareFieldsEnabled": "No hay campos de cuidado activados. Actívalos en Ajustes > Campos de cuidado."
+  "noCareFieldsEnabled": "No hay categorías de cuidado activadas. Actívalas en Ajustes > Categorías de cuidado.",
+  "basicCare": "Cuidados básicos",
+  "careCategories": "Categorías",
+  "notSet": "Sin definir",
+  "noAdditionalInfo": "Aún no hay vendedor, precio ni ubicación. Toca el lápiz para añadirlos."
 }

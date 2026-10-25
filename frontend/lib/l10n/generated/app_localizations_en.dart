@@ -1129,19 +1129,13 @@ class LEn extends L {
   }
 
   @override
-  String get moreCare => 'More care';
-
-  @override
-  String get noMoreCare => 'No data yet. Tap the pencil to add it.';
-
-  @override
   String get editMoreCare => 'Edit more care';
 
   @override
   String get careSaved => 'Care saved';
 
   @override
-  String get careFields => 'Care fields';
+  String get careFields => 'Care categories';
 
   @override
   String get manageCareFields =>
@@ -1149,10 +1143,10 @@ class LEn extends L {
 
   @override
   String get careFieldsDescription =>
-      'Enabled fields are shown and can be edited on every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.';
+      'Enabled categories are shown and can be edited in the Care section of every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.';
 
   @override
-  String get addCareField => 'New field';
+  String get addCareField => 'New category';
 
   @override
   String get careFieldUnit => 'Unit (optional)';
@@ -1187,5 +1181,18 @@ class LEn extends L {
 
   @override
   String get noCareFieldsEnabled =>
-      'No care fields are enabled. Enable them in Settings > Care fields.';
+      'No care categories are enabled. Enable them in Settings > Care categories.';
+
+  @override
+  String get basicCare => 'Basic care';
+
+  @override
+  String get careCategories => 'Categories';
+
+  @override
+  String get notSet => 'Not set';
+
+  @override
+  String get noAdditionalInfo =>
+      'No seller, price or location yet. Tap the pencil to add them.';
 }

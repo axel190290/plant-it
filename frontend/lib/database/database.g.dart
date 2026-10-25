@@ -2078,6 +2078,13 @@ class $CareFieldsTable extends CareFields
       additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 500),
       type: DriftSqlType.string,
       requiredDuringInsert: false);
+  static const VerificationMeta _iconMeta = const VerificationMeta('icon');
+  @override
+  late final GeneratedColumn<String> icon = GeneratedColumn<String>(
+      'icon', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 50),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
   static const VerificationMeta _enabledMeta =
       const VerificationMeta('enabled');
   @override
@@ -2098,7 +2105,7 @@ class $CareFieldsTable extends CareFields
       defaultValue: const Constant(0));
   @override
   List<GeneratedColumn> get $columns =>
-      [id, key, name, type, unit, options, enabled, position];
+      [id, key, name, type, unit, options, icon, enabled, position];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2127,6 +2134,10 @@ class $CareFieldsTable extends CareFields
     if (data.containsKey('options')) {
       context.handle(_optionsMeta,
           options.isAcceptableOrUnknown(data['options']!, _optionsMeta));
+    }
+    if (data.containsKey('icon')) {
+      context.handle(
+          _iconMeta, icon.isAcceptableOrUnknown(data['icon']!, _iconMeta));
     }
     if (data.containsKey('enabled')) {
       context.handle(_enabledMeta,
@@ -2157,6 +2168,8 @@ class $CareFieldsTable extends CareFields
           .read(DriftSqlType.string, data['${effectivePrefix}unit']),
       options: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}options']),
+      icon: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}icon']),
       enabled: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}enabled'])!,
       position: attachedDatabase.typeMapping
@@ -2180,6 +2193,7 @@ class CareField extends DataClass implements Insertable<CareField> {
   final CareFieldType type;
   final String? unit;
   final String? options;
+  final String? icon;
   final bool enabled;
   final int position;
   const CareField(
@@ -2189,6 +2203,7 @@ class CareField extends DataClass implements Insertable<CareField> {
       required this.type,
       this.unit,
       this.options,
+      this.icon,
       required this.enabled,
       required this.position});
   @override
@@ -2211,6 +2226,9 @@ class CareField extends DataClass implements Insertable<CareField> {
     if (!nullToAbsent || options != null) {
       map['options'] = Variable<String>(options);
     }
+    if (!nullToAbsent || icon != null) {
+      map['icon'] = Variable<String>(icon);
+    }
     map['enabled'] = Variable<bool>(enabled);
     map['position'] = Variable<int>(position);
     return map;
@@ -2226,6 +2244,7 @@ class CareField extends DataClass implements Insertable<CareField> {
       options: options == null && nullToAbsent
           ? const Value.absent()
           : Value(options),
+      icon: icon == null && nullToAbsent ? const Value.absent() : Value(icon),
       enabled: Value(enabled),
       position: Value(position),
     );
@@ -2242,6 +2261,7 @@ class CareField extends DataClass implements Insertable<CareField> {
           .fromJson(serializer.fromJson<String>(json['type'])),
       unit: serializer.fromJson<String?>(json['unit']),
       options: serializer.fromJson<String?>(json['options']),
+      icon: serializer.fromJson<String?>(json['icon']),
       enabled: serializer.fromJson<bool>(json['enabled']),
       position: serializer.fromJson<int>(json['position']),
     );
@@ -2257,6 +2277,7 @@ class CareField extends DataClass implements Insertable<CareField> {
           .toJson<String>($CareFieldsTable.$convertertype.toJson(type)),
       'unit': serializer.toJson<String?>(unit),
       'options': serializer.toJson<String?>(options),
+      'icon': serializer.toJson<String?>(icon),
       'enabled': serializer.toJson<bool>(enabled),
       'position': serializer.toJson<int>(position),
     };
@@ -2269,6 +2290,7 @@ class CareField extends DataClass implements Insertable<CareField> {
           CareFieldType? type,
           Value<String?> unit = const Value.absent(),
           Value<String?> options = const Value.absent(),
+          Value<String?> icon = const Value.absent(),
           bool? enabled,
           int? position}) =>
       CareField(
@@ -2278,6 +2300,7 @@ class CareField extends DataClass implements Insertable<CareField> {
         type: type ?? this.type,
         unit: unit.present ? unit.value : this.unit,
         options: options.present ? options.value : this.options,
+        icon: icon.present ? icon.value : this.icon,
         enabled: enabled ?? this.enabled,
         position: position ?? this.position,
       );
@@ -2289,6 +2312,7 @@ class CareField extends DataClass implements Insertable<CareField> {
       type: data.type.present ? data.type.value : this.type,
       unit: data.unit.present ? data.unit.value : this.unit,
       options: data.options.present ? data.options.value : this.options,
+      icon: data.icon.present ? data.icon.value : this.icon,
       enabled: data.enabled.present ? data.enabled.value : this.enabled,
       position: data.position.present ? data.position.value : this.position,
     );
@@ -2303,6 +2327,7 @@ class CareField extends DataClass implements Insertable<CareField> {
           ..write('type: $type, ')
           ..write('unit: $unit, ')
           ..write('options: $options, ')
+          ..write('icon: $icon, ')
           ..write('enabled: $enabled, ')
           ..write('position: $position')
           ..write(')'))
@@ -2311,7 +2336,7 @@ class CareField extends DataClass implements Insertable<CareField> {
 
   @override
   int get hashCode =>
-      Object.hash(id, key, name, type, unit, options, enabled, position);
+      Object.hash(id, key, name, type, unit, options, icon, enabled, position);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2322,6 +2347,7 @@ class CareField extends DataClass implements Insertable<CareField> {
           other.type == this.type &&
           other.unit == this.unit &&
           other.options == this.options &&
+          other.icon == this.icon &&
           other.enabled == this.enabled &&
           other.position == this.position);
 }
@@ -2333,6 +2359,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
   final Value<CareFieldType> type;
   final Value<String?> unit;
   final Value<String?> options;
+  final Value<String?> icon;
   final Value<bool> enabled;
   final Value<int> position;
   const CareFieldsCompanion({
@@ -2342,6 +2369,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
     this.type = const Value.absent(),
     this.unit = const Value.absent(),
     this.options = const Value.absent(),
+    this.icon = const Value.absent(),
     this.enabled = const Value.absent(),
     this.position = const Value.absent(),
   });
@@ -2352,6 +2380,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
     required CareFieldType type,
     this.unit = const Value.absent(),
     this.options = const Value.absent(),
+    this.icon = const Value.absent(),
     this.enabled = const Value.absent(),
     this.position = const Value.absent(),
   }) : type = Value(type);
@@ -2362,6 +2391,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
     Expression<String>? type,
     Expression<String>? unit,
     Expression<String>? options,
+    Expression<String>? icon,
     Expression<bool>? enabled,
     Expression<int>? position,
   }) {
@@ -2372,6 +2402,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
       if (type != null) 'type': type,
       if (unit != null) 'unit': unit,
       if (options != null) 'options': options,
+      if (icon != null) 'icon': icon,
       if (enabled != null) 'enabled': enabled,
       if (position != null) 'position': position,
     });
@@ -2384,6 +2415,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
       Value<CareFieldType>? type,
       Value<String?>? unit,
       Value<String?>? options,
+      Value<String?>? icon,
       Value<bool>? enabled,
       Value<int>? position}) {
     return CareFieldsCompanion(
@@ -2393,6 +2425,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
       type: type ?? this.type,
       unit: unit ?? this.unit,
       options: options ?? this.options,
+      icon: icon ?? this.icon,
       enabled: enabled ?? this.enabled,
       position: position ?? this.position,
     );
@@ -2420,6 +2453,9 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
     if (options.present) {
       map['options'] = Variable<String>(options.value);
     }
+    if (icon.present) {
+      map['icon'] = Variable<String>(icon.value);
+    }
     if (enabled.present) {
       map['enabled'] = Variable<bool>(enabled.value);
     }
@@ -2438,6 +2474,7 @@ class CareFieldsCompanion extends UpdateCompanion<CareField> {
           ..write('type: $type, ')
           ..write('unit: $unit, ')
           ..write('options: $options, ')
+          ..write('icon: $icon, ')
           ..write('enabled: $enabled, ')
           ..write('position: $position')
           ..write(')'))
@@ -6709,6 +6746,7 @@ typedef $$CareFieldsTableCreateCompanionBuilder = CareFieldsCompanion Function({
   required CareFieldType type,
   Value<String?> unit,
   Value<String?> options,
+  Value<String?> icon,
   Value<bool> enabled,
   Value<int> position,
 });
@@ -6719,6 +6757,7 @@ typedef $$CareFieldsTableUpdateCompanionBuilder = CareFieldsCompanion Function({
   Value<CareFieldType> type,
   Value<String?> unit,
   Value<String?> options,
+  Value<String?> icon,
   Value<bool> enabled,
   Value<int> position,
 });
@@ -6773,6 +6812,9 @@ class $$CareFieldsTableFilterComposer
 
   ColumnFilters<String> get options => $composableBuilder(
       column: $table.options, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get icon => $composableBuilder(
+      column: $table.icon, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<bool> get enabled => $composableBuilder(
       column: $table.enabled, builder: (column) => ColumnFilters(column));
@@ -6829,6 +6871,9 @@ class $$CareFieldsTableOrderingComposer
   ColumnOrderings<String> get options => $composableBuilder(
       column: $table.options, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get icon => $composableBuilder(
+      column: $table.icon, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<bool> get enabled => $composableBuilder(
       column: $table.enabled, builder: (column) => ColumnOrderings(column));
 
@@ -6862,6 +6907,9 @@ class $$CareFieldsTableAnnotationComposer
 
   GeneratedColumn<String> get options =>
       $composableBuilder(column: $table.options, builder: (column) => column);
+
+  GeneratedColumn<String> get icon =>
+      $composableBuilder(column: $table.icon, builder: (column) => column);
 
   GeneratedColumn<bool> get enabled =>
       $composableBuilder(column: $table.enabled, builder: (column) => column);
@@ -6921,6 +6969,7 @@ class $$CareFieldsTableTableManager extends RootTableManager<
             Value<CareFieldType> type = const Value.absent(),
             Value<String?> unit = const Value.absent(),
             Value<String?> options = const Value.absent(),
+            Value<String?> icon = const Value.absent(),
             Value<bool> enabled = const Value.absent(),
             Value<int> position = const Value.absent(),
           }) =>
@@ -6931,6 +6980,7 @@ class $$CareFieldsTableTableManager extends RootTableManager<
             type: type,
             unit: unit,
             options: options,
+            icon: icon,
             enabled: enabled,
             position: position,
           ),
@@ -6941,6 +6991,7 @@ class $$CareFieldsTableTableManager extends RootTableManager<
             required CareFieldType type,
             Value<String?> unit = const Value.absent(),
             Value<String?> options = const Value.absent(),
+            Value<String?> icon = const Value.absent(),
             Value<bool> enabled = const Value.absent(),
             Value<int> position = const Value.absent(),
           }) =>
@@ -6951,6 +7002,7 @@ class $$CareFieldsTableTableManager extends RootTableManager<
             type: type,
             unit: unit,
             options: options,
+            icon: icon,
             enabled: enabled,
             position: position,
           ),

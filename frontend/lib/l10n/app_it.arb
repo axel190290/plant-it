@@ -439,14 +439,12 @@
   "careFieldDiseases": "Malattie",
   "careFieldToxicity": "Tossicità",
   "everyNDays": "ogni {days} giorni",
-  "moreCare": "Altre cure",
-  "noMoreCare": "Ancora nessun dato. Tocca la matita per aggiungerli.",
   "editMoreCare": "Modifica altre cure",
   "careSaved": "Cure salvate",
-  "careFields": "Campi di cura",
+  "careFields": "Categorie di cura",
   "manageCareFields": "Scegli quali cure mostrare e crea le tue",
-  "careFieldsDescription": "I campi attivi sono mostrati e modificabili su ogni specie e pianta. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.",
-  "addCareField": "Nuovo campo",
+  "careFieldsDescription": "Le categorie attive sono mostrate e modificabili nella sezione Cura di ogni specie e pianta. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.",
+  "addCareField": "Nuova categoria",
   "careFieldUnit": "Unità (facoltativa)",
   "careFieldOptions": "Opzioni, separate da virgole",
   "careFieldType": "Tipo",
@@ -457,5 +455,9 @@
   "customCareField": "Creato da te",
   "areYouSureYouWantToDeleteThisCareField": "I suoi valori saranno eliminati da tutte le specie.",
   "estimatedByAi": "Stimato dall'IA",
-  "noCareFieldsEnabled": "Nessun campo di cura attivo. Attivali in Impostazioni > Campi di cura."
+  "noCareFieldsEnabled": "Nessuna categoria di cura attiva. Attivale in Impostazioni > Categorie di cura.",
+  "basicCare": "Cure di base",
+  "careCategories": "Categorie",
+  "notSet": "Non impostato",
+  "noAdditionalInfo": "Ancora nessun venditore, prezzo o posizione. Tocca la matita per aggiungerli."
 }

@@ -1141,29 +1141,23 @@ class LEs extends L {
   }
 
   @override
-  String get moreCare => 'Más cuidados';
-
-  @override
-  String get noMoreCare => 'Aún no hay datos. Toca el lápiz para añadirlos.';
-
-  @override
   String get editMoreCare => 'Editar más cuidados';
 
   @override
   String get careSaved => 'Cuidados guardados';
 
   @override
-  String get careFields => 'Campos de cuidado';
+  String get careFields => 'Categorías de cuidado';
 
   @override
   String get manageCareFields => 'Elige qué cuidados mostrar y crea los tuyos';
 
   @override
   String get careFieldsDescription =>
-      'Los campos activados se muestran y se pueden editar en todas las especies y plantas. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.';
+      'Las categorías activadas se muestran y se pueden editar en la sección Cuidados de todas las especies y plantas. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.';
 
   @override
-  String get addCareField => 'Nuevo campo';
+  String get addCareField => 'Nueva categoría';
 
   @override
   String get careFieldUnit => 'Unidad (opcional)';
@@ -1198,5 +1192,18 @@ class LEs extends L {
 
   @override
   String get noCareFieldsEnabled =>
-      'No hay campos de cuidado activados. Actívalos en Ajustes > Campos de cuidado.';
+      'No hay categorías de cuidado activadas. Actívalas en Ajustes > Categorías de cuidado.';
+
+  @override
+  String get basicCare => 'Cuidados básicos';
+
+  @override
+  String get careCategories => 'Categorías';
+
+  @override
+  String get notSet => 'Sin definir';
+
+  @override
+  String get noAdditionalInfo =>
+      'Aún no hay vendedor, precio ni ubicación. Toca el lápiz para añadirlos.';
 }

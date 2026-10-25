@@ -426,14 +426,12 @@
   "careFieldDiseases": "Maladies",
   "careFieldToxicity": "Toxicité",
   "everyNDays": "tous les {days} jours",
-  "moreCare": "Plus d'entretien",
-  "noMoreCare": "Pas encore de données. Touchez le crayon pour les ajouter.",
   "editMoreCare": "Modifier plus d'entretien",
   "careSaved": "Entretien enregistré",
-  "careFields": "Champs d'entretien",
+  "careFields": "Catégories d'entretien",
   "manageCareFields": "Choisissez l'entretien à afficher et créez le vôtre",
-  "careFieldsDescription": "Les champs activés sont affichés et modifiables sur chaque espèce et plante. Les ravageurs et traitements d'une plante précise sont enregistrés comme événements (types « pest » et « treatment ») dans son historique.",
-  "addCareField": "Nouveau champ",
+  "careFieldsDescription": "Les catégories activées sont affichées et modifiables dans la section Entretien de chaque espèce et plante. Les ravageurs et traitements d'une plante précise sont enregistrés comme événements (types « pest » et « treatment ») dans son historique.",
+  "addCareField": "Nouvelle catégorie",
   "careFieldUnit": "Unité (facultative)",
   "careFieldOptions": "Options, séparées par des virgules",
   "careFieldType": "Type",
@@ -444,5 +442,9 @@
   "customCareField": "Créé par vous",
   "areYouSureYouWantToDeleteThisCareField": "Ses valeurs seront supprimées de toutes les espèces.",
   "estimatedByAi": "Estimé par l'IA",
-  "noCareFieldsEnabled": "Aucun champ d'entretien activé. Activez-les dans Paramètres > Champs d'entretien."
+  "noCareFieldsEnabled": "Aucune catégorie d'entretien activée. Activez-les dans Paramètres > Catégories d'entretien.",
+  "basicCare": "Entretien de base",
+  "careCategories": "Catégories",
+  "notSet": "Non défini",
+  "noAdditionalInfo": "Pas encore de vendeur, prix ou emplacement. Touchez le crayon pour les ajouter."
 }

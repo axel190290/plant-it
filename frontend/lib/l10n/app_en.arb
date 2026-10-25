@@ -471,14 +471,12 @@
       }
     }
   },
-  "moreCare": "More care",
-  "noMoreCare": "No data yet. Tap the pencil to add it.",
   "editMoreCare": "Edit more care",
   "careSaved": "Care saved",
-  "careFields": "Care fields",
+  "careFields": "Care categories",
   "manageCareFields": "Choose which care to show and create your own",
-  "careFieldsDescription": "Enabled fields are shown and can be edited on every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.",
-  "addCareField": "New field",
+  "careFieldsDescription": "Enabled categories are shown and can be edited in the Care section of every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.",
+  "addCareField": "New category",
   "careFieldUnit": "Unit (optional)",
   "careFieldOptions": "Options, separated by commas",
   "careFieldType": "Type",
@@ -489,5 +487,9 @@
   "customCareField": "Created by you",
   "areYouSureYouWantToDeleteThisCareField": "Its values will be deleted from every species.",
   "estimatedByAi": "Estimated by AI",
-  "noCareFieldsEnabled": "No care fields are enabled. Enable them in Settings > Care fields."
+  "noCareFieldsEnabled": "No care categories are enabled. Enable them in Settings > Care categories.",
+  "basicCare": "Basic care",
+  "careCategories": "Categories",
+  "notSet": "Not set",
+  "noAdditionalInfo": "No seller, price or location yet. Tap the pencil to add them."
 }

@@ -86,6 +86,8 @@ class CareFields extends Table {
   TextColumn get unit => text().withLength(max: 20).nullable()();
   // Choices of a choice field, separated by "|"
   TextColumn get options => text().withLength(max: 500).nullable()();
+  // Key of appIcons; null for built-in fields, which have a fixed icon
+  TextColumn get icon => text().withLength(max: 50).nullable()();
   BoolColumn get enabled => boolean().withDefault(const Constant(true))();
   IntColumn get position => integer().withDefault(const Constant(0))();
 }
@@ -196,7 +198,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -226,10 +228,13 @@ class AppDatabase extends _$AppDatabase {
       },
       onUpgrade: (m, from, to) async {
         if (from < 2) {
+          // Created with the current columns, icon included
           await m.createTable(careFields);
           await m.createTable(speciesCareValues);
           await initHealthEventTypes();
           await initCareFields();
+        } else if (from < 3) {
+          await m.addColumn(careFields, careFields.icon);
         }
       },
       beforeOpen: (details) async {

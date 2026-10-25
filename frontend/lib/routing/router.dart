@@ -447,6 +447,8 @@ GoRouter router() => GoRouter(
             EditCareValuesViewModel viewModel = EditCareValuesViewModel(
               careFieldRepository: context.read(),
               speciesCareValueRepository: context.read(),
+              speciesCareRepository: context.read(),
+              speciesRepository: context.read(),
               streamController: context.read(),
             );
             viewModel.load.execute(id);

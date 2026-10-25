@@ -9,6 +9,7 @@ import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/data/service/care/open_plantbook_client.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/ui/core/ui/create_care_field_dialog.dart';
 
 void main() {
   group('care field database', () {
@@ -98,6 +99,50 @@ void main() {
     } finally {
       await dir.delete(recursive: true);
     }
+  });
+
+  test('upgrading a version 2 database adds the category icons', () async {
+    Directory dir = await Directory.systemTemp.createTemp('plant_it_test');
+    File file = File('${dir.path}/db.sqlite');
+    try {
+      AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
+      await db.customStatement('SELECT 1');
+      await db.customStatement('ALTER TABLE care_fields DROP COLUMN icon');
+      await db.customStatement('PRAGMA user_version = 2');
+      await db.close();
+
+      db = AppDatabase.forTesting(NativeDatabase(file));
+      CareFieldRepository repository = CareFieldRepository(db: db);
+      await repository.insertCustom(const CareFieldDraft(
+        name: 'Pot size',
+        type: CareFieldType.number,
+        icon: 'ruler',
+        unit: ' cm ',
+      ).toCompanion());
+      CareField custom = (await repository.getAll()).getOrThrow().last;
+      expect(custom.icon, 'ruler');
+      expect(custom.unit, 'cm');
+      await db.close();
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
+  test('CareFieldDraft keeps options only for list categories', () {
+    CareFieldsCompanion choice = const CareFieldDraft(
+      name: 'Light exposure',
+      type: CareFieldType.choice,
+      icon: 'sun',
+      options: [' North', 'South ', '', 'East|West'],
+    ).toCompanion();
+    expect(choice.options.value, 'North|South|East/West');
+    CareFieldsCompanion text = const CareFieldDraft(
+      name: 'Origin',
+      type: CareFieldType.text,
+      icon: 'leaf',
+      options: ['ignored'],
+    ).toCompanion();
+    expect(text.options.value, isNull);
   });
 
   test('OpenPlantbookClient.toExtraCare keeps the measured ranges', () {

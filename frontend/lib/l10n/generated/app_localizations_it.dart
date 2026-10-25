@@ -1236,30 +1236,23 @@ class LIt extends L {
   }
 
   @override
-  String get moreCare => 'Altre cure';
-
-  @override
-  String get noMoreCare =>
-      'Ancora nessun dato. Tocca la matita per aggiungerli.';
-
-  @override
   String get editMoreCare => 'Modifica altre cure';
 
   @override
   String get careSaved => 'Cure salvate';
 
   @override
-  String get careFields => 'Campi di cura';
+  String get careFields => 'Categorie di cura';
 
   @override
   String get manageCareFields => 'Scegli quali cure mostrare e crea le tue';
 
   @override
   String get careFieldsDescription =>
-      'I campi attivi sono mostrati e modificabili su ogni specie e pianta. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.';
+      'Le categorie attive sono mostrate e modificabili nella sezione Cura di ogni specie e pianta. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.';
 
   @override
-  String get addCareField => 'Nuovo campo';
+  String get addCareField => 'Nuova categoria';
 
   @override
   String get careFieldUnit => 'Unità (facoltativa)';
@@ -1294,5 +1287,18 @@ class LIt extends L {
 
   @override
   String get noCareFieldsEnabled =>
-      'Nessun campo di cura attivo. Attivali in Impostazioni > Campi di cura.';
+      'Nessuna categoria di cura attiva. Attivale in Impostazioni > Categorie di cura.';
+
+  @override
+  String get basicCare => 'Cure di base';
+
+  @override
+  String get careCategories => 'Categorie';
+
+  @override
+  String get notSet => 'Non impostato';
+
+  @override
+  String get noAdditionalInfo =>
+      'Ancora nessun venditore, prezzo o posizione. Tocca la matita per aggiungerli.';
 }

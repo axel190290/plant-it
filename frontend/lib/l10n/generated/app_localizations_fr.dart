@@ -1135,20 +1135,13 @@ class LFr extends L {
   }
 
   @override
-  String get moreCare => 'Plus d\'entretien';
-
-  @override
-  String get noMoreCare =>
-      'Pas encore de données. Touchez le crayon pour les ajouter.';
-
-  @override
   String get editMoreCare => 'Modifier plus d\'entretien';
 
   @override
   String get careSaved => 'Entretien enregistré';
 
   @override
-  String get careFields => 'Champs d\'entretien';
+  String get careFields => 'Catégories d\'entretien';
 
   @override
   String get manageCareFields =>
@@ -1156,10 +1149,10 @@ class LFr extends L {
 
   @override
   String get careFieldsDescription =>
-      'Les champs activés sont affichés et modifiables sur chaque espèce et plante. Les ravageurs et traitements d\'une plante précise sont enregistrés comme événements (types « pest » et « treatment ») dans son historique.';
+      'Les catégories activées sont affichées et modifiables dans la section Entretien de chaque espèce et plante. Les ravageurs et traitements d\'une plante précise sont enregistrés comme événements (types « pest » et « treatment ») dans son historique.';
 
   @override
-  String get addCareField => 'Nouveau champ';
+  String get addCareField => 'Nouvelle catégorie';
 
   @override
   String get careFieldUnit => 'Unité (facultative)';
@@ -1194,5 +1187,18 @@ class LFr extends L {
 
   @override
   String get noCareFieldsEnabled =>
-      'Aucun champ d\'entretien activé. Activez-les dans Paramètres > Champs d\'entretien.';
+      'Aucune catégorie d\'entretien activée. Activez-les dans Paramètres > Catégories d\'entretien.';
+
+  @override
+  String get basicCare => 'Entretien de base';
+
+  @override
+  String get careCategories => 'Catégories';
+
+  @override
+  String get notSet => 'Non défini';
+
+  @override
+  String get noAdditionalInfo =>
+      'Pas encore de vendeur, prix ou emplacement. Touchez le crayon pour les ajouter.';
 }

@@ -1783,18 +1783,6 @@ abstract class L {
   /// **'every {days} days'**
   String everyNDays(String days);
 
-  /// No description provided for @moreCare.
-  ///
-  /// In en, this message translates to:
-  /// **'More care'**
-  String get moreCare;
-
-  /// No description provided for @noMoreCare.
-  ///
-  /// In en, this message translates to:
-  /// **'No data yet. Tap the pencil to add it.'**
-  String get noMoreCare;
-
   /// No description provided for @editMoreCare.
   ///
   /// In en, this message translates to:
@@ -1810,7 +1798,7 @@ abstract class L {
   /// No description provided for @careFields.
   ///
   /// In en, this message translates to:
-  /// **'Care fields'**
+  /// **'Care categories'**
   String get careFields;
 
   /// No description provided for @manageCareFields.
@@ -1822,13 +1810,13 @@ abstract class L {
   /// No description provided for @careFieldsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Enabled fields are shown and can be edited on every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.'**
+  /// **'Enabled categories are shown and can be edited in the Care section of every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.'**
   String get careFieldsDescription;
 
   /// No description provided for @addCareField.
   ///
   /// In en, this message translates to:
-  /// **'New field'**
+  /// **'New category'**
   String get addCareField;
 
   /// No description provided for @careFieldUnit.
@@ -1894,8 +1882,32 @@ abstract class L {
   /// No description provided for @noCareFieldsEnabled.
   ///
   /// In en, this message translates to:
-  /// **'No care fields are enabled. Enable them in Settings > Care fields.'**
+  /// **'No care categories are enabled. Enable them in Settings > Care categories.'**
   String get noCareFieldsEnabled;
+
+  /// No description provided for @basicCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Basic care'**
+  String get basicCare;
+
+  /// No description provided for @careCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Categories'**
+  String get careCategories;
+
+  /// No description provided for @notSet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not set'**
+  String get notSet;
+
+  /// No description provided for @noAdditionalInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'No seller, price or location yet. Tap the pencil to add them.'**
+  String get noAdditionalInfo;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

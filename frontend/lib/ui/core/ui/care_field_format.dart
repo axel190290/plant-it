@@ -3,6 +3,7 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
+import 'package:plant_it/utils/icons.dart';
 
 /// The name of a care field: translated for built-in fields, as written by
 /// the user for the others.
@@ -64,81 +65,58 @@ String? formatCareValue(L l, CareField field, CareValue value) {
   }
 }
 
-/// The enabled care fields that have a value, one per row.
-class CareValuesSection extends StatelessWidget {
-  final List<CareField> fields;
-  final Map<int, CareValue> values;
-  final String emptyText;
+/// Converts values of built-in fields by key, as given by the external data
+/// sources, to values by field id.
+Map<int, CareValue> careValuesByFieldId(
+    List<CareField> fields, Map<String, CareValue> byKey) {
+  return {
+    for (CareField field in fields)
+      if (field.key != null && byKey.containsKey(field.key))
+        field.id: byKey[field.key]!
+  };
+}
 
-  const CareValuesSection({
-    super.key,
-    required this.fields,
-    required this.values,
-    required this.emptyText,
-  });
+/// Icons offered for the care categories created by the user.
+const List<String> customCareFieldIcons = [
+  'sprout',
+  'leaf',
+  'flower',
+  'tree_pine',
+  'sun',
+  'droplet',
+  'thermometer',
+  'wind',
+  'bug',
+  'scissors',
+  'flask_conical',
+  'ruler',
+  'heart',
+  'star',
+  'tag',
+  'package_open',
+];
 
-  /// Converts values of built-in fields by key, as given by the external
-  /// data sources, to values by field id.
-  static Map<int, CareValue> valuesByKey(
-      List<CareField> fields, Map<String, CareValue> byKey) {
-    return {
-      for (CareField field in fields)
-        if (field.key != null && byKey.containsKey(field.key))
-          field.id: byKey[field.key]!
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    L l = L.of(context);
-    List<(CareField, String, bool)> rows = [];
-    for (CareField field in fields) {
-      if (!field.enabled || !values.containsKey(field.id)) continue;
-      String? text = formatCareValue(l, field, values[field.id]!);
-      if (text != null) {
-        rows.add((field, text, values[field.id]!.estimated));
-      }
-    }
-    if (rows.isEmpty) {
-      return Text(emptyText, style: Theme.of(context).textTheme.bodyLarge);
-    }
-
-    return Column(
-      children: rows.map((row) {
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: Text(
-                  careFieldName(l, row.$1),
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyLarge!
-                      .copyWith(fontWeight: FontWeight.w500),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 3,
-                child:
-                    Text(row.$2, style: Theme.of(context).textTheme.bodyLarge),
-              ),
-              if (row.$3)
-                Tooltip(
-                  message: l.estimatedByAi,
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 6, top: 3),
-                    child: Icon(LucideIcons.sparkles,
-                        size: 14, color: Theme.of(context).colorScheme.primary),
-                  ),
-                ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
+IconData careFieldIcon(CareField field) {
+  String name = switch (field.key) {
+    'light_lux' => 'sun_medium',
+    'light_hours' => 'sunrise',
+    'env_humidity' => 'droplets',
+    'watering_summer' => 'droplet',
+    'watering_winter' => 'snowflake',
+    'soil_moisture' => 'shovel',
+    'conductivity' => 'zap',
+    'water_type' => 'glass_water',
+    'watering_method' => 'shower_head',
+    'substrate' => 'layers',
+    'fertilizer' => 'flask_conical',
+    'pruning' => 'scissors',
+    'repotting' => 'package_open',
+    'flowering_season' => 'flower',
+    'dormancy_season' => 'moon',
+    'common_pests' => 'bug',
+    'diseases' => 'shield_alert',
+    'toxicity' => 'skull',
+    _ => field.icon ?? 'sprout',
+  };
+  return appIcons[name] ?? LucideIcons.sprout;
 }

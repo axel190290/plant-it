@@ -3,17 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
-import 'package:plant_it/ui/core/ui/care_values_section.dart';
+import 'package:plant_it/ui/core/ui/care_field_format.dart';
+import 'package:plant_it/ui/core/ui/create_care_field_dialog.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/settings/view_models/care_fields_viewmodel.dart';
 import 'package:result_dart/result_dart.dart';
-
-String careFieldTypeName(L l, CareFieldType type) => switch (type) {
-      CareFieldType.number => l.careFieldTypeNumber,
-      CareFieldType.range => l.careFieldTypeRange,
-      CareFieldType.text => l.careFieldTypeText,
-      CareFieldType.choice => l.careFieldTypeChoice,
-    };
 
 /// Enables the built-in care fields and manages the ones created by the user.
 class CareFieldsScreen extends StatelessWidget {
@@ -31,74 +25,9 @@ class CareFieldsScreen extends StatelessWidget {
   }
 
   Future<void> _add(BuildContext context) async {
-    L l = L.of(context);
-    TextEditingController name = TextEditingController();
-    TextEditingController unit = TextEditingController();
-    TextEditingController options = TextEditingController();
-    CareFieldType type = CareFieldType.text;
-
-    bool? confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setState) => AlertDialog(
-          title: Text(l.addCareField),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: name,
-                  maxLength: 50,
-                  autofocus: true,
-                  decoration: InputDecoration(labelText: l.name),
-                  onChanged: (_) => setState(() {}),
-                ),
-                DropdownButtonFormField<CareFieldType>(
-                  value: type,
-                  decoration: InputDecoration(labelText: l.careFieldType),
-                  items: CareFieldType.values
-                      .map((t) => DropdownMenuItem(
-                          value: t, child: Text(careFieldTypeName(l, t))))
-                      .toList(),
-                  onChanged: (t) => setState(() => type = t ?? type),
-                ),
-                if (type == CareFieldType.number || type == CareFieldType.range)
-                  TextField(
-                    controller: unit,
-                    maxLength: 20,
-                    decoration: InputDecoration(labelText: l.careFieldUnit),
-                  ),
-                if (type == CareFieldType.choice)
-                  TextField(
-                    controller: options,
-                    decoration: InputDecoration(labelText: l.careFieldOptions),
-                  ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(ctx).pop(false),
-              child: Text(l.cancel),
-            ),
-            TextButton(
-              onPressed: name.text.trim().isEmpty
-                  ? null
-                  : () => Navigator.of(ctx).pop(true),
-              child: Text(l.save),
-            ),
-          ],
-        ),
-      ),
-    );
-    if (confirmed != true) return;
-
-    Result<void> result = await viewModel.add(
-      name: name.text,
-      type: type,
-      unit: unit.text,
-      options: options.text.split(','),
-    );
+    CareFieldDraft? draft = await showCreateCareFieldDialog(context);
+    if (draft == null) return;
+    Result<void> result = await viewModel.add(draft);
     if (context.mounted) _showError(context, result);
   }
 
@@ -167,24 +96,32 @@ class CareFieldsScreen extends StatelessWidget {
                   if (custom) {
                     subtitle = "$subtitle · ${l.customCareField}";
                   }
+                  Widget toggle = Switch(
+                    value: field.enabled,
+                    onChanged: (enabled) async {
+                      Result<void> result =
+                          await viewModel.setEnabled(field, enabled);
+                      if (context.mounted) _showError(context, result);
+                    },
+                  );
                   return ListTile(
                     title: Text(careFieldName(l, field)),
                     subtitle: Text(subtitle),
-                    leading: custom
-                        ? IconButton(
-                            icon: const Icon(LucideIcons.trash),
-                            tooltip: l.delete,
-                            onPressed: () => _delete(context, field),
+                    leading: Icon(careFieldIcon(field)),
+                    onLongPress: custom ? () => _delete(context, field) : null,
+                    trailing: custom
+                        ? Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(LucideIcons.trash),
+                                tooltip: l.delete,
+                                onPressed: () => _delete(context, field),
+                              ),
+                              toggle,
+                            ],
                           )
-                        : null,
-                    trailing: Switch(
-                      value: field.enabled,
-                      onChanged: (enabled) async {
-                        Result<void> result =
-                            await viewModel.setEnabled(field, enabled);
-                        if (context.mounted) _showError(context, result);
-                      },
-                    ),
+                        : toggle,
                   );
                 }),
               ],

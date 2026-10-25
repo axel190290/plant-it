@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/ui/core/ui/care_field_format.dart';
 import 'package:plant_it/domain/models/reminder_occurrence.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/plant/view_models/plant_view_model.dart';
@@ -28,13 +30,8 @@ abstract class InfoGridWidget extends StatefulWidget {
 }
 
 class _InfoGridWidgetState extends State<InfoGridWidget> {
-  int _pages = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _pages = (widget.getInfoChildren().length / widget.maxNum).ceil();
-  }
+  // Computed on every build, so new values are shown after a reload
+  int get _pages => (widget.getInfoChildren().length / widget.maxNum).ceil();
 
   Widget _buildSinglePage(List<Widget>? tiles) {
     return GridView.builder(
@@ -102,12 +99,40 @@ class _InfoGridWidgetState extends State<InfoGridWidget> {
 }
 
 class SpeciesCareInfoGridWidget extends InfoGridWidget {
+  // The care categories and their values, shown after the basic care
+  final List<CareField> careFields;
+  final Map<int, CareValue> careValues;
+  final void Function(String title, String value, bool estimated)? onTapValue;
+
   const SpeciesCareInfoGridWidget({
     super.key,
     required super.care,
     required super.maxNum,
     required super.appLocalizations,
+    this.careFields = const [],
+    this.careValues = const {},
+    this.onTapValue,
   });
+
+  List<InfoWidget> _categoryChildren() {
+    List<InfoWidget> result = [];
+    for (CareField field in careFields) {
+      CareValue? value = careValues[field.id];
+      if (!field.enabled || value == null) continue;
+      String? text = formatCareValue(appLocalizations, field, value);
+      if (text == null) continue;
+      String title = careFieldName(appLocalizations, field);
+      result.add(InfoWidget(
+        icon: careFieldIcon(field),
+        title: value.estimated ? "$title ✨" : title,
+        value: text,
+        onTap: onTapValue == null
+            ? null
+            : () => onTapValue!(title, text, value.estimated),
+      ));
+    }
+    return result;
+  }
 
   @override
   List<InfoWidget> getInfoChildren() {
@@ -165,6 +190,7 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
       ));
     }
 
+    result.addAll(_categoryChildren());
     return result;
   }
 }

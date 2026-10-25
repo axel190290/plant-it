@@ -11,6 +11,7 @@ import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 import 'package:plant_it/ui/home/widgets/home_screen.dart';
 import 'package:plant_it/ui/search/view_models/search_viewmodel.dart';
 import 'package:plant_it/ui/search/widgets/search_page.dart';
+import 'package:plant_it/ui/settings/view_models/reminder/reminder_viewmodel.dart';
 import 'package:plant_it/ui/settings/view_models/settings_viewmodel.dart';
 import 'package:plant_it/ui/settings/widgets/settings_screen.dart';
 import 'package:plant_it/utils/stream_code.dart';
@@ -19,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class AppMainView extends StatefulWidget {
   final HomeViewModel homeViewModel;
   final CalendarViewModel calendarViewModel;
+  final ReminderViewModel reminderViewModel;
   final SearchViewModel searchViewModel;
   final SettingsViewModel settingsViewModel;
   final StreamController<StreamCode> streamController;
@@ -30,6 +32,7 @@ class AppMainView extends StatefulWidget {
     super.key,
     required this.homeViewModel,
     required this.calendarViewModel,
+    required this.reminderViewModel,
     required this.searchViewModel,
     required this.settingsViewModel,
     int? selectedView,
@@ -57,6 +60,7 @@ class _AppMainViewState extends State<AppMainView> {
       ),
       CalendarScreen(
         viewModel: widget.calendarViewModel,
+        reminderViewModel: widget.reminderViewModel,
         streamController: widget.streamController,
       ),
       SearchPage(

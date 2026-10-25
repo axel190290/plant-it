@@ -1668,6 +1668,18 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Show less'**
   String get showLess;
+
+  /// No description provided for @newReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get newReminder;
+
+  /// No description provided for @noRemindersYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No reminders yet. Create one to be notified when a plant needs care.'**
+  String get noRemindersYet;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

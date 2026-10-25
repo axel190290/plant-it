@@ -1080,4 +1080,11 @@ class LEs extends L {
 
   @override
   String get showLess => 'Ver menos';
+
+  @override
+  String get newReminder => 'Nuevo';
+
+  @override
+  String get noRemindersYet =>
+      'Aún no hay recordatorios. Crea uno para recibir un aviso cuando una planta necesite cuidados.';
 }

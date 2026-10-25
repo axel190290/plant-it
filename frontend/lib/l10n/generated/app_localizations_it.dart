@@ -1299,6 +1299,23 @@ class LIt extends L {
   String get notSet => 'Non impostato';
 
   @override
-  String get noAdditionalInfo =>
-      'Ancora nessun venditore, prezzo o posizione. Tocca la matita per aggiungerli.';
+  String get editDescription => 'Modifica descrizione';
+
+  @override
+  String get noDescription =>
+      'Ancora nessuna descrizione. Tocca per scriverla o compilarla automaticamente.';
+
+  @override
+  String get fillAutomatically => 'Compila automaticamente';
+
+  @override
+  String get noDescriptionFound =>
+      'Nessuna descrizione trovata per questa specie.';
+
+  @override
+  String get descriptionSaved => 'Descrizione salvata';
+
+  @override
+  String get descriptionSharedWarning =>
+      'La descrizione appartiene alla specie, quindi è condivisa dalle tue piante di questa specie.';
 }

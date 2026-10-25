@@ -187,6 +187,11 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
                                   style: Theme.of(context).textTheme.bodyLarge!,
                                 )
                               : _getSpeciesInfo(),
+                          if (widget.viewModel.description != null) ...[
+                            const SizedBox(height: 12),
+                            Text(widget.viewModel.description!,
+                                style: Theme.of(context).textTheme.bodyLarge!),
+                          ],
                           const SizedBox(height: 16),
 
                           // Care

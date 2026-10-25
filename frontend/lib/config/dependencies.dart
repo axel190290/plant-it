@@ -20,6 +20,7 @@ import 'package:plant_it/data/service/reminder_occurrence_service.dart';
 import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/data/service/care/open_plantbook_client.dart';
 import 'package:plant_it/data/service/care/species_care_enricher.dart';
+import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
 import 'package:plant_it/data/service/search/flora_codex_searcher.dart';
 import 'package:plant_it/data/service/search/gbif_searcher.dart';
@@ -139,6 +140,12 @@ List<SingleChildWidget> get providersLocal {
     Provider(
       create: (context) => AiCareEstimator(
         userSettingRepository: context.read(),
+      ),
+    ),
+    Provider(
+      create: (context) => SpeciesDescriptionService(
+        gbifSearcher: context.read(),
+        aiCareEstimator: context.read(),
       ),
     ),
     Provider(

@@ -97,6 +97,8 @@ class ViewSpeciesViewModel extends ChangeNotifier {
   String get species => _species.species.value;
   String? get family => _species.family.value;
   String? get genus => _species.genus.value;
+  String? get description =>
+      _species.description.present ? _species.description.value : null;
   SpeciesDataSource get dataSource => _species.dataSource.value;
   String? get base64image => _base64Image;
   int? get light => _speciesCare.light.value;
@@ -188,8 +190,7 @@ class ViewSpeciesViewModel extends ChangeNotifier {
       return careFields;
     }
     _externalCareValues = details.getOrThrow().careValues;
-    _careValues =
-        careValuesByFieldId(_careFields, _externalCareValues);
+    _careValues = careValuesByFieldId(_careFields, _externalCareValues);
 
     String? url =
         details.getOrThrow().speciesCompanion.externalAvatarUrl.present

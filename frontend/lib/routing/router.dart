@@ -130,6 +130,7 @@ GoRouter router() => GoRouter(
                     reminderOccurrenceRepository: context.read(),
                     careFieldRepository: context.read(),
                     speciesCareValueRepository: context.read(),
+                    speciesDescriptionService: context.read(),
                   );
                   viewModel.load.execute(id);
                   return PlantScreen(

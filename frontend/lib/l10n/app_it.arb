@@ -459,5 +459,10 @@
   "basicCare": "Cure di base",
   "careCategories": "Categorie",
   "notSet": "Non impostato",
-  "noAdditionalInfo": "Ancora nessun venditore, prezzo o posizione. Tocca la matita per aggiungerli."
+  "editDescription": "Modifica descrizione",
+  "noDescription": "Ancora nessuna descrizione. Tocca per scriverla o compilarla automaticamente.",
+  "fillAutomatically": "Compila automaticamente",
+  "noDescriptionFound": "Nessuna descrizione trovata per questa specie.",
+  "descriptionSaved": "Descrizione salvata",
+  "descriptionSharedWarning": "La descrizione appartiene alla specie, quindi è condivisa dalle tue piante di questa specie."
 }

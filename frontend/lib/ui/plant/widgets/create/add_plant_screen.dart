@@ -8,8 +8,6 @@ import 'package:plant_it/ui/core/ui/summary.dart';
 import 'package:plant_it/ui/plant/view_models/add_plant_viewmodel.dart';
 import 'package:plant_it/ui/plant/widgets/create/location_step.dart';
 import 'package:plant_it/ui/plant/widgets/create/name_step.dart';
-import 'package:plant_it/ui/plant/widgets/create/price_step.dart';
-import 'package:plant_it/ui/plant/widgets/create/seller_step.dart';
 import 'package:plant_it/ui/plant/widgets/create/start_date_step.dart';
 import 'package:plant_it/utils/stream_code.dart';
 
@@ -59,14 +57,6 @@ class _AddPlantScreenState extends State<AddPlantScreen> {
               appLocalizations: appLocalizations,
             ),
             StartDateStep(
-              viewModel: widget.viewModel,
-              appLocalizations: appLocalizations,
-            ),
-            PriceStep(
-              viewModel: widget.viewModel,
-              appLocalizations: appLocalizations,
-            ),
-            SellerStep(
               viewModel: widget.viewModel,
               appLocalizations: appLocalizations,
             ),

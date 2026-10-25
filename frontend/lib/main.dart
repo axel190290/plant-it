@@ -69,6 +69,7 @@ void main() async {
       gbifSearcher: context.read(),
       plantNetIdentifier: context.read(),
       careEnricher: context.read(),
+      descriptionService: context.read(),
       cache: context.read(),
     ),
   );

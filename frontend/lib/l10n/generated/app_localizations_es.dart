@@ -1204,6 +1204,23 @@ class LEs extends L {
   String get notSet => 'Sin definir';
 
   @override
-  String get noAdditionalInfo =>
-      'Aún no hay vendedor, precio ni ubicación. Toca el lápiz para añadirlos.';
+  String get editDescription => 'Editar descripción';
+
+  @override
+  String get noDescription =>
+      'Aún no hay descripción. Toca para escribirla o rellenarla automáticamente.';
+
+  @override
+  String get fillAutomatically => 'Rellenar automáticamente';
+
+  @override
+  String get noDescriptionFound =>
+      'No se ha encontrado ninguna descripción para esta especie.';
+
+  @override
+  String get descriptionSaved => 'Descripción guardada';
+
+  @override
+  String get descriptionSharedWarning =>
+      'La descripción pertenece a la especie, así que la comparten tus plantas de esta especie.';
 }

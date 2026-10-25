@@ -446,5 +446,10 @@
   "basicCare": "Cuidados básicos",
   "careCategories": "Categorías",
   "notSet": "Sin definir",
-  "noAdditionalInfo": "Aún no hay vendedor, precio ni ubicación. Toca el lápiz para añadirlos."
+  "editDescription": "Editar descripción",
+  "noDescription": "Aún no hay descripción. Toca para escribirla o rellenarla automáticamente.",
+  "fillAutomatically": "Rellenar automáticamente",
+  "noDescriptionFound": "No se ha encontrado ninguna descripción para esta especie.",
+  "descriptionSaved": "Descripción guardada",
+  "descriptionSharedWarning": "La descripción pertenece a la especie, así que la comparten tus plantas de esta especie."
 }

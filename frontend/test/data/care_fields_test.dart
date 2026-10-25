@@ -85,6 +85,7 @@ void main() {
       await db.customStatement('DROP TABLE care_fields');
       await db.customStatement(
           "DELETE FROM event_types WHERE name IN ('pest', 'treatment')");
+      await db.customStatement('ALTER TABLE species DROP COLUMN description');
       await db.customStatement('PRAGMA user_version = 1');
       await db.close();
 
@@ -108,6 +109,7 @@ void main() {
       AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
       await db.customStatement('SELECT 1');
       await db.customStatement('ALTER TABLE care_fields DROP COLUMN icon');
+      await db.customStatement('ALTER TABLE species DROP COLUMN description');
       await db.customStatement('PRAGMA user_version = 2');
       await db.close();
 

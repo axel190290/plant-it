@@ -8,8 +8,6 @@ import 'package:plant_it/ui/core/ui/stepper.dart';
 import 'package:plant_it/ui/plant/view_models/edit_plant_viewmodel.dart';
 import 'package:plant_it/ui/plant/widgets/edit/location_step.dart';
 import 'package:plant_it/ui/plant/widgets/edit/name_step.dart';
-import 'package:plant_it/ui/plant/widgets/edit/price_step.dart';
-import 'package:plant_it/ui/plant/widgets/edit/seller_step.dart';
 import 'package:plant_it/ui/plant/widgets/edit/start_date_step.dart';
 import 'package:plant_it/utils/stream_code.dart';
 
@@ -60,14 +58,6 @@ class _EditPlantScreenState extends State<EditPlantScreen> {
               appLocalizations: appLocalizations,
             ),
             StartDateStep(
-              viewModel: widget.viewModel,
-              appLocalizations: appLocalizations,
-            ),
-            PriceStep(
-              viewModel: widget.viewModel,
-              appLocalizations: appLocalizations,
-            ),
-            SellerStep(
               viewModel: widget.viewModel,
               appLocalizations: appLocalizations,
             ),

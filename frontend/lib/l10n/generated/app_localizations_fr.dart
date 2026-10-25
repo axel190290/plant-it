@@ -1199,6 +1199,23 @@ class LFr extends L {
   String get notSet => 'Non défini';
 
   @override
-  String get noAdditionalInfo =>
-      'Pas encore de vendeur, prix ou emplacement. Touchez le crayon pour les ajouter.';
+  String get editDescription => 'Modifier la description';
+
+  @override
+  String get noDescription =>
+      'Pas encore de description. Touchez pour l\'écrire ou la remplir automatiquement.';
+
+  @override
+  String get fillAutomatically => 'Remplir automatiquement';
+
+  @override
+  String get noDescriptionFound =>
+      'Aucune description trouvée pour cette espèce.';
+
+  @override
+  String get descriptionSaved => 'Description enregistrée';
+
+  @override
+  String get descriptionSharedWarning =>
+      'La description appartient à l\'espèce, elle est donc partagée par vos plantes de cette espèce.';
 }

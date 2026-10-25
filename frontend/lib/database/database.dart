@@ -50,6 +50,8 @@ class Species extends Table {
   TextColumn get externalAvatarUrl => text().withLength(max: 0).nullable()();
   IntColumn get year => integer().nullable()();
   TextColumn get bibliography => text().withLength(max: 200).nullable()();
+  // Short description of the plant and important facts about it
+  TextColumn get description => text().withLength(max: 2000).nullable()();
 }
 
 class SpeciesSynonyms extends Table {
@@ -198,7 +200,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -235,6 +237,9 @@ class AppDatabase extends _$AppDatabase {
           await initCareFields();
         } else if (from < 3) {
           await m.addColumn(careFields, careFields.icon);
+        }
+        if (from < 4) {
+          await m.addColumn(species, species.description);
         }
       },
       beforeOpen: (details) async {

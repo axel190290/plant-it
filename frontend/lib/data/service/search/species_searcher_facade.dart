@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:drift/drift.dart';
 import 'package:logging/logging.dart';
 import 'package:plant_it/data/service/care/species_care_enricher.dart';
+import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
 import 'package:plant_it/data/service/search/cache/app_cache.dart';
 import 'package:plant_it/data/service/search/flora_codex_searcher.dart';
@@ -22,6 +23,7 @@ class SpeciesSearcherFacade {
   final GbifSearcher _gbifSearcher;
   final PlantNetIdentifier _plantNetIdentifier;
   final SpeciesCareEnricher _careEnricher;
+  final SpeciesDescriptionService _descriptionService;
   final Logger _log = Logger("SpeciesSearcherFacade");
   final AppCache _cache;
 
@@ -31,12 +33,14 @@ class SpeciesSearcherFacade {
     required GbifSearcher gbifSearcher,
     required PlantNetIdentifier plantNetIdentifier,
     required SpeciesCareEnricher careEnricher,
+    required SpeciesDescriptionService descriptionService,
     required AppCache cache,
   })  : _localSearcher = localSearcher,
         _floraCodexSearcher = floraCodexSearcher,
         _gbifSearcher = gbifSearcher,
         _plantNetIdentifier = plantNetIdentifier,
         _careEnricher = careEnricher,
+        _descriptionService = descriptionService,
         _cache = cache;
 
   Future<Result<List<SpeciesSearcherPartialResult>>> search(
@@ -148,9 +152,16 @@ class SpeciesSearcherFacade {
       extra: details.careValues,
       sources: CareSources(species: species.dataSource.value.name),
     );
+    String? description = await _descriptionService.describe(
+      species.scientificName.value,
+      species.family.value,
+      aiValues: enriched.$2,
+    );
     return SpeciesSearcherResult(
-      speciesCompanion:
-          species.copyWith(bibliography: Value(enriched.$3.encode())),
+      speciesCompanion: species.copyWith(
+        bibliography: Value(enriched.$3.encode()),
+        description: Value(description),
+      ),
       speciesCareCompanion: enriched.$1,
       speciesSynonymsCompanion: details.speciesSynonymsCompanion,
       careValues: enriched.$2,

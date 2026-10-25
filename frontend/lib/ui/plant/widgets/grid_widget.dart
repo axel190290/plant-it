@@ -15,12 +15,15 @@ abstract class InfoGridWidget extends StatefulWidget {
   final SpeciesCareCompanion care;
   final int maxNum;
   final L appLocalizations;
+  // When false, every tile is shown in rows of two instead of pages
+  final bool paginate;
 
   const InfoGridWidget({
     super.key,
     required this.care,
     required this.maxNum,
     required this.appLocalizations,
+    this.paginate = true,
   });
 
   List<InfoWidget> getInfoChildren();
@@ -91,7 +94,7 @@ class _InfoGridWidgetState extends State<InfoGridWidget> {
     if (_pages == 0) {
       return SizedBox();
     }
-    if (_pages == 1) {
+    if (_pages == 1 || !widget.paginate) {
       return _buildSinglePage(widget.getInfoChildren());
     }
     return _buildMultiplePages();
@@ -109,6 +112,7 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
     required super.care,
     required super.maxNum,
     required super.appLocalizations,
+    super.paginate = false,
     this.careFields = const [],
     this.careValues = const {},
     this.onTapValue,

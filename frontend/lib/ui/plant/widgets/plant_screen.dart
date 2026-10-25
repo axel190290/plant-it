@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/database/database.dart' as db;
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
@@ -106,6 +107,87 @@ class _PlantScreenState extends State<PlantScreen> {
       message = L.of(context).errorWithMessage(e.toString());
     }
     if (!mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+    setState(() {});
+  }
+
+  Future<void> _editDescription() async {
+    L l = L.of(context);
+    final TextEditingController controller =
+        TextEditingController(text: widget.viewModel.species.description ?? "");
+    bool searching = false;
+    final String? result = await showDialog<String>(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(l.editDescription),
+          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  labelText: l.description,
+                  border: const OutlineInputBorder(),
+                ),
+                minLines: 4,
+                maxLines: 12,
+                maxLength: SpeciesDescriptionService.maxLength,
+              ),
+              Text(l.descriptionSharedWarning,
+                  style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 8),
+              searching
+                  ? const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: CircularProgressIndicator(),
+                    )
+                  : TextButton.icon(
+                      icon: const Icon(LucideIcons.sparkles),
+                      label: Text(l.fillAutomatically),
+                      onPressed: () async {
+                        setState(() => searching = true);
+                        String? found =
+                            await widget.viewModel.findDescription();
+                        if (!context.mounted) return;
+                        setState(() => searching = false);
+                        if (found == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l.noDescriptionFound)));
+                        } else {
+                          controller.text = found;
+                        }
+                      },
+                    ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(l.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              child: Text(l.save),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (result == null || !mounted) return;
+
+    String message;
+    try {
+      await widget.viewModel.updateDescription.executeWithFuture(result);
+      if (!mounted) return;
+      message = L.of(context).descriptionSaved;
+    } catch (e) {
+      if (!mounted) return;
+      message = L.of(context).errorWithMessage(e.toString());
+    }
     ScaffoldMessenger.of(context)
         .showSnackBar(SnackBar(content: Text(message)));
     setState(() {});
@@ -429,45 +511,21 @@ class _PlantScreenState extends State<PlantScreen> {
                           // Additional info
                           _sectionTitle(
                             appLocalizations.additionalInfo,
-                            onEdit: () => context.push(
-                                Routes.editPlantWithId(widget.viewModel.id)),
-                            tooltip: appLocalizations.editPlant,
+                            onEdit: _editDescription,
+                            tooltip: appLocalizations.editDescription,
                           ),
-                          if (widget.viewModel.plant.seller == null &&
-                              widget.viewModel.plant.price == null &&
-                              widget.viewModel.plant.location == null)
-                            Text(
-                              appLocalizations.noAdditionalInfo,
-                              style: Theme.of(context).textTheme.bodyLarge!,
+                          GestureDetector(
+                            onTap: _editDescription,
+                            child: SizedBox(
+                              width: double.infinity,
+                              child: Text(
+                                widget.viewModel.species.description ??
+                                    appLocalizations.noDescription,
+                                style: Theme.of(context).textTheme.bodyLarge!,
+                              ),
                             ),
-                          if (widget.viewModel.plant.seller != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  appLocalizations.seller,
-                                  style: Theme.of(context).textTheme.bodyLarge!,
-                                ),
-                                Text(
-                                  widget.viewModel.plant.seller!,
-                                  style: Theme.of(context).textTheme.bodyLarge!,
-                                ),
-                              ],
-                            ),
-                          if (widget.viewModel.plant.price != null)
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  appLocalizations.price,
-                                  style: Theme.of(context).textTheme.bodyLarge!,
-                                ),
-                                Text(
-                                  widget.viewModel.plant.price!.toString(),
-                                  style: Theme.of(context).textTheme.bodyLarge!,
-                                ),
-                              ],
-                            ),
+                          ),
+                          const SizedBox(height: 8),
                           if (widget.viewModel.plant.location != null)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,

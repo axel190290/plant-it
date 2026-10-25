@@ -437,6 +437,14 @@ class $SpeciesTable extends Species with TableInfo<$SpeciesTable, Specy> {
       additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 200),
       type: DriftSqlType.string,
       requiredDuringInsert: false);
+  static const VerificationMeta _descriptionMeta =
+      const VerificationMeta('description');
+  @override
+  late final GeneratedColumn<String> description = GeneratedColumn<String>(
+      'description', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 2000),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -449,7 +457,8 @@ class $SpeciesTable extends Species with TableInfo<$SpeciesTable, Specy> {
         externalId,
         externalAvatarUrl,
         year,
-        bibliography
+        bibliography,
+        description
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -512,6 +521,12 @@ class $SpeciesTable extends Species with TableInfo<$SpeciesTable, Specy> {
           bibliography.isAcceptableOrUnknown(
               data['bibliography']!, _bibliographyMeta));
     }
+    if (data.containsKey('description')) {
+      context.handle(
+          _descriptionMeta,
+          description.isAcceptableOrUnknown(
+              data['description']!, _descriptionMeta));
+    }
     return context;
   }
 
@@ -544,6 +559,8 @@ class $SpeciesTable extends Species with TableInfo<$SpeciesTable, Specy> {
           .read(DriftSqlType.int, data['${effectivePrefix}year']),
       bibliography: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}bibliography']),
+      description: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}description']),
     );
   }
 
@@ -569,6 +586,7 @@ class Specy extends DataClass implements Insertable<Specy> {
   final String? externalAvatarUrl;
   final int? year;
   final String? bibliography;
+  final String? description;
   const Specy(
       {required this.id,
       required this.scientificName,
@@ -580,7 +598,8 @@ class Specy extends DataClass implements Insertable<Specy> {
       this.externalId,
       this.externalAvatarUrl,
       this.year,
-      this.bibliography});
+      this.bibliography,
+      this.description});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -612,6 +631,9 @@ class Specy extends DataClass implements Insertable<Specy> {
     if (!nullToAbsent || bibliography != null) {
       map['bibliography'] = Variable<String>(bibliography);
     }
+    if (!nullToAbsent || description != null) {
+      map['description'] = Variable<String>(description);
+    }
     return map;
   }
 
@@ -637,6 +659,9 @@ class Specy extends DataClass implements Insertable<Specy> {
       bibliography: bibliography == null && nullToAbsent
           ? const Value.absent()
           : Value(bibliography),
+      description: description == null && nullToAbsent
+          ? const Value.absent()
+          : Value(description),
     );
   }
 
@@ -657,6 +682,7 @@ class Specy extends DataClass implements Insertable<Specy> {
           serializer.fromJson<String?>(json['externalAvatarUrl']),
       year: serializer.fromJson<int?>(json['year']),
       bibliography: serializer.fromJson<String?>(json['bibliography']),
+      description: serializer.fromJson<String?>(json['description']),
     );
   }
   @override
@@ -675,6 +701,7 @@ class Specy extends DataClass implements Insertable<Specy> {
       'externalAvatarUrl': serializer.toJson<String?>(externalAvatarUrl),
       'year': serializer.toJson<int?>(year),
       'bibliography': serializer.toJson<String?>(bibliography),
+      'description': serializer.toJson<String?>(description),
     };
   }
 
@@ -689,7 +716,8 @@ class Specy extends DataClass implements Insertable<Specy> {
           Value<String?> externalId = const Value.absent(),
           Value<String?> externalAvatarUrl = const Value.absent(),
           Value<int?> year = const Value.absent(),
-          Value<String?> bibliography = const Value.absent()}) =>
+          Value<String?> bibliography = const Value.absent(),
+          Value<String?> description = const Value.absent()}) =>
       Specy(
         id: id ?? this.id,
         scientificName: scientificName ?? this.scientificName,
@@ -705,6 +733,7 @@ class Specy extends DataClass implements Insertable<Specy> {
         year: year.present ? year.value : this.year,
         bibliography:
             bibliography.present ? bibliography.value : this.bibliography,
+        description: description.present ? description.value : this.description,
       );
   Specy copyWithCompanion(SpeciesCompanion data) {
     return Specy(
@@ -727,6 +756,8 @@ class Specy extends DataClass implements Insertable<Specy> {
       bibliography: data.bibliography.present
           ? data.bibliography.value
           : this.bibliography,
+      description:
+          data.description.present ? data.description.value : this.description,
     );
   }
 
@@ -743,14 +774,26 @@ class Specy extends DataClass implements Insertable<Specy> {
           ..write('externalId: $externalId, ')
           ..write('externalAvatarUrl: $externalAvatarUrl, ')
           ..write('year: $year, ')
-          ..write('bibliography: $bibliography')
+          ..write('bibliography: $bibliography, ')
+          ..write('description: $description')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, scientificName, family, genus, species,
-      author, dataSource, externalId, externalAvatarUrl, year, bibliography);
+  int get hashCode => Object.hash(
+      id,
+      scientificName,
+      family,
+      genus,
+      species,
+      author,
+      dataSource,
+      externalId,
+      externalAvatarUrl,
+      year,
+      bibliography,
+      description);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -765,7 +808,8 @@ class Specy extends DataClass implements Insertable<Specy> {
           other.externalId == this.externalId &&
           other.externalAvatarUrl == this.externalAvatarUrl &&
           other.year == this.year &&
-          other.bibliography == this.bibliography);
+          other.bibliography == this.bibliography &&
+          other.description == this.description);
 }
 
 class SpeciesCompanion extends UpdateCompanion<Specy> {
@@ -780,6 +824,7 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
   final Value<String?> externalAvatarUrl;
   final Value<int?> year;
   final Value<String?> bibliography;
+  final Value<String?> description;
   const SpeciesCompanion({
     this.id = const Value.absent(),
     this.scientificName = const Value.absent(),
@@ -792,6 +837,7 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
     this.externalAvatarUrl = const Value.absent(),
     this.year = const Value.absent(),
     this.bibliography = const Value.absent(),
+    this.description = const Value.absent(),
   });
   SpeciesCompanion.insert({
     this.id = const Value.absent(),
@@ -805,6 +851,7 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
     this.externalAvatarUrl = const Value.absent(),
     this.year = const Value.absent(),
     this.bibliography = const Value.absent(),
+    this.description = const Value.absent(),
   })  : scientificName = Value(scientificName),
         species = Value(species);
   static Insertable<Specy> custom({
@@ -819,6 +866,7 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
     Expression<String>? externalAvatarUrl,
     Expression<int>? year,
     Expression<String>? bibliography,
+    Expression<String>? description,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -832,6 +880,7 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
       if (externalAvatarUrl != null) 'external_avatar_url': externalAvatarUrl,
       if (year != null) 'year': year,
       if (bibliography != null) 'bibliography': bibliography,
+      if (description != null) 'description': description,
     });
   }
 
@@ -846,7 +895,8 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
       Value<String?>? externalId,
       Value<String?>? externalAvatarUrl,
       Value<int?>? year,
-      Value<String?>? bibliography}) {
+      Value<String?>? bibliography,
+      Value<String?>? description}) {
     return SpeciesCompanion(
       id: id ?? this.id,
       scientificName: scientificName ?? this.scientificName,
@@ -859,6 +909,7 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
       externalAvatarUrl: externalAvatarUrl ?? this.externalAvatarUrl,
       year: year ?? this.year,
       bibliography: bibliography ?? this.bibliography,
+      description: description ?? this.description,
     );
   }
 
@@ -899,6 +950,9 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
     if (bibliography.present) {
       map['bibliography'] = Variable<String>(bibliography.value);
     }
+    if (description.present) {
+      map['description'] = Variable<String>(description.value);
+    }
     return map;
   }
 
@@ -915,7 +969,8 @@ class SpeciesCompanion extends UpdateCompanion<Specy> {
           ..write('externalId: $externalId, ')
           ..write('externalAvatarUrl: $externalAvatarUrl, ')
           ..write('year: $year, ')
-          ..write('bibliography: $bibliography')
+          ..write('bibliography: $bibliography, ')
+          ..write('description: $description')
           ..write(')'))
         .toString();
   }
@@ -5015,6 +5070,7 @@ typedef $$SpeciesTableCreateCompanionBuilder = SpeciesCompanion Function({
   Value<String?> externalAvatarUrl,
   Value<int?> year,
   Value<String?> bibliography,
+  Value<String?> description,
 });
 typedef $$SpeciesTableUpdateCompanionBuilder = SpeciesCompanion Function({
   Value<int> id,
@@ -5028,6 +5084,7 @@ typedef $$SpeciesTableUpdateCompanionBuilder = SpeciesCompanion Function({
   Value<String?> externalAvatarUrl,
   Value<int?> year,
   Value<String?> bibliography,
+  Value<String?> description,
 });
 
 final class $$SpeciesTableReferences
@@ -5157,6 +5214,9 @@ class $$SpeciesTableFilterComposer
 
   ColumnFilters<String> get bibliography => $composableBuilder(
       column: $table.bibliography, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnFilters(column));
 
   Expression<bool> plantsRefs(
       Expression<bool> Function($$PlantsTableFilterComposer f) f) {
@@ -5308,6 +5368,9 @@ class $$SpeciesTableOrderingComposer
   ColumnOrderings<String> get bibliography => $composableBuilder(
       column: $table.bibliography,
       builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => ColumnOrderings(column));
 }
 
 class $$SpeciesTableAnnotationComposer
@@ -5352,6 +5415,9 @@ class $$SpeciesTableAnnotationComposer
 
   GeneratedColumn<String> get bibliography => $composableBuilder(
       column: $table.bibliography, builder: (column) => column);
+
+  GeneratedColumn<String> get description => $composableBuilder(
+      column: $table.description, builder: (column) => column);
 
   Expression<T> plantsRefs<T extends Object>(
       Expression<T> Function($$PlantsTableAnnotationComposer a) f) {
@@ -5499,6 +5565,7 @@ class $$SpeciesTableTableManager extends RootTableManager<
             Value<String?> externalAvatarUrl = const Value.absent(),
             Value<int?> year = const Value.absent(),
             Value<String?> bibliography = const Value.absent(),
+            Value<String?> description = const Value.absent(),
           }) =>
               SpeciesCompanion(
             id: id,
@@ -5512,6 +5579,7 @@ class $$SpeciesTableTableManager extends RootTableManager<
             externalAvatarUrl: externalAvatarUrl,
             year: year,
             bibliography: bibliography,
+            description: description,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -5525,6 +5593,7 @@ class $$SpeciesTableTableManager extends RootTableManager<
             Value<String?> externalAvatarUrl = const Value.absent(),
             Value<int?> year = const Value.absent(),
             Value<String?> bibliography = const Value.absent(),
+            Value<String?> description = const Value.absent(),
           }) =>
               SpeciesCompanion.insert(
             id: id,
@@ -5538,6 +5607,7 @@ class $$SpeciesTableTableManager extends RootTableManager<
             externalAvatarUrl: externalAvatarUrl,
             year: year,
             bibliography: bibliography,
+            description: description,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) =>

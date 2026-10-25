@@ -1903,11 +1903,41 @@ abstract class L {
   /// **'Not set'**
   String get notSet;
 
-  /// No description provided for @noAdditionalInfo.
+  /// No description provided for @editDescription.
   ///
   /// In en, this message translates to:
-  /// **'No seller, price or location yet. Tap the pencil to add them.'**
-  String get noAdditionalInfo;
+  /// **'Edit description'**
+  String get editDescription;
+
+  /// No description provided for @noDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No description yet. Tap to write one or fill it in automatically.'**
+  String get noDescription;
+
+  /// No description provided for @fillAutomatically.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in automatically'**
+  String get fillAutomatically;
+
+  /// No description provided for @noDescriptionFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No description was found for this species.'**
+  String get noDescriptionFound;
+
+  /// No description provided for @descriptionSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Description saved'**
+  String get descriptionSaved;
+
+  /// No description provided for @descriptionSharedWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'The description belongs to the species, so it is shared by your plants of this species.'**
+  String get descriptionSharedWarning;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

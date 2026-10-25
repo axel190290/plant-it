@@ -491,5 +491,10 @@
   "basicCare": "Basic care",
   "careCategories": "Categories",
   "notSet": "Not set",
-  "noAdditionalInfo": "No seller, price or location yet. Tap the pencil to add them."
+  "editDescription": "Edit description",
+  "noDescription": "No description yet. Tap to write one or fill it in automatically.",
+  "fillAutomatically": "Fill in automatically",
+  "noDescriptionFound": "No description was found for this species.",
+  "descriptionSaved": "Description saved",
+  "descriptionSharedWarning": "The description belongs to the species, so it is shared by your plants of this species."
 }

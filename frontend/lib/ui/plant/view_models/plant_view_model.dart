@@ -18,6 +18,7 @@ import 'package:plant_it/data/repository/reminder_repository.dart';
 import 'package:plant_it/data/repository/species_care_repository.dart';
 import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
+import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/database/database.dart' as db;
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/reminder_occurrence.dart';
@@ -35,7 +36,9 @@ class PlantViewModel extends ChangeNotifier {
     required ReminderOccurrenceRepository reminderOccurrenceRepository,
     required CareFieldRepository careFieldRepository,
     required SpeciesCareValueRepository speciesCareValueRepository,
-  })  : _careFieldRepository = careFieldRepository,
+    required SpeciesDescriptionService speciesDescriptionService,
+  })  : _speciesDescriptionService = speciesDescriptionService,
+        _careFieldRepository = careFieldRepository,
         _speciesCareValueRepository = speciesCareValueRepository,
         _plantRepository = plantRepository,
         _speciesRepository = speciesRepository,
@@ -77,6 +80,10 @@ class PlantViewModel extends ChangeNotifier {
       if (result.isError()) throw result.exceptionOrNull()!;
       return;
     }, initialValue: null);
+    updateDescription = Command.createAsync((String? description) async {
+      Result<void> result = await _updateDescription(description);
+      if (result.isError()) throw result.exceptionOrNull()!;
+    }, initialValue: null);
     deleteEvent = Command.createAsync((db.Event event) async {
       Result<void> result = await _eventRepository.delete(event.id);
       if (result.isError()) throw result.exceptionOrNull()!;
@@ -92,6 +99,7 @@ class PlantViewModel extends ChangeNotifier {
   }
 
   //final Logger _log = Logger('PlantViewModel');
+  final SpeciesDescriptionService _speciesDescriptionService;
   final CareFieldRepository _careFieldRepository;
   final SpeciesCareValueRepository _speciesCareValueRepository;
   List<db.CareField> _careFields = [];
@@ -141,6 +149,7 @@ class PlantViewModel extends ChangeNotifier {
   late final Command<int?, void> toggleAvatar;
   late final Command<int, void> downloadPhoto;
   late final Command<String?, void> updateNote;
+  late final Command<String?, void> updateDescription;
   late final Command<db.Event, void> deleteEvent;
 
   EventRepository get eventRepository => _eventRepository;
@@ -267,6 +276,27 @@ class PlantViewModel extends ChangeNotifier {
     _care = care.getOrThrow();
     return Success("ok");
   }
+
+  Future<Result<void>> _updateDescription(String? description) async {
+    String? trimmed = description?.trim();
+    if (trimmed != null &&
+        trimmed.length > SpeciesDescriptionService.maxLength) {
+      trimmed = trimmed.substring(0, SpeciesDescriptionService.maxLength);
+    }
+    Result<bool> updated = await _speciesRepository.update(_species
+        .toCompanion(true)
+        .copyWith(
+            description: drift.Value(
+                trimmed == null || trimmed.isEmpty ? null : trimmed)));
+    if (updated.isError()) {
+      return updated.exceptionOrNull()!.toFailure();
+    }
+    return _loadSpecies(_plant.id);
+  }
+
+  /// A description of the species from the external sources, not saved.
+  Future<String?> findDescription() => _speciesDescriptionService.describe(
+      _species.scientificName, _species.family);
 
   Future<Result<void>> _loadCareValues() async {
     Result<List<db.CareField>> fields = await _careFieldRepository.getAll();

@@ -138,6 +138,9 @@ class AiCareEstimator {
     'common_pests',
     'diseases',
     'toxicity',
+    // Not care fields: the species description
+    'description',
+    'important_facts',
   ];
 
   static String _language() {
@@ -176,7 +179,13 @@ class AiCareEstimator {
         "- common_pests: its usual pests\n"
         "- diseases: its usual diseases\n"
         "- toxicity: whether it is toxic for pets or people\n"
-        "Write the text fields in ${_language()}, in one short sentence each. "
+        "- description: two or three sentences presenting the plant: what it "
+        "is known for, where it comes from and what it looks like\n"
+        "- important_facts: two or three facts its owner should know, such as "
+        "toxicity warnings or what yellow leaves mean, each on its own line "
+        "starting with \"• \"\n"
+        "Write the text fields in ${_language()}; except description and "
+        "important_facts, in one short sentence each. "
         "Use null for any value you do not know with reasonable confidence.";
   }
 

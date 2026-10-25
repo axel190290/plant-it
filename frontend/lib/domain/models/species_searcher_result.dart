@@ -30,6 +30,9 @@ class SpeciesSearcherPartialResult {
         'externalAvatarUrl': speciesCompanion.externalAvatarUrl.value,
         'year': speciesCompanion.year.value,
         'bibliography': speciesCompanion.bibliography.value,
+        'description': speciesCompanion.description.present
+            ? speciesCompanion.description.value
+            : null,
       },
     };
   }
@@ -49,6 +52,7 @@ class SpeciesSearcherPartialResult {
         externalAvatarUrl: Value(json['speciesCompanion']['externalAvatarUrl']),
         year: Value(json['speciesCompanion']['year']),
         bibliography: Value(json['speciesCompanion']['bibliography']),
+        description: Value(json['speciesCompanion']['description']),
       ),
     );
   }
@@ -86,6 +90,9 @@ class SpeciesSearcherResult {
         'externalAvatarUrl': speciesCompanion.externalAvatarUrl.value,
         'year': speciesCompanion.year.value,
         'bibliography': speciesCompanion.bibliography.value,
+        'description': speciesCompanion.description.present
+            ? speciesCompanion.description.value
+            : null,
       },
       'speciesCareCompanion': {
         'species': speciesCareCompanion.species.value,
@@ -123,6 +130,7 @@ class SpeciesSearcherResult {
         externalAvatarUrl: Value(json['speciesCompanion']['externalAvatarUrl']),
         year: Value(json['speciesCompanion']['year']),
         bibliography: Value(json['speciesCompanion']['bibliography']),
+        description: Value(json['speciesCompanion']['description']),
       ),
       speciesCareCompanion: SpeciesCareCompanion(
         species: Value(json['speciesCareCompanion']['species']),

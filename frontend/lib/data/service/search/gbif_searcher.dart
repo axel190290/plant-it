@@ -206,6 +206,70 @@ class GbifSearcher extends SpeciesSearcher {
     }
   }
 
+  /// A short summary of the species from Wikipedia, through iNaturalist, in
+  /// the device language when available.
+  Future<String?> getSummary(String scientificName) async {
+    String locale = _deviceLanguage();
+    try {
+      http.Response search = await http
+          .get(Uri.parse("$iNaturalistUrl/taxa").replace(queryParameters: {
+        'q': scientificName,
+        'rank': 'species',
+        'per_page': '1',
+      }));
+      if (search.statusCode != 200) {
+        return null;
+      }
+      List<dynamic> results =
+          json.decode(utf8.decode(search.bodyBytes))['results'] ?? [];
+      if (results.isEmpty ||
+          (results.first['name'] ?? "").toString().toLowerCase() !=
+              scientificName.toLowerCase()) {
+        return null;
+      }
+      http.Response taxon = await http.get(
+          Uri.parse("$iNaturalistUrl/taxa/${results.first['id']}")
+              .replace(queryParameters: {'locale': locale}));
+      if (taxon.statusCode != 200) {
+        return null;
+      }
+      List<dynamic> details =
+          json.decode(utf8.decode(taxon.bodyBytes))['results'] ?? [];
+      if (details.isEmpty) {
+        return null;
+      }
+      return cleanSummary(details.first['wikipedia_summary']);
+    } catch (e) {
+      _log.warning("Error while loading summary from iNaturalist: $e");
+      return null;
+    }
+  }
+
+  /// Removes the HTML of a Wikipedia summary and keeps its first sentences.
+  static String? cleanSummary(String? html) {
+    if (html == null) {
+      return null;
+    }
+    String text = html
+        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll(RegExp(r'\s+'), ' ')
+        .trim();
+    if (text.isEmpty) {
+      return null;
+    }
+    if (text.length <= 600) {
+      return text;
+    }
+    int cut = text.lastIndexOf('. ', 600);
+    return cut > 100
+        ? text.substring(0, cut + 1)
+        : "${text.substring(0, 600)}…";
+  }
+
   static String _deviceLanguage() =>
       PlatformDispatcher.instance.locale.languageCode;
 

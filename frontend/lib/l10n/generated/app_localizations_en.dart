@@ -1193,6 +1193,22 @@ class LEn extends L {
   String get notSet => 'Not set';
 
   @override
-  String get noAdditionalInfo =>
-      'No seller, price or location yet. Tap the pencil to add them.';
+  String get editDescription => 'Edit description';
+
+  @override
+  String get noDescription =>
+      'No description yet. Tap to write one or fill it in automatically.';
+
+  @override
+  String get fillAutomatically => 'Fill in automatically';
+
+  @override
+  String get noDescriptionFound => 'No description was found for this species.';
+
+  @override
+  String get descriptionSaved => 'Description saved';
+
+  @override
+  String get descriptionSharedWarning =>
+      'The description belongs to the species, so it is shared by your plants of this species.';
 }

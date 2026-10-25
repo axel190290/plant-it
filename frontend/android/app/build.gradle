@@ -26,7 +26,8 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.github.mdeluise.plantit"
+        // Own id, so it installs next to the official Plant-it app
+        applicationId = "com.github.axel190290.plantit"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -37,11 +38,22 @@ android {
         multiDexEnabled true
     }
 
+    signingConfigs {
+        // Fixed key kept in the repository, so every build (including the
+        // ones made by GitHub Actions) has the same signature and installs
+        // as an update of the previous one. It is public: anyone could sign
+        // an APK with it, so only install APKs built from your own fork.
+        release {
+            storeFile file("plant-diary.keystore")
+            storePassword "plantdiary"
+            keyAlias "plantdiary"
+            keyPassword "plantdiary"
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
     }
 }

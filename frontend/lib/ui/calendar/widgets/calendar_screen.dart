@@ -9,16 +9,21 @@ import 'package:plant_it/ui/calendar/view_models/calendar_viewmodel.dart';
 import 'package:plant_it/ui/calendar/widgets/calendar_header.dart';
 import 'package:plant_it/ui/calendar/widgets/event_and_reminder_occurrences_list.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
+import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
+import 'package:plant_it/ui/home/widgets/reminder_occurrence_list.dart';
 import 'package:plant_it/utils/stream_code.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class CalendarScreen extends StatefulWidget {
   final CalendarViewModel viewModel;
+  // Owns the next actions, which the home page loads and keeps updated
+  final HomeViewModel homeViewModel;
   final StreamController<StreamCode> streamController;
 
   const CalendarScreen({
     super.key,
     required this.viewModel,
+    required this.homeViewModel,
     required this.streamController,
   });
 
@@ -49,6 +54,35 @@ class _CalendarScreenState extends State<CalendarScreen> {
         widget.viewModel.load.execute();
       }
     });
+  }
+
+  Widget _nextActions() {
+    return ListenableBuilder(
+      listenable: Listenable.merge(
+          [widget.homeViewModel, widget.homeViewModel.load.results]),
+      builder: (context, _) {
+        if (widget.homeViewModel.load.isExecuting.value) {
+          return const SizedBox();
+        }
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 90),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                L.of(context).nextActions,
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall!
+                    .copyWith(fontWeight: FontWeight.w500, fontSize: 20),
+              ),
+              const SizedBox(height: 10),
+              ReminderOccurrenceList(viewModel: widget.homeViewModel),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -194,6 +228,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     viewModel: widget.viewModel,
                     day: _focusedDay,
                   ),
+                  _nextActions(),
                 ],
               ),
             );

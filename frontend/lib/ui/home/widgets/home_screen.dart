@@ -8,7 +8,6 @@ import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 import 'package:plant_it/ui/home/widgets/carousel.dart';
 import 'package:plant_it/ui/home/widgets/homescreen_empty_data.dart';
-import 'package:plant_it/ui/home/widgets/reminder_occurrence_list.dart';
 import 'package:plant_it/utils/stream_code.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -97,26 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   viewModel: widget.viewModel,
                   filter: _filter,
                 ),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 0, horizontal: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        L.of(context).nextActions,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineSmall!
-                            .copyWith(
-                                fontWeight: FontWeight.w500, fontSize: 20),
-                      ),
-                      SizedBox(height: 10),
-                      ReminderOccurrenceList(viewModel: widget.viewModel),
-                      SizedBox(height: 20),
-                    ],
-                  ),
-                ),
+                SizedBox(height: 20),
               ],
             ),
           );

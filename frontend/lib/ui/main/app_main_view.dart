@@ -57,6 +57,7 @@ class _AppMainViewState extends State<AppMainView> {
       ),
       CalendarScreen(
         viewModel: widget.calendarViewModel,
+        homeViewModel: widget.homeViewModel,
         streamController: widget.streamController,
       ),
       SearchPage(

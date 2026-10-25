@@ -4,11 +4,14 @@ import 'package:command_it/command_it.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
+import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/plant/widgets/grid_widget.dart';
+import 'package:plant_it/ui/search/widgets/species_card.dart';
 import 'package:plant_it/ui/species/view_models/view_species_viewmodel.dart';
 import 'package:plant_it/ui/species/widgets/view/species_image.dart';
 import 'package:plant_it/utils/stream_code.dart';
@@ -113,12 +116,8 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
                         children: [
                           Chip(
                             labelPadding: EdgeInsets.all(0),
-                            label: Text(
-                              widget.viewModel.source ==
-                                      SpeciesDataSource.custom
-                                  ? appLocalizations.custom
-                                  : appLocalizations.floraCodex,
-                            ),
+                            label: Text(dataSourceLabel(
+                                context, widget.viewModel.source)),
                           ),
                           Text(widget.viewModel.species,
                               style:
@@ -176,6 +175,7 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
                             maxNum: 4,
                             appLocalizations: appLocalizations,
                           ),
+                          ..._getCareSources(appLocalizations),
                           const SizedBox(height: 16),
 
                           // Synonyms
@@ -290,6 +290,50 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
         },
       ),
     );
+  }
+
+  List<Widget> _getCareSources(L appLocalizations) {
+    CareSources? sources = widget.viewModel.careSources;
+    if (sources == null) {
+      return [];
+    }
+    TextStyle style = Theme.of(context).textTheme.bodySmall!;
+    List<String> names = [
+      if (sources.species == SpeciesDataSource.gbif.name) "GBIF",
+      if (sources.species == SpeciesDataSource.floraCodex.name)
+        appLocalizations.floraCodex,
+      if (sources.care == CareSources.openPlantbook) "Open Plantbook",
+    ];
+    String fieldName(String field) => switch (field) {
+          CareSources.light => appLocalizations.sunlight,
+          CareSources.humidity => appLocalizations.humidity,
+          CareSources.temperature => appLocalizations.temperature,
+          CareSources.ph => appLocalizations.ph,
+          _ => field,
+        };
+    return [
+      const SizedBox(height: 8),
+      if (names.isNotEmpty)
+        Text(appLocalizations.careSources(names.join(", ")), style: style),
+      if (sources.hasAiEstimate)
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(LucideIcons.sparkles,
+                size: 14, color: Theme.of(context).colorScheme.primary),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                appLocalizations.aiEstimatedCare(
+                  AiProvider.fromKey(sources.aiProvider).displayName,
+                  sources.aiFields.map(fieldName).join(", "),
+                ),
+                style: style,
+              ),
+            ),
+          ],
+        ),
+    ];
   }
 
   RichText _getSpeciesInfo() {

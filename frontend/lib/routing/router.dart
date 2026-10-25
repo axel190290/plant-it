@@ -221,6 +221,38 @@ GoRouter router() => GoRouter(
                 },
               ),
               GoRoute(
+                path: Routes.settingsGbif,
+                builder: (context, state) {
+                  return GbifScreen(
+                    viewModel: state.extra as SettingsViewModel,
+                  );
+                },
+              ),
+              GoRoute(
+                path: Routes.settingsPlantNet,
+                builder: (context, state) {
+                  return PlantNetScreen(
+                    viewModel: state.extra as SettingsViewModel,
+                  );
+                },
+              ),
+              GoRoute(
+                path: Routes.settingsOpenPlantbook,
+                builder: (context, state) {
+                  return OpenPlantbookScreen(
+                    viewModel: state.extra as SettingsViewModel,
+                  );
+                },
+              ),
+              GoRoute(
+                path: Routes.settingsAiCare,
+                builder: (context, state) {
+                  return AiCareScreen(
+                    viewModel: state.extra as SettingsViewModel,
+                  );
+                },
+              ),
+              GoRoute(
                 path: Routes.settingsDatabaseAndCache,
                 builder: (context, state) {
                   SettingsViewModel viewModel =

@@ -13,6 +13,7 @@ import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/data/repository/species_synonym_repository.dart';
 import 'package:plant_it/data/service/search/cache/app_cache.dart';
 import 'package:plant_it/database/database.dart' as db;
+import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/utils/stream_code.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -95,26 +96,49 @@ class EditSpeciesViewModel extends ChangeNotifier {
 
   void setLight(int light) {
     _speciesCare = _speciesCare.copyWith(light: Value(light));
+    _clearAiEstimate(CareSources.light);
   }
 
   void setHumidity(int humidity) {
     _speciesCare = _speciesCare.copyWith(humidity: Value(humidity));
+    _clearAiEstimate(CareSources.humidity);
   }
 
   void setTempMax(int tempMax) {
     _speciesCare = _speciesCare.copyWith(tempMax: Value(tempMax));
+    _clearAiEstimate(CareSources.temperature);
   }
 
   void setTempMin(int tempMin) {
     _speciesCare = _speciesCare.copyWith(tempMin: Value(tempMin));
+    _clearAiEstimate(CareSources.temperature);
   }
 
   void setPhMax(int phMax) {
     _speciesCare = _speciesCare.copyWith(phMax: Value(phMax));
+    _clearAiEstimate(CareSources.ph);
   }
 
   void setPhMin(int phMin) {
     _speciesCare = _speciesCare.copyWith(phMin: Value(phMin));
+    _clearAiEstimate(CareSources.ph);
+  }
+
+  /// A value set by the user is no longer an AI estimate
+  void _clearAiEstimate(String field) {
+    CareSources? sources = CareSources.decode(
+        _species.bibliography.present ? _species.bibliography.value : null);
+    if (sources == null || !sources.aiFields.contains(field)) {
+      return;
+    }
+    List<String> aiFields = sources.aiFields.where((f) => f != field).toList();
+    CareSources updated = CareSources(
+      species: sources.species,
+      care: sources.care,
+      aiProvider: aiFields.isEmpty ? null : sources.aiProvider,
+      aiFields: aiFields,
+    );
+    _species = _species.copyWith(bibliography: Value(updated.encode()));
   }
 
   void setSynonyms(List<String> synonyms) {

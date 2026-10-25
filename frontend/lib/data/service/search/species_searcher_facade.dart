@@ -1,26 +1,41 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:drift/drift.dart';
 import 'package:logging/logging.dart';
+import 'package:plant_it/data/service/care/species_care_enricher.dart';
+import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
 import 'package:plant_it/data/service/search/cache/app_cache.dart';
 import 'package:plant_it/data/service/search/flora_codex_searcher.dart';
+import 'package:plant_it/data/service/search/gbif_searcher.dart';
 import 'package:plant_it/data/service/search/local_searcher.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/species_searcher_result.dart';
 import 'package:result_dart/result_dart.dart';
 
 class SpeciesSearcherFacade {
   final LocalSearcher _localSearcher;
   final FloraCodexSearcher _floraCodexSearcher;
+  final GbifSearcher _gbifSearcher;
+  final PlantNetIdentifier _plantNetIdentifier;
+  final SpeciesCareEnricher _careEnricher;
   final Logger _log = Logger("SpeciesSearcherFacade");
   final AppCache _cache;
 
   SpeciesSearcherFacade({
     required LocalSearcher localSearcher,
     required FloraCodexSearcher floraCodexSearcher,
+    required GbifSearcher gbifSearcher,
+    required PlantNetIdentifier plantNetIdentifier,
+    required SpeciesCareEnricher careEnricher,
     required AppCache cache,
   })  : _localSearcher = localSearcher,
         _floraCodexSearcher = floraCodexSearcher,
+        _gbifSearcher = gbifSearcher,
+        _plantNetIdentifier = plantNetIdentifier,
+        _careEnricher = careEnricher,
         _cache = cache;
 
   Future<Result<List<SpeciesSearcherPartialResult>>> search(
@@ -45,10 +60,24 @@ class SpeciesSearcherFacade {
 
     Result<List<SpeciesSearcherPartialResult>> floraCodexResult =
         await _floraCodexSearcher.search(term, offset, limit);
+    // An unreachable external source must not hide the results of the others
     if (floraCodexResult.isError()) {
-      return Failure(Exception(floraCodexResult.exceptionOrNull()));
+      _log.warning(floraCodexResult.exceptionOrNull());
+    } else {
+      result.addAll(floraCodexResult.getOrThrow());
     }
-    result.addAll(floraCodexResult.getOrThrow());
+
+    Result<List<SpeciesSearcherPartialResult>> gbifResult =
+        await _gbifSearcher.search(term, offset, limit);
+    if (gbifResult.isError()) {
+      _log.warning(gbifResult.exceptionOrNull());
+    } else {
+      Set<String> names = result
+          .map((r) => r.speciesCompanion.scientificName.value.toLowerCase())
+          .toSet();
+      result.addAll(gbifResult.getOrThrow().where((r) => !names
+          .contains(r.speciesCompanion.scientificName.value.toLowerCase())));
+    }
 
     await _saveCacheSearch(
         emptyToAsterisk, result.sublist(0, min(result.length, limit)));
@@ -72,25 +101,56 @@ class SpeciesSearcherFacade {
       }
       _saveCacheDetails(id, SpeciesDataSource.custom, result.getOrThrow());
       return result;
-    } else if (species.speciesCompanion.dataSource.value ==
-        SpeciesDataSource.floraCodex) {
-      String cacheKey =
-          "${species.speciesCompanion.externalId.value}_floraCodex_details";
-      SpeciesSearcherResult? cached =
-          await _cacheHitDetails(cacheKey, SpeciesDataSource.floraCodex);
-      if (cached != null) {
-        return Success(cached);
-      }
-      Result<SpeciesSearcherResult> result = await _floraCodexSearcher
+    }
+
+    SpeciesDataSource source = species.speciesCompanion.dataSource.value;
+    String cacheKey =
+        "${species.speciesCompanion.externalId.value}_${source.name}_details";
+    SpeciesSearcherResult? cached = await _cacheHitDetails(cacheKey, source);
+    if (cached != null) {
+      return Success(cached);
+    }
+
+    Result<SpeciesSearcherResult> result;
+    if (source == SpeciesDataSource.floraCodex) {
+      result = await _floraCodexSearcher
           .getDetails(species.speciesCompanion.externalId.value.toString());
-      if (result.isError()) {
-        return result;
-      }
-      _saveCacheDetails(
-          cacheKey, SpeciesDataSource.floraCodex, result.getOrThrow());
+    } else if (source == SpeciesDataSource.gbif) {
+      result = await _gbifSearcher
+          .getDetails(species.speciesCompanion.externalId.value.toString());
+    } else {
+      return Failure(Exception("missing or wrong data source value"));
+    }
+    if (result.isError()) {
       return result;
     }
-    return Failure(Exception("missing or wrong data source value"));
+
+    SpeciesSearcherResult details = await _withCare(result.getOrThrow());
+    _saveCacheDetails(cacheKey, source, details);
+    return Success(details);
+  }
+
+  /// Identifies the species in the given photos. Results open the same
+  /// species details as a search by name.
+  Future<Result<List<SpeciesSearcherPartialResult>>> identify(
+      List<File> images) {
+    return _plantNetIdentifier.identify(images);
+  }
+
+  Future<SpeciesSearcherResult> _withCare(SpeciesSearcherResult details) async {
+    SpeciesCompanion species = details.speciesCompanion;
+    (SpeciesCareCompanion, CareSources) enriched = await _careEnricher.enrich(
+      scientificName: species.scientificName.value,
+      family: species.family.value,
+      care: details.speciesCareCompanion,
+      sources: CareSources(species: species.dataSource.value.name),
+    );
+    return SpeciesSearcherResult(
+      speciesCompanion:
+          species.copyWith(bibliography: Value(enriched.$2.encode())),
+      speciesCareCompanion: enriched.$1,
+      speciesSynonymsCompanion: details.speciesSynonymsCompanion,
+    );
   }
 
   Future<List<SpeciesSearcherPartialResult>?> _cacheHitSearch(

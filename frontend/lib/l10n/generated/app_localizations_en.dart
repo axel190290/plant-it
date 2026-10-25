@@ -705,14 +705,14 @@ class LEn extends L {
     String _temp0 = intl.Intl.selectLogic(
       genus,
       {
-        'null': 'uknown',
+        'null': 'unknown',
         'other': '|$genus|',
       },
     );
     String _temp1 = intl.Intl.selectLogic(
       family,
       {
-        'null': 'uknown',
+        'null': 'unknown',
         'other': '|$family|',
       },
     );
@@ -917,4 +917,122 @@ class LEn extends L {
   @override
   String get notificationBody8 =>
       '|emoji| |plantName| misses its |eventType|. Time to make it happy again!';
+
+  @override
+  String get gbifDescription =>
+      'GBIF (Global Biodiversity Information Facility) is a free, open database with the scientific and common names of every plant species. It needs no API key. Photos are taken from iNaturalist.';
+
+  @override
+  String get configureTheGbifSettings =>
+      'Search plants by scientific or common name, free';
+
+  @override
+  String get configureThePlantNetSettings => 'Identify plants from a photo';
+
+  @override
+  String get plantNetDescription =>
+      'Pl@ntNet identifies plants from one or more photos and links each result to its GBIF species. The free plan allows 500 identifications per day. To use it you need a free API key.';
+
+  @override
+  String get plantNetGetApiKey =>
+      'To get your API key, sign up on the Pl@ntNet website, or click here';
+
+  @override
+  String get insertThePlantNetApiKey => 'Insert the Pl@ntNet API Key';
+
+  @override
+  String get configureTheOpenPlantbookSettings =>
+      'Care data: light, temperature and humidity';
+
+  @override
+  String get openPlantbookDescription =>
+      'Open Plantbook is a free database with the light, temperature and humidity ranges of thousands of plants. It does not provide soil pH. To use it you need a free client ID and client secret.';
+
+  @override
+  String get openPlantbookGetCredentials =>
+      'To get your credentials, sign up on the Open Plantbook website and create an API client, or click here';
+
+  @override
+  String get clientId => 'Client ID';
+
+  @override
+  String get clientSecret => 'Client secret';
+
+  @override
+  String get aiCare => 'AI to complete care';
+
+  @override
+  String get configureTheAiCareSettings =>
+      'Estimate the care values no source provides';
+
+  @override
+  String get aiCareDescription =>
+      'When a plant has care values that no data source provides (for example soil pH), an AI model can estimate them. Estimated values are marked as such on the species page and can be edited once the plant is in your collection. Only the scientific name of the plant is sent.';
+
+  @override
+  String get aiProvider => 'AI provider';
+
+  @override
+  String get aiProviderNone => 'None';
+
+  @override
+  String get aiProviderClaudeHint =>
+      'Paid. Get an API key in the Claude Console';
+
+  @override
+  String get aiProviderGeminiHint =>
+      'Has a free tier. Get an API key in Google AI Studio';
+
+  @override
+  String get aiProviderGitHubModelsHint =>
+      'Free with limits. Use a GitHub token with the \"Models\" permission';
+
+  @override
+  String get getApiKeyClickHere => 'To get your key, click here';
+
+  @override
+  String get aiModel => 'Model';
+
+  @override
+  String aiModelDefault(String model) {
+    return 'Default: $model';
+  }
+
+  @override
+  String get insertTheAiModel => 'Model to use (leave empty for the default)';
+
+  @override
+  String get identifyByPhoto => 'Identify by photo';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get identifying => 'Identifying the plant...';
+
+  @override
+  String get photoIdentificationResults => 'Most likely species in your photo';
+
+  @override
+  String get noPlantIdentified =>
+      'No plant could be identified in the photo. Try a closer photo of a leaf or flower.';
+
+  @override
+  String get plantNetKeyMissing =>
+      'To identify plants by photo, add your Pl@ntNet API key in Settings > Data sources.';
+
+  @override
+  String identificationConfidence(String percent) {
+    return '$percent% match';
+  }
+
+  @override
+  String careSources(String sources) {
+    return 'Sources: $sources';
+  }
+
+  @override
+  String aiEstimatedCare(String provider, String fields) {
+    return 'Estimated by AI ($provider): $fields. Check these values and edit them if needed.';
+  }
 }

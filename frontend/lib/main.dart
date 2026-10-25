@@ -66,6 +66,9 @@ void main() async {
     create: (context) => SpeciesSearcherFacade(
       localSearcher: context.read(),
       floraCodexSearcher: context.read(),
+      gbifSearcher: context.read(),
+      plantNetIdentifier: context.read(),
+      careEnricher: context.read(),
       cache: context.read(),
     ),
   );

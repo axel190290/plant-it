@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:command_it/command_it.dart';
@@ -37,14 +38,24 @@ class SearchViewModel extends ChangeNotifier {
       if (result.isError()) throw result.exceptionOrNull()!;
       return;
     }, initialValue: null);
+    identify = Command.createAsync((List<File> images) async {
+      Result<void> result = await _identify(images);
+      if (result.isError()) throw result.exceptionOrNull()!;
+      return;
+    }, initialValue: null);
   }
 
   final _log = Logger('SearchViewModel');
   List<SpeciesSearcherPartialResult> _result = [];
+  bool _isPhotoResult = false;
 
   late final Command<Query, void> search;
+  late final Command<List<File>, void> identify;
 
   List<SpeciesSearcherPartialResult> get result => _result;
+
+  /// Whether [result] comes from a photo identification
+  bool get isPhotoResult => _isPhotoResult;
 
   Future<Result<void>> _query(Query query) async {
     Result<List<SpeciesSearcherPartialResult>> species =
@@ -58,6 +69,20 @@ class SearchViewModel extends ChangeNotifier {
     }
     _log.fine("Loaded queried species");
     _result = species.getOrThrow();
+    _isPhotoResult = false;
+    notifyListeners();
+    return Success("ok");
+  }
+
+  Future<Result<void>> _identify(List<File> images) async {
+    Result<List<SpeciesSearcherPartialResult>> species =
+        await _speciesSearcherFacade.identify(images);
+    if (species.isError()) {
+      return species;
+    }
+    _log.fine("Identified species from photo");
+    _result = species.getOrThrow();
+    _isPhotoResult = true;
     notifyListeners();
     return Success("ok");
   }

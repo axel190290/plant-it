@@ -34,7 +34,7 @@ class Plants extends Table {
       textEnum<AvatarMode>().withDefault(const Constant("none"))();
 }
 
-enum SpeciesDataSource { custom, floraCodex }
+enum SpeciesDataSource { custom, floraCodex, gbif }
 
 class Species extends Table {
   IntColumn get id => integer().autoIncrement()();

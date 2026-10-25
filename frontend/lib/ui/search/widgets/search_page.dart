@@ -1,9 +1,12 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:command_it/command_it.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/species_searcher_result.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
@@ -30,10 +33,13 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController _searchController = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
+    // Listening also makes the errors handled locally instead of globally
+    widget.viewModel.identify.errors.addListener(_onIdentifyError);
     _searchController.addListener(() {
       if (_searchController.text.isEmpty) {
         widget.viewModel.search.execute(
@@ -48,10 +54,10 @@ class _SearchPageState extends State<SearchPage> {
     widget.streamController.stream.listen((_) {
       widget.viewModel.search.execute(
         Query(
-            term: "",
-            offset: 0,
-            limit: 10,
-          ),
+          term: "",
+          offset: 0,
+          limit: 10,
+        ),
       );
     });
   }
@@ -68,16 +74,95 @@ class _SearchPageState extends State<SearchPage> {
     }
   }
 
+  Future<void> _identifyByPhoto() async {
+    ImageSource? source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(L.of(context).identifyByPhoto,
+                  style: Theme.of(context).textTheme.titleMedium),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.camera),
+              title: Text(L.of(context).camera),
+              onTap: () => Navigator.of(context).pop(ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.images),
+              title: Text(L.of(context).gallery),
+              onTap: () => Navigator.of(context).pop(ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+
+    List<XFile> picked;
+    if (source == ImageSource.camera) {
+      XFile? photo = await _picker.pickImage(
+          source: source, maxWidth: 1600, imageQuality: 85);
+      picked = photo == null ? [] : [photo];
+    } else {
+      // Pl@ntNet accepts up to 5 photos of the same plant
+      picked = await _picker.pickMultiImage(
+          limit: 5, maxWidth: 1600, imageQuality: 85);
+    }
+    if (picked.isEmpty || !mounted) return;
+
+    _searchController.clear();
+    widget.viewModel.identify
+        .execute(picked.take(5).map((f) => File(f.path)).toList());
+  }
+
+  void _onIdentifyError() {
+    CommandError? error = widget.viewModel.identify.errors.value;
+    if (error == null || !mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(error.error is MissingApiKeyException
+            ? L.of(context).plantNetKeyMissing
+            : L.of(context).errorWithMessage(error.error.toString())),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.viewModel.identify.errors.removeListener(_onIdentifyError);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: true,
       bottom: true,
-      child: ValueListenableBuilder<CommandResult<Query?, void>>(
-          valueListenable: widget.viewModel.search.results,
-          builder: (context, command, _) {
-            if (command.isExecuting) {
-              return const Center(child: CircularProgressIndicator());
+      child: ListenableBuilder(
+          listenable: Listenable.merge([
+            widget.viewModel.search.results,
+            widget.viewModel.identify.isExecuting,
+          ]),
+          builder: (context, _) {
+            CommandResult<Query?, void> command =
+                widget.viewModel.search.results.value;
+            if (command.isExecuting ||
+                widget.viewModel.identify.isExecuting.value) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    if (widget.viewModel.identify.isExecuting.value) ...[
+                      const SizedBox(height: 16),
+                      Text(L.of(context).identifying),
+                    ],
+                  ],
+                ),
+              );
             }
 
             if (command.hasError) {
@@ -112,6 +197,11 @@ class _SearchPageState extends State<SearchPage> {
                                 _searchController.clear();
                               },
                             ),
+                          IconButton(
+                            icon: const Icon(LucideIcons.camera),
+                            tooltip: L.of(context).identifyByPhoto,
+                            onPressed: _identifyByPhoto,
+                          ),
                           IconButton(
                             icon: const Icon(LucideIcons.plus),
                             onPressed: () => context.push(
@@ -155,7 +245,18 @@ class _SearchPageState extends State<SearchPage> {
                           // ),
                         ]),
                   ),
-                  widget.viewModel.result.isEmpty
+                  if (widget.viewModel.isPhotoResult)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Text(
+                        widget.viewModel.result.isEmpty
+                            ? L.of(context).noPlantIdentified
+                            : L.of(context).photoIdentificationResults,
+                        style: Theme.of(context).textTheme.titleMedium,
+                      ),
+                    ),
+                  widget.viewModel.result.isEmpty &&
+                          !widget.viewModel.isPhotoResult
                       ? Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 10),
                           child: SizedBox(

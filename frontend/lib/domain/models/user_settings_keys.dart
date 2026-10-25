@@ -17,7 +17,20 @@ enum UserSettingsKeys {
   notificationDateTimeSunday('notification_datetime_sunday'),
 
   useFloraCodex('use_flora_codex'),
-  floraCodexKey('flora_codex_key');
+  floraCodexKey('flora_codex_key'),
+
+  useGbif('use_gbif'),
+  plantNetKey('plantnet_key'),
+  plantbookClientId('plantbook_client_id'),
+  plantbookClientSecret('plantbook_client_secret'),
+
+  aiProvider('ai_provider'),
+  claudeKey('claude_key'),
+  claudeModel('claude_model'),
+  geminiKey('gemini_key'),
+  geminiModel('gemini_model'),
+  githubModelsToken('github_models_token'),
+  githubModelsModel('github_models_model');
 
   final String key;
 

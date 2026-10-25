@@ -135,7 +135,8 @@ class AddPlantViewModel extends ChangeNotifier {
     }
     _log.fine("Species synonyms saved");
 
-    if (species.externalAvatarUrl.present) {
+    if (species.externalAvatarUrl.present &&
+        species.externalAvatarUrl.value != null) {
       Result<int> avatarResult = await _saveAvatar(
           speciesId.getOrThrow(), species.externalAvatarUrl.value!);
       if (avatarResult.isError()) {

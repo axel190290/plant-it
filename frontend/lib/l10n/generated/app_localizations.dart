@@ -6,6 +6,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_es.dart';
+import 'app_localizations_fr.dart';
 import 'app_localizations_it.dart';
 
 // ignore_for_file: type=lint
@@ -94,6 +96,8 @@ abstract class L {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('es'),
+    Locale('fr'),
     Locale('it')
   ];
 
@@ -1134,7 +1138,7 @@ abstract class L {
   /// A description of a plant classification
   ///
   /// In en, this message translates to:
-  /// **'{species} is a species of genus {genus, select, null {uknown} other {|{genus}|}} and family {family, select, null {uknown} other {|{family}|}}.'**
+  /// **'{species} is a species of genus {genus, select, null {unknown} other {|{genus}|}} and family {family, select, null {unknown} other {|{family}|}}.'**
   String speciesClassificationInfo(String species, String genus, String family);
 
   /// No description provided for @eventType.
@@ -1412,6 +1416,198 @@ abstract class L {
   /// In en, this message translates to:
   /// **'|emoji| |plantName| misses its |eventType|. Time to make it happy again!'**
   String get notificationBody8;
+
+  /// No description provided for @gbifDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'GBIF (Global Biodiversity Information Facility) is a free, open database with the scientific and common names of every plant species. It needs no API key. Photos are taken from iNaturalist.'**
+  String get gbifDescription;
+
+  /// No description provided for @configureTheGbifSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Search plants by scientific or common name, free'**
+  String get configureTheGbifSettings;
+
+  /// No description provided for @configureThePlantNetSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Identify plants from a photo'**
+  String get configureThePlantNetSettings;
+
+  /// No description provided for @plantNetDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Pl@ntNet identifies plants from one or more photos and links each result to its GBIF species. The free plan allows 500 identifications per day. To use it you need a free API key.'**
+  String get plantNetDescription;
+
+  /// No description provided for @plantNetGetApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'To get your API key, sign up on the Pl@ntNet website, or click here'**
+  String get plantNetGetApiKey;
+
+  /// No description provided for @insertThePlantNetApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Insert the Pl@ntNet API Key'**
+  String get insertThePlantNetApiKey;
+
+  /// No description provided for @configureTheOpenPlantbookSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Care data: light, temperature and humidity'**
+  String get configureTheOpenPlantbookSettings;
+
+  /// No description provided for @openPlantbookDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Plantbook is a free database with the light, temperature and humidity ranges of thousands of plants. It does not provide soil pH. To use it you need a free client ID and client secret.'**
+  String get openPlantbookDescription;
+
+  /// No description provided for @openPlantbookGetCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'To get your credentials, sign up on the Open Plantbook website and create an API client, or click here'**
+  String get openPlantbookGetCredentials;
+
+  /// No description provided for @clientId.
+  ///
+  /// In en, this message translates to:
+  /// **'Client ID'**
+  String get clientId;
+
+  /// No description provided for @clientSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Client secret'**
+  String get clientSecret;
+
+  /// No description provided for @aiCare.
+  ///
+  /// In en, this message translates to:
+  /// **'AI to complete care'**
+  String get aiCare;
+
+  /// No description provided for @configureTheAiCareSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimate the care values no source provides'**
+  String get configureTheAiCareSettings;
+
+  /// No description provided for @aiCareDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'When a plant has care values that no data source provides (for example soil pH), an AI model can estimate them. Estimated values are marked as such on the species page and can be edited once the plant is in your collection. Only the scientific name of the plant is sent.'**
+  String get aiCareDescription;
+
+  /// No description provided for @aiProvider.
+  ///
+  /// In en, this message translates to:
+  /// **'AI provider'**
+  String get aiProvider;
+
+  /// No description provided for @aiProviderNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get aiProviderNone;
+
+  /// No description provided for @aiProviderClaudeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid. Get an API key in the Claude Console'**
+  String get aiProviderClaudeHint;
+
+  /// No description provided for @aiProviderGeminiHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Has a free tier. Get an API key in Google AI Studio'**
+  String get aiProviderGeminiHint;
+
+  /// No description provided for @aiProviderGitHubModelsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Free with limits. Use a GitHub token with the \"Models\" permission'**
+  String get aiProviderGitHubModelsHint;
+
+  /// No description provided for @getApiKeyClickHere.
+  ///
+  /// In en, this message translates to:
+  /// **'To get your key, click here'**
+  String get getApiKeyClickHere;
+
+  /// No description provided for @aiModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model'**
+  String get aiModel;
+
+  /// No description provided for @aiModelDefault.
+  ///
+  /// In en, this message translates to:
+  /// **'Default: {model}'**
+  String aiModelDefault(String model);
+
+  /// No description provided for @insertTheAiModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Model to use (leave empty for the default)'**
+  String get insertTheAiModel;
+
+  /// No description provided for @identifyByPhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Identify by photo'**
+  String get identifyByPhoto;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @identifying.
+  ///
+  /// In en, this message translates to:
+  /// **'Identifying the plant...'**
+  String get identifying;
+
+  /// No description provided for @photoIdentificationResults.
+  ///
+  /// In en, this message translates to:
+  /// **'Most likely species in your photo'**
+  String get photoIdentificationResults;
+
+  /// No description provided for @noPlantIdentified.
+  ///
+  /// In en, this message translates to:
+  /// **'No plant could be identified in the photo. Try a closer photo of a leaf or flower.'**
+  String get noPlantIdentified;
+
+  /// No description provided for @plantNetKeyMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'To identify plants by photo, add your Pl@ntNet API key in Settings > Data sources.'**
+  String get plantNetKeyMissing;
+
+  /// No description provided for @identificationConfidence.
+  ///
+  /// In en, this message translates to:
+  /// **'{percent}% match'**
+  String identificationConfidence(String percent);
+
+  /// No description provided for @careSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources: {sources}'**
+  String careSources(String sources);
+
+  /// No description provided for @aiEstimatedCare.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated by AI ({provider}): {fields}. Check these values and edit them if needed.'**
+  String aiEstimatedCare(String provider, String fields);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {
@@ -1424,7 +1620,7 @@ class _LDelegate extends LocalizationsDelegate<L> {
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['en', 'it'].contains(locale.languageCode);
+      <String>['en', 'es', 'fr', 'it'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_LDelegate old) => false;
@@ -1435,6 +1631,10 @@ L lookupL(Locale locale) {
   switch (locale.languageCode) {
     case 'en':
       return LEn();
+    case 'es':
+      return LEs();
+    case 'fr':
+      return LFr();
     case 'it':
       return LIt();
   }

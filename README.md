@@ -26,6 +26,19 @@ Plant-it helps you remember the last time you did a treatment of your plants, wh
 * Upload photos of your plants
 * Set reminders for some actions on your plants (e.g., notify if not watered every 4 days)
 
+## Plant data sources
+Plants can be found by name or identified from a photo, and their care is completed from several sources. All of them are configured in *Settings > Data sources*:
+
+| Source | Used for | Needs |
+|---|---|---|
+| [GBIF](https://www.gbif.org) | Search by scientific or common name | Nothing, enabled by default |
+| [iNaturalist](https://www.inaturalist.org) | Species photos | Nothing |
+| [Pl@ntNet](https://my.plantnet.org) | Identification from a photo (camera button in the search bar) | Free API key |
+| [Open Plantbook](https://open.plantbook.io) | Light, temperature and humidity ranges | Free client ID and secret |
+| AI (Claude, Gemini or GitHub Models) | Estimate the care values no source provides, such as soil pH | API key or GitHub token, optional |
+
+Photo and name results open the same species page. Values estimated by the AI are marked on that page and can be edited once the plant is in your collection.
+
 ## Download
 You can download the Plant-it Android app from the following sources:
 

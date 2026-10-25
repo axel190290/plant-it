@@ -6,6 +6,13 @@ import 'package:plant_it/domain/models/species_searcher_result.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/search/view_models/search_viewmodel.dart';
 
+String dataSourceLabel(BuildContext context, db.SpeciesDataSource source) =>
+    switch (source) {
+      db.SpeciesDataSource.custom => L.of(context).custom,
+      db.SpeciesDataSource.floraCodex => L.of(context).floraCodex,
+      db.SpeciesDataSource.gbif => "GBIF",
+    };
+
 class SpeciesCard extends StatelessWidget {
   final SearchViewModel viewModel;
   final SpeciesSearcherPartialResult speciesSearcherResult;
@@ -58,12 +65,16 @@ class SpeciesCard extends StatelessWidget {
                     children: [
                       Chip(
                         labelPadding: EdgeInsets.all(0),
-                        label: Text(
-                          source == db.SpeciesDataSource.custom
-                              ? L.of(context).custom
-                              : L.of(context).floraCodex,
-                        ),
+                        label: Text(dataSourceLabel(context, source)),
                       ),
+                      if (speciesSearcherResult.confidence != null)
+                        Text(
+                          L.of(context).identificationConfidence(
+                              (speciesSearcherResult.confidence! * 100)
+                                  .round()
+                                  .toString()),
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
                       SizedBox(
                         width: MediaQuery.of(context).size.width * .3,
                         child: Text(

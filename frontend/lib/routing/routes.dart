@@ -15,6 +15,10 @@ abstract final class Routes {
   static String settingsInfo = '/settings-info';
   static String settingsDataSources = '/settings-dataSources';
   static String settingsFloraCodex = '/settings-dataSources/floraCodex';
+  static String settingsGbif = '/settings-dataSources/gbif';
+  static String settingsPlantNet = '/settings-dataSources/plantNet';
+  static String settingsOpenPlantbook = '/settings-dataSources/openPlantbook';
+  static String settingsAiCare = '/settings-dataSources/aiCare';
   static String settingsDatabaseAndCache = '/settings-databaseAndCache';
 
   static final String _eventTypeRelative = 'eventType';

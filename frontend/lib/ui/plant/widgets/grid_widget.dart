@@ -150,10 +150,10 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
     }
 
     String? phValue;
-    if (care.phMax.value != null && care.tempMin.value != null) {
+    if (care.phMax.value != null && care.phMin.value != null) {
       phValue = "${care.phMin.value} - ${care.phMax.value}";
     } else if (care.phMax.value == null && care.phMin.value != null) {
-      phValue = "${appLocalizations.min} ${care.tempMin.value}";
+      phValue = "${appLocalizations.min} ${care.phMin.value}";
     } else if (care.phMax.value != null && care.phMin.value == null) {
       phValue = "${appLocalizations.max} ${care.phMax.value}";
     }

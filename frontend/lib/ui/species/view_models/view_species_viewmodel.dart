@@ -15,6 +15,7 @@ import 'package:plant_it/data/repository/species_synonym_repository.dart';
 import 'package:plant_it/data/service/search/cache/app_cache.dart';
 import 'package:plant_it/data/service/search/species_searcher_facade.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/species_searcher_result.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -96,6 +97,8 @@ class ViewSpeciesViewModel extends ChangeNotifier {
   SpeciesCareCompanion get care => _speciesCare;
   SpeciesDataSource get source => _species.dataSource.value;
   SpeciesCompanion get speciesObj => _species;
+  CareSources? get careSources => CareSources.decode(
+      _species.bibliography.present ? _species.bibliography.value : null);
 
   Future<Result<void>> _load(int speciesId) async {
     Result<Specy> species = await _speciesRepository.get(speciesId);
@@ -142,7 +145,8 @@ class ViewSpeciesViewModel extends ChangeNotifier {
       return details;
     }
 
-    _species = external.speciesCompanion;
+    // The details carry what the search result lacks, like the care sources
+    _species = details.getOrThrow().speciesCompanion;
     _log.fine("External species loaded");
 
     _speciesCare = details.getOrThrow().speciesCareCompanion;
@@ -151,16 +155,23 @@ class ViewSpeciesViewModel extends ChangeNotifier {
     _speciesSynonyms = details.getOrThrow().speciesSynonymsCompanion;
     _log.fine("External species synonyms loaded");
 
-    if (details.getOrThrow().speciesCompanion.externalAvatarUrl.present) {
-      String url =
-          details.getOrThrow().speciesCompanion.externalAvatarUrl.value!;
-
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode != 200) {
-        return Failure(Exception("Failed to download image from URL: $url"));
+    String? url =
+        details.getOrThrow().speciesCompanion.externalAvatarUrl.present
+            ? details.getOrThrow().speciesCompanion.externalAvatarUrl.value
+            : null;
+    if (url != null) {
+      // A missing photo must not hide the species details
+      try {
+        final response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          _log.fine("External species image loaded");
+          _base64Image = base64Encode(response.bodyBytes);
+        } else {
+          _log.warning("Failed to download image from URL: $url");
+        }
+      } catch (e) {
+        _log.warning("Failed to download image from URL: $url, $e");
       }
-      _log.fine("External species image loaded");
-      _base64Image = base64Encode(response.bodyBytes);
     }
 
     return Success("ok");

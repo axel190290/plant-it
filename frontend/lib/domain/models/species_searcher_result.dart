@@ -3,9 +3,12 @@ import 'package:plant_it/database/database.dart';
 
 class SpeciesSearcherPartialResult {
   final SpeciesCompanion speciesCompanion;
+  // How sure the photo identification is (0-1), null for name searches
+  final double? confidence;
 
   SpeciesSearcherPartialResult({
     required this.speciesCompanion,
+    this.confidence,
   });
 
   Map<String, dynamic> toJson() {

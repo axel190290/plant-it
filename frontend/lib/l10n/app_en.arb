@@ -364,5 +364,68 @@
   "notificationBody5": "|emoji| |plantName| is overdue for |eventType|. Give it a boost!",
   "notificationBody6": "|emoji| |plantName| is ready for |eventType|. Don't let it down!",
   "notificationBody7": "|emoji| |plantName| needs its |eventType|. You're the hero it deserves!",
-  "notificationBody8": "|emoji| |plantName| misses its |eventType|. Time to make it happy again!"
+  "notificationBody8": "|emoji| |plantName| misses its |eventType|. Time to make it happy again!",
+  "gbifDescription": "GBIF (Global Biodiversity Information Facility) is a free, open database with the scientific and common names of every plant species. It needs no API key. Photos are taken from iNaturalist.",
+  "configureTheGbifSettings": "Search plants by scientific or common name, free",
+  "configureThePlantNetSettings": "Identify plants from a photo",
+  "plantNetDescription": "Pl@ntNet identifies plants from one or more photos and links each result to its GBIF species. The free plan allows 500 identifications per day. To use it you need a free API key.",
+  "plantNetGetApiKey": "To get your API key, sign up on the Pl@ntNet website, or click here",
+  "insertThePlantNetApiKey": "Insert the Pl@ntNet API Key",
+  "configureTheOpenPlantbookSettings": "Care data: light, temperature and humidity",
+  "openPlantbookDescription": "Open Plantbook is a free database with the light, temperature and humidity ranges of thousands of plants. It does not provide soil pH. To use it you need a free client ID and client secret.",
+  "openPlantbookGetCredentials": "To get your credentials, sign up on the Open Plantbook website and create an API client, or click here",
+  "clientId": "Client ID",
+  "clientSecret": "Client secret",
+  "aiCare": "AI to complete care",
+  "configureTheAiCareSettings": "Estimate the care values no source provides",
+  "aiCareDescription": "When a plant has care values that no data source provides (for example soil pH), an AI model can estimate them. Estimated values are marked as such on the species page and can be edited once the plant is in your collection. Only the scientific name of the plant is sent.",
+  "aiProvider": "AI provider",
+  "aiProviderNone": "None",
+  "aiProviderClaudeHint": "Paid. Get an API key in the Claude Console",
+  "aiProviderGeminiHint": "Has a free tier. Get an API key in Google AI Studio",
+  "aiProviderGitHubModelsHint": "Free with limits. Use a GitHub token with the \"Models\" permission",
+  "getApiKeyClickHere": "To get your key, click here",
+  "aiModel": "Model",
+  "aiModelDefault": "Default: {model}",
+  "@aiModelDefault": {
+    "placeholders": {
+      "model": {
+        "type": "String"
+      }
+    }
+  },
+  "insertTheAiModel": "Model to use (leave empty for the default)",
+  "identifyByPhoto": "Identify by photo",
+  "camera": "Camera",
+  "identifying": "Identifying the plant...",
+  "photoIdentificationResults": "Most likely species in your photo",
+  "noPlantIdentified": "No plant could be identified in the photo. Try a closer photo of a leaf or flower.",
+  "plantNetKeyMissing": "To identify plants by photo, add your Pl@ntNet API key in Settings > Data sources.",
+  "identificationConfidence": "{percent}% match",
+  "@identificationConfidence": {
+    "placeholders": {
+      "percent": {
+        "type": "String"
+      }
+    }
+  },
+  "careSources": "Sources: {sources}",
+  "@careSources": {
+    "placeholders": {
+      "sources": {
+        "type": "String"
+      }
+    }
+  },
+  "aiEstimatedCare": "Estimated by AI ({provider}): {fields}. Check these values and edit them if needed.",
+  "@aiEstimatedCare": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      },
+      "fields": {
+        "type": "String"
+      }
+    }
+  }
 }

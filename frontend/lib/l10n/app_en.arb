@@ -586,5 +586,96 @@
   "useSpeciesImage": "Use the species image",
   "imageUpdated": "Image updated",
   "noPhotosFound": "No photos found for this species",
-  "photosFromINaturalist": "Photos shared on iNaturalist. The one you choose is saved with the plant photos."
+  "photosFromINaturalist": "Photos shared on iNaturalist. The one you choose is saved with the plant photos.",
+  "suggestionsForPlant": "Suggestions for {plant}",
+  "@suggestionsForPlant": {
+    "placeholders": {
+      "plant": {
+        "type": "String"
+      }
+    }
+  },
+  "suggestionsHint": "Based on its care, the season and its location. Tap one to create it.",
+  "noSuggestions": "No suggestions: add care such as watering or fertilizer to the plant's species.",
+  "suggestionWatering": "Watering",
+  "suggestionFertilizing": "Fertilizer",
+  "suggestionPruning": "Pruning",
+  "suggestionRepotting": "Repotting",
+  "suggestionPestCheck": "Check for pests",
+  "suggestionMisting": "Mist the leaves",
+  "suggestionProtectFromCold": "Protect from the cold",
+  "suggestionMoveOutdoors": "Move outdoors",
+  "reasonWatering": "Watering of the current season",
+  "reasonFertilizing": "During the growing season",
+  "reasonPruning": "At its pruning time",
+  "reasonRepotting": "At its repotting frequency",
+  "reasonPestCheck": "Look for its usual pests on leaves and stems",
+  "reasonMisting": "It needs a high ambient humidity",
+  "reasonProtectFromCold": "Outdoor plant that does not withstand winter cold",
+  "reasonMoveOutdoors": "When the warm weather returns",
+  "everyCountDays": "{count, plural, =1{every day} other{every {count} days}}",
+  "@everyCountDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "everyCountWeeks": "{count, plural, =1{every week} other{every {count} weeks}}",
+  "@everyCountWeeks": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "everyCountMonths": "{count, plural, =1{every month} other{every {count} months}}",
+  "@everyCountMonths": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "everyCountYears": "{count, plural, =1{every year} other{every {count} years}}",
+  "@everyCountYears": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fromDate": "from {date}",
+  "@fromDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "untilDate": "until {date}",
+  "@untilDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "protectFromRainAlert": "{day}: {rain} mm of rain. {plant} is watered every {days} days: protect it from the rain",
+  "@protectFromRainAlert": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "rain": {
+        "type": "String"
+      },
+      "plant": {
+        "type": "String"
+      },
+      "days": {
+        "type": "String"
+      }
+    }
+  }
 }

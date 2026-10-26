@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:plant_it/data/repository/user_setting_repository.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/domain/models/reminder_suggestion.dart';
 import 'package:plant_it/domain/models/user_settings_keys.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -74,8 +75,9 @@ class AiCareEstimator {
     return (await _apiKey(provider)).isEmpty ? AiProvider.none : provider;
   }
 
-  Future<Result<CareData>> estimate(
-      AiProvider provider, String scientificName, String? family) async {
+  /// Sends [prompt] to [provider] and returns its JSON answer as text.
+  Future<Result<String>> _ask(
+      AiProvider provider, String prompt, Map<String, dynamic> schema) async {
     String apiKey = await _apiKey(provider);
     String model = (await _userSettingRepository.getOrDefault(
             provider.modelSetting!.key, ""))
@@ -85,11 +87,9 @@ class AiCareEstimator {
       model = provider.defaultModel;
     }
 
-    String prompt = _prompt(scientificName, family);
-    Result<String> answer;
     try {
-      answer = switch (provider) {
-        AiProvider.claude => await _askClaude(apiKey, model, prompt),
+      return switch (provider) {
+        AiProvider.claude => await _askClaude(apiKey, model, prompt, schema),
         AiProvider.gemini => await _askGemini(apiKey, model, prompt),
         AiProvider.githubModels =>
           await _askGitHubModels(apiKey, model, prompt),
@@ -99,6 +99,12 @@ class AiCareEstimator {
       return Failure(
           Exception("Error while contacting ${provider.displayName}: $e"));
     }
+  }
+
+  Future<Result<CareData>> estimate(
+      AiProvider provider, String scientificName, String? family) async {
+    Result<String> answer =
+        await _ask(provider, _prompt(scientificName, family), _schema);
     if (answer.isError()) {
       return Failure(answer.exceptionOrNull()!);
     }
@@ -108,6 +114,92 @@ class AiCareEstimator {
     }
     return Success(
         CareData(care.getOrThrow(), parseExtraCare(answer.getOrThrow())));
+  }
+
+  static final Map<String, dynamic> _scheduleSchema = {
+    'type': 'object',
+    'properties': {
+      'fertilizer_every': {
+        'type': ['integer', 'null']
+      },
+      'fertilizer_unit': {
+        'type': ['string', 'null'],
+        'enum': ['days', 'weeks', 'months', null]
+      },
+      'pruning_month': {
+        'type': ['integer', 'null']
+      },
+      'repotting_every_years': {
+        'type': ['integer', 'null']
+      },
+      'repotting_month': {
+        'type': ['integer', 'null']
+      },
+    },
+    'required': [
+      'fertilizer_every',
+      'fertilizer_unit',
+      'pruning_month',
+      'repotting_every_years',
+      'repotting_month'
+    ],
+    'additionalProperties': false,
+  };
+
+  /// Reads the schedule out of the fertilizer, pruning and repotting texts
+  /// of a species, for the texts the rules could not read.
+  Future<Result<ScheduleHints>> interpretSchedule(AiProvider provider,
+      Map<String, String> texts, bool southernHemisphere) async {
+    String hemisphere = southernHemisphere ? 'southern' : 'northern';
+    String prompt = "These texts describe how to care for a plant in the "
+        "$hemisphere hemisphere:\n"
+        "${texts.entries.map((e) => '- ${e.key}: ${e.value}').join('\n')}\n"
+        "Answer only with a JSON object with these fields, null when the "
+        "text does not say it:\n"
+        "- fertilizer_every and fertilizer_unit (days, weeks or months): how "
+        "often to fertilize during the growing season\n"
+        "- pruning_month: month (1-12) to prune\n"
+        "- repotting_every_years: every how many years to repot\n"
+        "- repotting_month: month (1-12) to repot";
+    Result<String> answer = await _ask(provider, prompt, _scheduleSchema);
+    if (answer.isError()) {
+      return Failure(answer.exceptionOrNull()!);
+    }
+    return parseSchedule(answer.getOrThrow());
+  }
+
+  static Result<ScheduleHints> parseSchedule(String answer) {
+    int start = answer.indexOf('{');
+    int end = answer.lastIndexOf('}');
+    if (start < 0 || end <= start) {
+      return Failure(Exception("The AI answer is not valid JSON"));
+    }
+    Map<String, dynamic> values;
+    try {
+      values = json.decode(answer.substring(start, end + 1));
+    } catch (e) {
+      return Failure(Exception("The AI answer is not valid JSON"));
+    }
+    int? read(String key, int min, int max) {
+      dynamic v = values[key];
+      int? n = v is num ? v.round() : (v is String ? int.tryParse(v) : null);
+      return n == null || n < min || n > max ? null : n;
+    }
+
+    FrequencyUnit? unit = switch (values['fertilizer_unit']) {
+      'days' => FrequencyUnit.days,
+      'weeks' => FrequencyUnit.weeks,
+      'months' => FrequencyUnit.months,
+      _ => null,
+    };
+    int? every = read('fertilizer_every', 1, 365);
+    return Success(ScheduleHints(
+      fertilizerQuantity: unit == null ? null : every,
+      fertilizerUnit: every == null ? null : unit,
+      pruningMonth: read('pruning_month', 1, 12),
+      repottingYears: read('repotting_every_years', 1, 10),
+      repottingMonth: read('repotting_month', 1, 12),
+    ));
   }
 
   Future<String> _apiKey(AiProvider provider) async {
@@ -223,8 +315,8 @@ class AiCareEstimator {
     'additionalProperties': false,
   };
 
-  Future<Result<String>> _askClaude(
-      String apiKey, String model, String prompt) async {
+  Future<Result<String>> _askClaude(String apiKey, String model, String prompt,
+      Map<String, dynamic> schema) async {
     // Server-side fallback re-runs a declined request on another model
     bool supportsFallbacks = model.startsWith('claude-opus-5') ||
         model.startsWith('claude-fable-5-1') ||
@@ -241,7 +333,7 @@ class AiCareEstimator {
       'max_tokens': 8000,
       'output_config': {
         'effort': 'low',
-        'format': {'type': 'json_schema', 'schema': _schema},
+        'format': {'type': 'json_schema', 'schema': schema},
       },
       if (supportsFallbacks) 'fallbacks': 'default',
       'messages': [

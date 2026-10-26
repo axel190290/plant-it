@@ -84,8 +84,24 @@ void main() {
           (await repository.getAll()).getOrThrow().map((f) => f.id).toList();
       List<int> reversed = ids.reversed.toList();
       await repository.reorder(reversed);
-      expect((await repository.getAll()).getOrThrow().map((f) => f.id),
-          reversed);
+      expect(
+          (await repository.getAll()).getOrThrow().map((f) => f.id), reversed);
+    });
+
+    test('reads the values of a species by key', () async {
+      int species = await db.into(db.species).insert(SpeciesCompanion.insert(
+            scientificName: 'Echeveria elegans',
+            species: 'Echeveria elegans',
+          ));
+      SpeciesCareValueRepository values = SpeciesCareValueRepository(db: db);
+      await values.saveByKeys(species, {
+        'watering_summer': const CareValue(value: 10),
+        'substrate': const CareValue(text: 'Cactus mix'),
+      });
+      Map<String, CareValue> byKey =
+          (await values.getBySpeciesKeyed(species)).getOrThrow();
+      expect(byKey.keys.toSet(), {'watering_summer', 'substrate'});
+      expect(byKey['watering_summer']!.value, 10);
     });
 
     test('adds a custom field after the built-in ones', () async {
@@ -163,8 +179,8 @@ void main() {
     try {
       AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
       await db.customStatement('SELECT 1');
-      await db.customStatement(
-          "DELETE FROM care_fields WHERE key LIKE 'basic_%'");
+      await db
+          .customStatement("DELETE FROM care_fields WHERE key LIKE 'basic_%'");
       await db.customStatement('PRAGMA user_version = 4');
       await db.close();
 
@@ -179,6 +195,39 @@ void main() {
       ]);
       expect(fields[4].key, 'light_lux');
       expect(careFieldIconName(fields[0]), 'sun');
+      await db.close();
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
+  test('upgrading a version 5 database adds the suggestion event types',
+      () async {
+    Directory dir = await Directory.systemTemp.createTemp('plant_it_test');
+    File file = File('${dir.path}/db.sqlite');
+    try {
+      AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
+      await db.customStatement('SELECT 1');
+      await db.customStatement("DELETE FROM event_types WHERE name IN "
+          "('repotting', 'inspection', 'misting', 'protect', 'move outdoors')");
+      await db.customStatement('PRAGMA user_version = 5');
+      await db.close();
+
+      db = AppDatabase.forTesting(NativeDatabase(file));
+      List<String> types =
+          (await db.select(db.eventTypes).get()).map((t) => t.name).toList();
+      expect(
+          types,
+          containsAll([
+            'watering',
+            'pest',
+            'repotting',
+            'inspection',
+            'misting',
+            'protect',
+            'move outdoors'
+          ]));
+      expect(types.where((t) => t == 'pest').length, 1);
       await db.close();
     } finally {
       await dir.delete(recursive: true);

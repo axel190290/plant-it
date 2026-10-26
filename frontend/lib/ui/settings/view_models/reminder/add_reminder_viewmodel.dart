@@ -8,7 +8,9 @@ import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/repository/reminder_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
+import 'package:plant_it/data/service/care/reminder_suggestion_service.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/reminder_suggestion.dart';
 import 'package:plant_it/utils/stream_code.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -19,7 +21,10 @@ class AddReminderViewModel extends ChangeNotifier {
     required PlantRepository plantRepository,
     required SpeciesRepository speciesRepository,
     required StreamController<StreamCode> streamController,
-  })  : _reminderRepository = reminderRepository,
+    required ReminderSuggestionService reminderSuggestionService,
+  })  : _reminderSuggestionService = reminderSuggestionService,
+        _streamController = streamController,
+        _reminderRepository = reminderRepository,
         _eventTypeRepository = eventTypeRepository,
         _plantRepository = plantRepository,
         _speciesRepository = speciesRepository {
@@ -35,6 +40,8 @@ class AddReminderViewModel extends ChangeNotifier {
   }
 
   final ReminderRepository _reminderRepository;
+  final ReminderSuggestionService _reminderSuggestionService;
+  final StreamController<StreamCode> _streamController;
   final EventTypeRepository _eventTypeRepository;
   final PlantRepository _plantRepository;
   final SpeciesRepository _speciesRepository;
@@ -82,6 +89,56 @@ class AddReminderViewModel extends ChangeNotifier {
     _log.fine("Specy loaded");
 
     notifyListeners();
+    return Success("ok");
+  }
+
+  /// Reminders that fit the care of [plant], the season and its location.
+  Future<List<ReminderSuggestion>> suggestionsFor(Plant plant) =>
+      _reminderSuggestionService.suggest(plant);
+
+  /// The event type of a suggestion, created if it was deleted or renamed.
+  Future<Result<EventType>> _eventTypeFor(SuggestionKind kind) async {
+    String name = suggestionEventTypes[kind]!;
+    for (EventType type in _eventTypes.values) {
+      if (type.name == name) return Success(type);
+    }
+    Result<int> id = await _eventTypeRepository.insert(EventTypesCompanion(
+      name: Value(name),
+      icon: const Value('sprout'),
+      color: const Value('#81C784'),
+    ));
+    if (id.isError()) return Failure(id.exceptionOrNull()!);
+    Result<EventType> type = await _eventTypeRepository.get(id.getOrThrow());
+    if (type.isSuccess()) {
+      _eventTypes[type.getOrThrow().id] = type.getOrThrow();
+    }
+    return type;
+  }
+
+  /// Creates the reminder of [suggestion] for [plant].
+  Future<Result<void>> createSuggested(
+      Plant plant, ReminderSuggestion suggestion) async {
+    Result<EventType> type = await _eventTypeFor(suggestion.kind);
+    if (type.isError()) return type;
+    // Remind again sooner for frequent care
+    (int, FrequencyUnit) repeatAfter = switch (suggestion.frequencyUnit) {
+      FrequencyUnit.days => (1, FrequencyUnit.days),
+      FrequencyUnit.weeks => (3, FrequencyUnit.days),
+      _ => (7, FrequencyUnit.days),
+    };
+    Result<int> inserted = await _reminderRepository.insert(RemindersCompanion(
+      type: Value(type.getOrThrow().id),
+      plant: Value(plant.id),
+      startDate: Value(suggestion.start),
+      endDate: Value(suggestion.end),
+      frequencyQuantity: Value(suggestion.frequencyQuantity),
+      frequencyUnit: Value(suggestion.frequencyUnit),
+      repeatAfterQuantity: Value(repeatAfter.$1),
+      repeatAfterUnit: Value(repeatAfter.$2),
+      enabled: const Value(true),
+    ));
+    if (inserted.isError()) return Failure(inserted.exceptionOrNull()!);
+    _streamController.add(StreamCode.insertReminder);
     return Success("ok");
   }
 

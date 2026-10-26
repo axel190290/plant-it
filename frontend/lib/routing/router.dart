@@ -88,6 +88,7 @@ GoRouter router() => GoRouter(
                 weatherService: context.read(),
                 plantRepository: context.read(),
                 speciesCareRepository: context.read(),
+                speciesCareValueRepository: context.read(),
               );
               weatherViewModel.load.execute();
 
@@ -350,6 +351,7 @@ GoRouter router() => GoRouter(
                     plantRepository: context.read(),
                     speciesRepository: context.read(),
                     streamController: context.read(),
+                    reminderSuggestionService: context.read(),
                   );
                   viewModel.load.execute();
                   return AddReminderScreen(viewModel: viewModel);

@@ -2202,6 +2202,163 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Photos shared on iNaturalist. The one you choose is saved with the plant photos.'**
   String get photosFromINaturalist;
+
+  /// No description provided for @suggestionsForPlant.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggestions for {plant}'**
+  String suggestionsForPlant(String plant);
+
+  /// No description provided for @suggestionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Based on its care, the season and its location. Tap one to create it.'**
+  String get suggestionsHint;
+
+  /// No description provided for @noSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'No suggestions: add care such as watering or fertilizer to the plant\'s species.'**
+  String get noSuggestions;
+
+  /// No description provided for @suggestionWatering.
+  ///
+  /// In en, this message translates to:
+  /// **'Watering'**
+  String get suggestionWatering;
+
+  /// No description provided for @suggestionFertilizing.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizer'**
+  String get suggestionFertilizing;
+
+  /// No description provided for @suggestionPruning.
+  ///
+  /// In en, this message translates to:
+  /// **'Pruning'**
+  String get suggestionPruning;
+
+  /// No description provided for @suggestionRepotting.
+  ///
+  /// In en, this message translates to:
+  /// **'Repotting'**
+  String get suggestionRepotting;
+
+  /// No description provided for @suggestionPestCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check for pests'**
+  String get suggestionPestCheck;
+
+  /// No description provided for @suggestionMisting.
+  ///
+  /// In en, this message translates to:
+  /// **'Mist the leaves'**
+  String get suggestionMisting;
+
+  /// No description provided for @suggestionProtectFromCold.
+  ///
+  /// In en, this message translates to:
+  /// **'Protect from the cold'**
+  String get suggestionProtectFromCold;
+
+  /// No description provided for @suggestionMoveOutdoors.
+  ///
+  /// In en, this message translates to:
+  /// **'Move outdoors'**
+  String get suggestionMoveOutdoors;
+
+  /// No description provided for @reasonWatering.
+  ///
+  /// In en, this message translates to:
+  /// **'Watering of the current season'**
+  String get reasonWatering;
+
+  /// No description provided for @reasonFertilizing.
+  ///
+  /// In en, this message translates to:
+  /// **'During the growing season'**
+  String get reasonFertilizing;
+
+  /// No description provided for @reasonPruning.
+  ///
+  /// In en, this message translates to:
+  /// **'At its pruning time'**
+  String get reasonPruning;
+
+  /// No description provided for @reasonRepotting.
+  ///
+  /// In en, this message translates to:
+  /// **'At its repotting frequency'**
+  String get reasonRepotting;
+
+  /// No description provided for @reasonPestCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Look for its usual pests on leaves and stems'**
+  String get reasonPestCheck;
+
+  /// No description provided for @reasonMisting.
+  ///
+  /// In en, this message translates to:
+  /// **'It needs a high ambient humidity'**
+  String get reasonMisting;
+
+  /// No description provided for @reasonProtectFromCold.
+  ///
+  /// In en, this message translates to:
+  /// **'Outdoor plant that does not withstand winter cold'**
+  String get reasonProtectFromCold;
+
+  /// No description provided for @reasonMoveOutdoors.
+  ///
+  /// In en, this message translates to:
+  /// **'When the warm weather returns'**
+  String get reasonMoveOutdoors;
+
+  /// No description provided for @everyCountDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{every day} other{every {count} days}}'**
+  String everyCountDays(int count);
+
+  /// No description provided for @everyCountWeeks.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{every week} other{every {count} weeks}}'**
+  String everyCountWeeks(int count);
+
+  /// No description provided for @everyCountMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{every month} other{every {count} months}}'**
+  String everyCountMonths(int count);
+
+  /// No description provided for @everyCountYears.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{every year} other{every {count} years}}'**
+  String everyCountYears(int count);
+
+  /// No description provided for @fromDate.
+  ///
+  /// In en, this message translates to:
+  /// **'from {date}'**
+  String fromDate(String date);
+
+  /// No description provided for @untilDate.
+  ///
+  /// In en, this message translates to:
+  /// **'until {date}'**
+  String untilDate(String date);
+
+  /// No description provided for @protectFromRainAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: {rain} mm of rain. {plant} is watered every {days} days: protect it from the rain'**
+  String protectFromRainAlert(
+      String day, String rain, String plant, String days);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

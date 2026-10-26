@@ -28,6 +28,31 @@ class SpeciesCareValueRepository {
     }
   }
 
+  /// The values of the built-in fields of a species, by field key.
+  Future<Result<Map<String, CareValue>>> getBySpeciesKeyed(
+      int speciesId) async {
+    try {
+      List<TypedResult> rows = await (db.select(db.speciesCareValues).join([
+        innerJoin(db.careFields,
+            db.careFields.id.equalsExp(db.speciesCareValues.field)),
+      ])
+            ..where(db.speciesCareValues.species.equals(speciesId) &
+                db.careFields.key.isNotNull()))
+          .get();
+      return Success({
+        for (TypedResult row in rows)
+          row.readTable(db.careFields).key!: CareValue(
+            value: row.readTable(db.speciesCareValues).value,
+            maxValue: row.readTable(db.speciesCareValues).maxValue,
+            text: row.readTable(db.speciesCareValues).textValue,
+            estimated: row.readTable(db.speciesCareValues).estimated,
+          )
+      });
+    } catch (e) {
+      return Failure(Exception(e.toString()));
+    }
+  }
+
   /// Replaces the value of a field, or removes it when [value] is empty.
   Future<Result<void>> save(int speciesId, int fieldId, CareValue value) async {
     try {

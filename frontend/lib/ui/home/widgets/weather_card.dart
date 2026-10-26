@@ -98,12 +98,18 @@ class _WeatherCardState extends State<WeatherCard> {
             alert.plants.first,
             alert.limit.toString()),
         WeatherAlertType.rain => l.rainAlert(alert.plants.join(', ')),
+        WeatherAlertType.protectFromRain => l.protectFromRainAlert(
+            dayLabel(l, alert.day!.date),
+            alert.temperature!.round().toString(),
+            alert.plants.first,
+            alert.limit.toString()),
       };
 
   IconData _alertIcon(WeatherAlertType type) => switch (type) {
         WeatherAlertType.frost => LucideIcons.snowflake,
         WeatherAlertType.heat => LucideIcons.thermometer_sun,
         WeatherAlertType.rain => LucideIcons.umbrella,
+        WeatherAlertType.protectFromRain => LucideIcons.cloud_rain_wind,
       };
 
   @override

@@ -78,4 +78,29 @@ void main() {
     expect(alerts[1].plants, ['Monstera', 'Lavanda', 'Cactus']);
     expect(weatherAlerts(weather, const []), isEmpty);
   });
+
+  test('weatherAlerts asks to protect from heavy rain the plants that fear it',
+      () {
+    Weather weather = Weather(
+      place: 'Madrid',
+      latitude: 40.42,
+      days: [
+        DayForecast(date: DateTime(2026, 10, 26), precipitation: 3),
+        DayForecast(date: DateTime(2026, 10, 27), precipitation: 12),
+      ],
+    );
+    List<WeatherAlert> alerts = weatherAlerts(weather, const [
+      OutdoorPlant('Echeveria', null, null, 15),
+      OutdoorPlant('Helecho', null, null, 3),
+    ]);
+    expect(alerts.length, 2);
+    expect(alerts[0].type, WeatherAlertType.protectFromRain);
+    expect(alerts[0].plants, ['Echeveria']);
+    expect(alerts[0].temperature, 15);
+    expect(alerts[0].day!.date, DateTime(2026, 10, 27));
+    expect(alerts[0].limit, 15);
+    // Today it rains, but the protected plant is not told to skip watering
+    expect(alerts[1].type, WeatherAlertType.rain);
+    expect(alerts[1].plants, ['Helecho']);
+  });
 }

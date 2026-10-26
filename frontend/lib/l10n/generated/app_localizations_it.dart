@@ -1463,4 +1463,127 @@ class LIt extends L {
   @override
   String get photosFromINaturalist =>
       'Foto condivise su iNaturalist. Quella scelta viene salvata con le foto della pianta.';
+
+  @override
+  String suggestionsForPlant(String plant) {
+    return 'Suggerimenti per $plant';
+  }
+
+  @override
+  String get suggestionsHint =>
+      'In base alle sue cure, alla stagione e alla sua posizione. Toccane uno per crearlo.';
+
+  @override
+  String get noSuggestions =>
+      'Nessun suggerimento: aggiungi cure come annaffiatura o concime nella scheda della pianta.';
+
+  @override
+  String get suggestionWatering => 'Annaffiatura';
+
+  @override
+  String get suggestionFertilizing => 'Concime';
+
+  @override
+  String get suggestionPruning => 'Potatura';
+
+  @override
+  String get suggestionRepotting => 'Rinvaso';
+
+  @override
+  String get suggestionPestCheck => 'Controllare i parassiti';
+
+  @override
+  String get suggestionMisting => 'Nebulizzare le foglie';
+
+  @override
+  String get suggestionProtectFromCold => 'Proteggere dal freddo';
+
+  @override
+  String get suggestionMoveOutdoors => 'Portare all\'esterno';
+
+  @override
+  String get reasonWatering => 'Annaffiatura della stagione attuale';
+
+  @override
+  String get reasonFertilizing => 'Durante la stagione di crescita';
+
+  @override
+  String get reasonPruning => 'Nel suo periodo di potatura';
+
+  @override
+  String get reasonRepotting => 'Secondo la sua frequenza di rinvaso';
+
+  @override
+  String get reasonPestCheck =>
+      'Cerca i suoi parassiti abituali su foglie e steli';
+
+  @override
+  String get reasonMisting => 'Ha bisogno di un\'alta umidità ambientale';
+
+  @override
+  String get reasonProtectFromCold =>
+      'Pianta esterna che non resiste al freddo invernale';
+
+  @override
+  String get reasonMoveOutdoors => 'Quando torna il bel tempo';
+
+  @override
+  String everyCountDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ogni $count giorni',
+      one: 'ogni giorno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String everyCountWeeks(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ogni $count settimane',
+      one: 'ogni settimana',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String everyCountMonths(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ogni $count mesi',
+      one: 'ogni mese',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String everyCountYears(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'ogni $count anni',
+      one: 'ogni anno',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fromDate(String date) {
+    return 'dal $date';
+  }
+
+  @override
+  String untilDate(String date) {
+    return 'fino al $date';
+  }
+
+  @override
+  String protectFromRainAlert(
+      String day, String rain, String plant, String days) {
+    return '$day: $rain mm di pioggia. $plant si annaffia ogni $days giorni: proteggila dalla pioggia';
+  }
 }

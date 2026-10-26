@@ -2,9 +2,12 @@ import 'package:command_it/command_it.dart';
 import 'package:flutter/material.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/repository/species_care_repository.dart';
+import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/service/weather/weather_service.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/plant_location.dart';
+import 'package:plant_it/domain/models/reminder_suggestion.dart';
 import 'package:plant_it/domain/models/weather.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -15,7 +18,9 @@ class WeatherViewModel extends ChangeNotifier {
     required WeatherService weatherService,
     required PlantRepository plantRepository,
     required SpeciesCareRepository speciesCareRepository,
-  })  : _weatherService = weatherService,
+    required SpeciesCareValueRepository speciesCareValueRepository,
+  })  : _speciesCareValueRepository = speciesCareValueRepository,
+        _weatherService = weatherService,
         _plantRepository = plantRepository,
         _speciesCareRepository = speciesCareRepository {
     load = Command.createAsyncNoParam(() async {
@@ -26,6 +31,7 @@ class WeatherViewModel extends ChangeNotifier {
   final WeatherService _weatherService;
   final PlantRepository _plantRepository;
   final SpeciesCareRepository _speciesCareRepository;
+  final SpeciesCareValueRepository _speciesCareValueRepository;
 
   late final Command<void, void> load;
 
@@ -43,19 +49,22 @@ class WeatherViewModel extends ChangeNotifier {
     _weather = weather.getOrNull();
     _alerts = _weather == null
         ? []
-        : weatherAlerts(_weather!, await _outdoorPlants());
+        : weatherAlerts(_weather!, await _outdoorPlants(_weather!.season));
     notifyListeners();
   }
 
-  Future<List<OutdoorPlant>> _outdoorPlants() async {
+  Future<List<OutdoorPlant>> _outdoorPlants(Season season) async {
     List<Plant> plants = (await _plantRepository.getAll()).getOrDefault([]);
     List<OutdoorPlant> outdoor = [];
     for (Plant plant in plants) {
       if (plant.location != PlantLocation.outdoor) continue;
       Result<SpeciesCareData> care =
           await _speciesCareRepository.get(plant.species);
-      outdoor.add(OutdoorPlant(
-          plant.name, care.getOrNull()?.tempMin, care.getOrNull()?.tempMax));
+      Map<String, CareValue> values =
+          (await _speciesCareValueRepository.getBySpeciesKeyed(plant.species))
+              .getOrDefault({});
+      outdoor.add(OutdoorPlant(plant.name, care.getOrNull()?.tempMin,
+          care.getOrNull()?.tempMax, wateringDays(values, season)));
     }
     return outdoor;
   }

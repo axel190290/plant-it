@@ -19,6 +19,7 @@ import 'package:plant_it/data/service/scheduling_service.dart';
 import 'package:plant_it/data/service/reminder_occurrence_service.dart';
 import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/data/service/care/open_plantbook_client.dart';
+import 'package:plant_it/data/service/care/reminder_suggestion_service.dart';
 import 'package:plant_it/data/service/care/species_care_enricher.dart';
 import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
@@ -146,6 +147,14 @@ List<SingleChildWidget> get providersLocal {
     Provider(
       create: (context) => AiCareEstimator(
         userSettingRepository: context.read(),
+      ),
+    ),
+    Provider(
+      create: (context) => ReminderSuggestionService(
+        speciesCareRepository: context.read(),
+        speciesCareValueRepository: context.read(),
+        weatherService: context.read(),
+        aiCareEstimator: context.read(),
       ),
     ),
     Provider(

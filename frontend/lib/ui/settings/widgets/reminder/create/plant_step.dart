@@ -3,6 +3,7 @@ import 'package:plant_it/database/database.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/step_section.dart';
 import 'package:plant_it/ui/settings/view_models/reminder/add_reminder_viewmodel.dart';
+import 'package:plant_it/ui/settings/widgets/reminder/create/reminder_suggestions_panel.dart';
 
 class PlantStep extends StepSection<AddReminderViewModel> {
   final ValueNotifier<bool> _isValidNotifier = ValueNotifier(false);
@@ -51,67 +52,77 @@ class _PlantStepState extends State<PlantStep> {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 10),
-        AnimatedBuilder(
-            animation: widget._ongoingSelection,
-            builder: (context, _) {
-              return SingleChildScrollView(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * .7,
-                  child: GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    mainAxisSpacing: 8,
-                    crossAxisSpacing: 8,
-                    childAspectRatio: 3.7 / 2,
-                    children:
-                        List.generate(widget.viewModel.plants.length, (index) {
-                      Plant plant = widget.viewModel.plants.entries
-                          .elementAt(index)
-                          .value;
-                      bool isSelected = widget._ongoingSelection.value == plant;
-                      return GestureDetector(
-                        onTap: () {
-                          widget._ongoingSelection.value = plant;
-                          widget._isValidNotifier.value = true;
-                        },
-                        child: Card.outlined(
-                            shape: isSelected
-                                ? RoundedRectangleBorder(
-                                    borderRadius: BorderRadiusGeometry.all(
-                                        Radius.circular(15)),
-                                    side: isSelected
-                                        ? BorderSide(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .primary,
-                                            width: 2)
-                                        : BorderSide.none,
-                                  )
-                                : null,
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text(plant.name),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    widget.viewModel.species[plant.species]!
-                                        .scientificName,
-                                    style:
-                                        TextStyle(fontStyle: FontStyle.italic),
-                                  ),
-                                ],
-                              ),
-                            )),
-                      );
-                    }),
-                  ),
-                ),
-              );
-            })
+        Expanded(
+          child: AnimatedBuilder(
+              animation: widget._ongoingSelection,
+              builder: (context, _) {
+                Plant? selected = widget._ongoingSelection.value;
+                return ListView(
+                  children: [
+                    GridView.count(
+                      crossAxisCount: 2,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      mainAxisSpacing: 8,
+                      crossAxisSpacing: 8,
+                      childAspectRatio: 3.7 / 2,
+                      children: List.generate(widget.viewModel.plants.length,
+                          (index) {
+                        Plant plant = widget.viewModel.plants.entries
+                            .elementAt(index)
+                            .value;
+                        bool isSelected =
+                            widget._ongoingSelection.value == plant;
+                        return GestureDetector(
+                          onTap: () {
+                            widget._ongoingSelection.value = plant;
+                            widget._isValidNotifier.value = true;
+                          },
+                          child: Card.outlined(
+                              shape: isSelected
+                                  ? RoundedRectangleBorder(
+                                      borderRadius: BorderRadiusGeometry.all(
+                                          Radius.circular(15)),
+                                      side: isSelected
+                                          ? BorderSide(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              width: 2)
+                                          : BorderSide.none,
+                                    )
+                                  : null,
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(plant.name),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      widget.viewModel.species[plant.species]!
+                                          .scientificName,
+                                      style: TextStyle(
+                                          fontStyle: FontStyle.italic),
+                                    ),
+                                  ],
+                                ),
+                              )),
+                        );
+                      }),
+                    ),
+                    // Reminders that fit the chosen plant
+                    if (selected != null)
+                      ReminderSuggestionsPanel(
+                        key: ValueKey(selected.id),
+                        viewModel: widget.viewModel,
+                        plant: selected,
+                      ),
+                  ],
+                );
+              }),
+        ),
       ],
     );
   }

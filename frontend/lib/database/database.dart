@@ -200,7 +200,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -243,6 +243,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from >= 2 && from < 5) {
           await initBasicCareFields();
+        }
+        if (from < 6) {
+          await initHealthEventTypes();
         }
       },
       beforeOpen: (details) async {
@@ -287,7 +290,8 @@ class AppDatabase extends _$AppDatabase {
   }
 
   /// Event types to record the pests and diseases of a plant and their
-  /// treatments in its history.
+  /// treatments in its history, and the ones of the reminder suggestions.
+  /// Types that already exist by name are kept.
   Future<void> initHealthEventTypes() async {
     for (EventTypesCompanion type in [
       EventTypesCompanion.insert(
@@ -299,6 +303,32 @@ class AppDatabase extends _$AppDatabase {
         name: 'treatment',
         icon: 'spray_can',
         color: '#81C784',
+      ),
+      // Used by the reminder suggestions
+      EventTypesCompanion.insert(
+        name: 'repotting',
+        icon: 'package_open',
+        color: '#A1887F',
+      ),
+      EventTypesCompanion.insert(
+        name: 'inspection',
+        icon: 'search',
+        color: '#FFD54F',
+      ),
+      EventTypesCompanion.insert(
+        name: 'misting',
+        icon: 'droplets',
+        color: '#4FC3F7',
+      ),
+      EventTypesCompanion.insert(
+        name: 'protect',
+        icon: 'shield',
+        color: '#90A4AE',
+      ),
+      EventTypesCompanion.insert(
+        name: 'move outdoors',
+        icon: 'sun',
+        color: '#FFB74D',
       ),
     ]) {
       int existing = await managers.eventTypes

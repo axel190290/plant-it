@@ -70,7 +70,7 @@ class AddPlantViewModel extends ChangeNotifier {
     _plant = _plant.copyWith(note: Value(note));
   }
 
-  setLocation(String location) {
+  setLocation(String? location) {
     _plant = _plant.copyWith(location: Value(location));
   }
 

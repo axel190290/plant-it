@@ -1224,4 +1224,115 @@ class LFr extends L {
 
   @override
   String get restoreDefaultIcon => 'Icône d\'origine';
+
+  @override
+  String get indoor => 'Intérieur';
+
+  @override
+  String get outdoor => 'Extérieur';
+
+  @override
+  String get weatherAndLocation => 'Météo et emplacement';
+
+  @override
+  String get manageWeather => 'Météo locale et saison pour vos plantes';
+
+  @override
+  String get weatherDescription =>
+      'Votre emplacement sert à afficher la météo et la saison, mettre en avant l\'arrosage de la saison actuelle et vous avertir du gel, de la chaleur et de la pluie pour vos plantes d\'extérieur. La météo vient d\'Open-Meteo, qui ne reçoit que votre position approximative.';
+
+  @override
+  String get searchCity => 'Cherchez votre ville';
+
+  @override
+  String get useMyLocation => 'Utiliser ma position';
+
+  @override
+  String get myLocation => 'Ma position';
+
+  @override
+  String get noPlaceSet => 'Aucun emplacement';
+
+  @override
+  String get locationPermissionDenied =>
+      'La position n\'est pas disponible. Autorisez-la dans les réglages du téléphone ou cherchez votre ville.';
+
+  @override
+  String get noPlacesFound => 'Aucun lieu trouvé';
+
+  @override
+  String get setUpWeather =>
+      'Indiquez votre emplacement pour voir la météo et la saison';
+
+  @override
+  String get seasonSpring => 'Printemps';
+
+  @override
+  String get seasonSummer => 'Été';
+
+  @override
+  String get seasonAutumn => 'Automne';
+
+  @override
+  String get seasonWinter => 'Hiver';
+
+  @override
+  String get seasonDry => 'Saison sèche';
+
+  @override
+  String get seasonRainy => 'Saison des pluies';
+
+  @override
+  String humidityPercent(String humidity) {
+    return '$humidity% d\'humidité';
+  }
+
+  @override
+  String get weatherClear => 'Dégagé';
+
+  @override
+  String get weatherPartlyCloudy => 'Partiellement nuageux';
+
+  @override
+  String get weatherCloudy => 'Nuageux';
+
+  @override
+  String get weatherFog => 'Brouillard';
+
+  @override
+  String get weatherDrizzle => 'Bruine';
+
+  @override
+  String get weatherRain => 'Pluie';
+
+  @override
+  String get weatherSnow => 'Neige';
+
+  @override
+  String get weatherStorm => 'Orage';
+
+  @override
+  String frostAlert(String day, String temperature, String plant, String min) {
+    return '$day : jusqu\'à $temperature °C. $plant supporte au moins $min °C';
+  }
+
+  @override
+  String heatAlert(String day, String temperature, String plant, String max) {
+    return '$day : jusqu\'à $temperature °C. $plant supporte au plus $max °C';
+  }
+
+  @override
+  String rainAlert(String plants) {
+    return 'Il pleut aujourd\'hui : vous pouvez sauter l\'arrosage de $plants';
+  }
+
+  @override
+  String get outdoorAlertsHint =>
+      'Les alertes de gel, chaleur et pluie concernent les plantes dont l\'emplacement est Extérieur.';
+
+  @override
+  String get currentSeason => 'maintenant';
+
+  @override
+  String get forecast => 'Prévisions';
 }

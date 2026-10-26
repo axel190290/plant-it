@@ -1229,4 +1229,115 @@ class LEs extends L {
 
   @override
   String get restoreDefaultIcon => 'Icono original';
+
+  @override
+  String get indoor => 'Interior';
+
+  @override
+  String get outdoor => 'Exterior';
+
+  @override
+  String get weatherAndLocation => 'Clima y ubicación';
+
+  @override
+  String get manageWeather => 'Clima local y estación para tus plantas';
+
+  @override
+  String get weatherDescription =>
+      'Tu ubicación se usa para mostrar el clima y la estación, destacar el riego de la estación actual y avisarte de heladas, calor y lluvia para tus plantas de exterior. El clima viene de Open-Meteo, que solo recibe tu ubicación aproximada.';
+
+  @override
+  String get searchCity => 'Busca tu ciudad';
+
+  @override
+  String get useMyLocation => 'Usar mi ubicación';
+
+  @override
+  String get myLocation => 'Mi ubicación';
+
+  @override
+  String get noPlaceSet => 'Sin ubicación';
+
+  @override
+  String get locationPermissionDenied =>
+      'La ubicación no está disponible. Permítela en los ajustes del móvil o busca tu ciudad.';
+
+  @override
+  String get noPlacesFound => 'No se ha encontrado ningún lugar';
+
+  @override
+  String get setUpWeather =>
+      'Indica tu ubicación para ver el clima y la estación';
+
+  @override
+  String get seasonSpring => 'Primavera';
+
+  @override
+  String get seasonSummer => 'Verano';
+
+  @override
+  String get seasonAutumn => 'Otoño';
+
+  @override
+  String get seasonWinter => 'Invierno';
+
+  @override
+  String get seasonDry => 'Estación seca';
+
+  @override
+  String get seasonRainy => 'Estación lluviosa';
+
+  @override
+  String humidityPercent(String humidity) {
+    return '$humidity% humedad';
+  }
+
+  @override
+  String get weatherClear => 'Despejado';
+
+  @override
+  String get weatherPartlyCloudy => 'Parcialmente nublado';
+
+  @override
+  String get weatherCloudy => 'Nublado';
+
+  @override
+  String get weatherFog => 'Niebla';
+
+  @override
+  String get weatherDrizzle => 'Llovizna';
+
+  @override
+  String get weatherRain => 'Lluvia';
+
+  @override
+  String get weatherSnow => 'Nieve';
+
+  @override
+  String get weatherStorm => 'Tormenta';
+
+  @override
+  String frostAlert(String day, String temperature, String plant, String min) {
+    return '$day: hasta $temperature °C. $plant aguanta mínimo $min °C';
+  }
+
+  @override
+  String heatAlert(String day, String temperature, String plant, String max) {
+    return '$day: hasta $temperature °C. $plant aguanta máximo $max °C';
+  }
+
+  @override
+  String rainAlert(String plants) {
+    return 'Hoy llueve: puedes saltarte el riego de $plants';
+  }
+
+  @override
+  String get outdoorAlertsHint =>
+      'Los avisos de helada, calor y lluvia se muestran para las plantas con ubicación Exterior.';
+
+  @override
+  String get currentSeason => 'ahora';
+
+  @override
+  String get forecast => 'Pronóstico';
 }

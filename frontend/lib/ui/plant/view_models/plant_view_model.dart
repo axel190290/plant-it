@@ -19,6 +19,8 @@ import 'package:plant_it/data/repository/species_care_repository.dart';
 import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/data/service/care/species_description_service.dart';
+import 'package:plant_it/data/service/weather/weather_service.dart';
+import 'package:plant_it/domain/models/weather.dart';
 import 'package:plant_it/database/database.dart' as db;
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/reminder_occurrence.dart';
@@ -37,7 +39,9 @@ class PlantViewModel extends ChangeNotifier {
     required CareFieldRepository careFieldRepository,
     required SpeciesCareValueRepository speciesCareValueRepository,
     required SpeciesDescriptionService speciesDescriptionService,
-  })  : _speciesDescriptionService = speciesDescriptionService,
+    required WeatherService weatherService,
+  })  : _weatherService = weatherService,
+        _speciesDescriptionService = speciesDescriptionService,
         _careFieldRepository = careFieldRepository,
         _speciesCareValueRepository = speciesCareValueRepository,
         _plantRepository = plantRepository,
@@ -100,6 +104,8 @@ class PlantViewModel extends ChangeNotifier {
 
   //final Logger _log = Logger('PlantViewModel');
   final SpeciesDescriptionService _speciesDescriptionService;
+  final WeatherService _weatherService;
+  Season? _season;
   final CareFieldRepository _careFieldRepository;
   final SpeciesCareValueRepository _speciesCareValueRepository;
   List<db.CareField> _careFields = [];
@@ -129,6 +135,9 @@ class PlantViewModel extends ChangeNotifier {
   db.Specy get species => _species;
   db.SpeciesCareData get care => _care;
   List<db.CareField> get careFields => _careFields;
+
+  /// The current season, if a weather place is set.
+  Season? get season => _season;
   Map<int, CareValue> get careValues => _careValues;
   db.Plant get plant => _plant;
   List<db.EventType> get eventType => _eventType;
@@ -181,6 +190,8 @@ class PlantViewModel extends ChangeNotifier {
     if (loadCareValuesResult.isError()) {
       return loadCareValuesResult.exceptionOrNull()!.toFailure();
     }
+    // Without weather the season is just unknown
+    _season = (await _weatherService.getWeather()).getOrNull()?.season;
     final loadEventTypeResult = await _loadEventType();
     if (loadEventTypeResult.isError()) {
       return loadEventTypeResult.exceptionOrNull()!.toFailure();

@@ -5,6 +5,8 @@ class InfoWidget extends StatelessWidget {
   final String title;
   final String value;
   final VoidCallback? onTap;
+  // Stands out from the other tiles, e.g. the watering of the season
+  final bool highlighted;
 
   const InfoWidget({
     super.key,
@@ -12,11 +14,14 @@ class InfoWidget extends StatelessWidget {
     required this.title,
     required this.value,
     this.onTap,
+    this.highlighted = false,
   });
 
   @override
   Widget build(BuildContext context) {
     return Card.filled(
+      color:
+          highlighted ? Theme.of(context).colorScheme.primaryContainer : null,
       clipBehavior: Clip.hardEdge,
       child: InkWell(
         onTap: onTap,

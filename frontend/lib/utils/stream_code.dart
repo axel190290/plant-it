@@ -10,5 +10,6 @@ enum StreamCode {
   deleteSpecies,
   insertReminder,
   deleteReminder,
-  editReminder;
+  editReminder,
+  editWeather;
 }

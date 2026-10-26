@@ -21,6 +21,7 @@ abstract final class Routes {
   static String settingsAiCare = '/settings-dataSources/aiCare';
   static String settingsDatabaseAndCache = '/settings-databaseAndCache';
   static String settingsCareFields = '/settings-careFields';
+  static String settingsWeather = '/settings-weather';
 
   static final String _eventTypeRelative = 'eventType';
   static final String _eventTypesRelative = 'eventTypes';

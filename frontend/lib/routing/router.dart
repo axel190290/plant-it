@@ -1,5 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:plant_it/routing/routes.dart';
+import 'package:plant_it/ui/home/view_models/weather_viewmodel.dart';
+import 'package:plant_it/ui/settings/widgets/weather_settings_screen.dart';
 import 'package:plant_it/ui/settings/view_models/care_fields_viewmodel.dart';
 import 'package:plant_it/ui/settings/widgets/care_fields_screen.dart';
 import 'package:plant_it/ui/species/view_models/edit_care_values_viewmodel.dart';
@@ -82,6 +84,13 @@ GoRouter router() => GoRouter(
                 calendarViewModel.load.execute();
               }
 
+              WeatherViewModel weatherViewModel = WeatherViewModel(
+                weatherService: context.read(),
+                plantRepository: context.read(),
+                speciesCareRepository: context.read(),
+              );
+              weatherViewModel.load.execute();
+
               SearchViewModel searchViewModel = SearchViewModel(
                 speciesSearcherFacade: context.read(),
                 imageRepository: context.read(),
@@ -105,6 +114,7 @@ GoRouter router() => GoRouter(
 
               return AppMainView(
                 homeViewModel: homeViewModel,
+                weatherViewModel: weatherViewModel,
                 calendarViewModel: calendarViewModel,
                 searchViewModel: searchViewModel,
                 settingsViewModel: settingsViewModel,
@@ -131,6 +141,7 @@ GoRouter router() => GoRouter(
                     careFieldRepository: context.read(),
                     speciesCareValueRepository: context.read(),
                     speciesDescriptionService: context.read(),
+                    weatherService: context.read(),
                   );
                   viewModel.load.execute(id);
                   return PlantScreen(
@@ -259,6 +270,13 @@ GoRouter router() => GoRouter(
                     viewModel: state.extra as SettingsViewModel,
                   );
                 },
+              ),
+              GoRoute(
+                path: Routes.settingsWeather,
+                builder: (context, state) => WeatherSettingsScreen(
+                  weatherService: context.read(),
+                  streamController: context.read(),
+                ),
               ),
               GoRoute(
                 path: Routes.settingsCareFields,

@@ -8,6 +8,7 @@ import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/calendar/view_models/calendar_viewmodel.dart';
 import 'package:plant_it/ui/calendar/widgets/calendar_screen.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
+import 'package:plant_it/ui/home/view_models/weather_viewmodel.dart';
 import 'package:plant_it/ui/home/widgets/home_screen.dart';
 import 'package:plant_it/ui/search/view_models/search_viewmodel.dart';
 import 'package:plant_it/ui/search/widgets/search_page.dart';
@@ -18,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AppMainView extends StatefulWidget {
   final HomeViewModel homeViewModel;
+  final WeatherViewModel weatherViewModel;
   final CalendarViewModel calendarViewModel;
   final SearchViewModel searchViewModel;
   final SettingsViewModel settingsViewModel;
@@ -29,6 +31,7 @@ class AppMainView extends StatefulWidget {
   const AppMainView({
     super.key,
     required this.homeViewModel,
+    required this.weatherViewModel,
     required this.calendarViewModel,
     required this.searchViewModel,
     required this.settingsViewModel,
@@ -53,6 +56,7 @@ class _AppMainViewState extends State<AppMainView> {
     _screens = [
       HomeScreen(
         viewModel: widget.homeViewModel,
+        weatherViewModel: widget.weatherViewModel,
         streamController: widget.streamController,
       ),
       CalendarScreen(

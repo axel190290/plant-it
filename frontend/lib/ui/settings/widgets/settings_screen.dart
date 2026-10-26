@@ -66,6 +66,14 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
+                      onTap: () => context.push(Routes.settingsWeather),
+                      child: ListTile(
+                        title: Text(L.of(context).weatherAndLocation),
+                        subtitle: Text(L.of(context).manageWeather),
+                        leading: Icon(LucideIcons.cloud_sun),
+                      ),
+                    ),
+                    GestureDetector(
                       onTap: () => context.push(Routes.settingsDataSources,
                           extra: viewModel),
                       child: ListTile(

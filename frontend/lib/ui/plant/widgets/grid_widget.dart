@@ -105,6 +105,8 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
   final List<CareField> careFields;
   final Map<int, CareValue> careValues;
   final void Function(String title, String value, bool estimated)? onTapValue;
+  // Keys of the categories that apply now, like the watering of the season
+  final Set<String> currentKeys;
 
   const SpeciesCareInfoGridWidget({
     super.key,
@@ -115,6 +117,7 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
     this.careFields = const [],
     this.careValues = const {},
     this.onTapValue,
+    this.currentKeys = const {},
   });
 
   /// The value of a basic care category, or null if it is not set.
@@ -145,10 +148,14 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
     return null;
   }
 
-  InfoWidget _tile(String title, String text, IconData icon, bool estimated) {
+  InfoWidget _tile(String title, String text, IconData icon, bool estimated,
+      {bool current = false}) {
+    String shown =
+        current ? "$title · ${appLocalizations.currentSeason}" : title;
     return InfoWidget(
       icon: icon,
-      title: estimated ? "$title ✨" : title,
+      highlighted: current,
+      title: estimated ? "$shown ✨" : shown,
       value: text,
       onTap:
           onTapValue == null ? null : () => onTapValue!(title, text, estimated),
@@ -177,7 +184,8 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
       if (value == null) continue;
       String? text = formatCareValue(appLocalizations, field, value);
       if (text != null) {
-        result.add(_tile(title, text, careFieldIcon(field), value.estimated));
+        result.add(_tile(title, text, careFieldIcon(field), value.estimated,
+            current: currentKeys.contains(field.key)));
       }
     }
     return result;

@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   dynamic_color
   file_selector_windows
   flutter_localization
+  geolocator_windows
   permission_handler_windows
   sqlite3_flutter_libs
   url_launcher_windows

@@ -30,7 +30,11 @@ enum UserSettingsKeys {
   geminiKey('gemini_key'),
   geminiModel('gemini_model'),
   githubModelsToken('github_models_token'),
-  githubModelsModel('github_models_model');
+  githubModelsModel('github_models_model'),
+
+  weatherPlace('weather_place'),
+  weatherLatitude('weather_latitude'),
+  weatherLongitude('weather_longitude');
 
   final String key;
 

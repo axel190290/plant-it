@@ -1950,6 +1950,204 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Default icon'**
   String get restoreDefaultIcon;
+
+  /// No description provided for @indoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Indoor'**
+  String get indoor;
+
+  /// No description provided for @outdoor.
+  ///
+  /// In en, this message translates to:
+  /// **'Outdoor'**
+  String get outdoor;
+
+  /// No description provided for @weatherAndLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Weather and location'**
+  String get weatherAndLocation;
+
+  /// No description provided for @manageWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Local weather and season for your plants'**
+  String get manageWeather;
+
+  /// No description provided for @weatherDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Your location is used to show the local weather and season, highlight the watering of the current season and warn about frost, heat and rain for your outdoor plants. The weather comes from Open-Meteo, which receives only your approximate location.'**
+  String get weatherDescription;
+
+  /// No description provided for @searchCity.
+  ///
+  /// In en, this message translates to:
+  /// **'Search your city'**
+  String get searchCity;
+
+  /// No description provided for @useMyLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use my location'**
+  String get useMyLocation;
+
+  /// No description provided for @myLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'My location'**
+  String get myLocation;
+
+  /// No description provided for @noPlaceSet.
+  ///
+  /// In en, this message translates to:
+  /// **'No location set'**
+  String get noPlaceSet;
+
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
+  /// **'The location is not available. Allow it in the phone settings or search your city.'**
+  String get locationPermissionDenied;
+
+  /// No description provided for @noPlacesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No place found'**
+  String get noPlacesFound;
+
+  /// No description provided for @setUpWeather.
+  ///
+  /// In en, this message translates to:
+  /// **'Set your location to see the weather and the season'**
+  String get setUpWeather;
+
+  /// No description provided for @seasonSpring.
+  ///
+  /// In en, this message translates to:
+  /// **'Spring'**
+  String get seasonSpring;
+
+  /// No description provided for @seasonSummer.
+  ///
+  /// In en, this message translates to:
+  /// **'Summer'**
+  String get seasonSummer;
+
+  /// No description provided for @seasonAutumn.
+  ///
+  /// In en, this message translates to:
+  /// **'Autumn'**
+  String get seasonAutumn;
+
+  /// No description provided for @seasonWinter.
+  ///
+  /// In en, this message translates to:
+  /// **'Winter'**
+  String get seasonWinter;
+
+  /// No description provided for @seasonDry.
+  ///
+  /// In en, this message translates to:
+  /// **'Dry season'**
+  String get seasonDry;
+
+  /// No description provided for @seasonRainy.
+  ///
+  /// In en, this message translates to:
+  /// **'Rainy season'**
+  String get seasonRainy;
+
+  /// No description provided for @humidityPercent.
+  ///
+  /// In en, this message translates to:
+  /// **'{humidity}% humidity'**
+  String humidityPercent(String humidity);
+
+  /// No description provided for @weatherClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get weatherClear;
+
+  /// No description provided for @weatherPartlyCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Partly cloudy'**
+  String get weatherPartlyCloudy;
+
+  /// No description provided for @weatherCloudy.
+  ///
+  /// In en, this message translates to:
+  /// **'Cloudy'**
+  String get weatherCloudy;
+
+  /// No description provided for @weatherFog.
+  ///
+  /// In en, this message translates to:
+  /// **'Fog'**
+  String get weatherFog;
+
+  /// No description provided for @weatherDrizzle.
+  ///
+  /// In en, this message translates to:
+  /// **'Drizzle'**
+  String get weatherDrizzle;
+
+  /// No description provided for @weatherRain.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain'**
+  String get weatherRain;
+
+  /// No description provided for @weatherSnow.
+  ///
+  /// In en, this message translates to:
+  /// **'Snow'**
+  String get weatherSnow;
+
+  /// No description provided for @weatherStorm.
+  ///
+  /// In en, this message translates to:
+  /// **'Storm'**
+  String get weatherStorm;
+
+  /// No description provided for @frostAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: down to {temperature} °C. {plant} withstands at least {min} °C'**
+  String frostAlert(String day, String temperature, String plant, String min);
+
+  /// No description provided for @heatAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'{day}: up to {temperature} °C. {plant} withstands at most {max} °C'**
+  String heatAlert(String day, String temperature, String plant, String max);
+
+  /// No description provided for @rainAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'Rain today: you can skip watering {plants}'**
+  String rainAlert(String plants);
+
+  /// No description provided for @outdoorAlertsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Frost, heat and rain alerts are shown for plants whose location is Outdoor.'**
+  String get outdoorAlertsHint;
+
+  /// No description provided for @currentSeason.
+  ///
+  /// In en, this message translates to:
+  /// **'now'**
+  String get currentSeason;
+
+  /// No description provided for @forecast.
+  ///
+  /// In en, this message translates to:
+  /// **'Forecast'**
+  String get forecast;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

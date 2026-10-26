@@ -24,6 +24,7 @@ import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
 import 'package:plant_it/data/service/search/flora_codex_searcher.dart';
 import 'package:plant_it/data/service/search/gbif_searcher.dart';
+import 'package:plant_it/data/service/weather/weather_service.dart';
 import 'package:plant_it/data/service/search/local_searcher.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/utils/stream_code.dart';
@@ -118,6 +119,11 @@ List<SingleChildWidget> get providersLocal {
     ),
     Provider(
       create: (context) => FloraCodexSearcher(
+        userSettingRepository: context.read(),
+      ),
+    ),
+    Provider(
+      create: (context) => WeatherService(
         userSettingRepository: context.read(),
       ),
     ),

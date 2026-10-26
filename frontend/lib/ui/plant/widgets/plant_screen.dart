@@ -9,7 +9,9 @@ import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/database/database.dart' as db;
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
+import 'package:plant_it/domain/models/plant_location.dart';
 import 'package:plant_it/ui/core/ui/care_value_dialog.dart';
+import 'package:plant_it/ui/core/ui/weather_format.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/core/ui/event_card.dart';
 import 'package:plant_it/ui/plant/view_models/plant_view_model.dart';
@@ -439,6 +441,8 @@ class _PlantScreenState extends State<PlantScreen> {
                             appLocalizations: appLocalizations,
                             careFields: widget.viewModel.careFields,
                             careValues: widget.viewModel.careValues,
+                            currentKeys:
+                                currentSeasonCareKeys(widget.viewModel.season),
                             onTapValue: (title, value, estimated) =>
                                 showCareValueDialog(
                                     context, title, value, estimated),
@@ -535,7 +539,8 @@ class _PlantScreenState extends State<PlantScreen> {
                                   style: Theme.of(context).textTheme.bodyLarge!,
                                 ),
                                 Text(
-                                  widget.viewModel.plant.location!,
+                                  PlantLocation.label(appLocalizations,
+                                      widget.viewModel.plant.location!),
                                   style: Theme.of(context).textTheme.bodyLarge!,
                                 ),
                               ],

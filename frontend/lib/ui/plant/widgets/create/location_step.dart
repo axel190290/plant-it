@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:plant_it/l10n/generated/app_localizations.dart';
+import 'package:plant_it/domain/models/plant_location.dart';
 import 'package:plant_it/ui/core/ui/step_section.dart';
+import 'package:plant_it/ui/plant/widgets/location_dialog.dart';
 import 'package:plant_it/ui/plant/view_models/add_plant_viewmodel.dart';
 
 class LocationStep extends StepSection<AddPlantViewModel> {
@@ -22,7 +23,7 @@ class LocationStep extends StepSection<AddPlantViewModel> {
 
   @override
   void confirm() {
-    viewModel.setLocation(_ongoingSelection.value!);
+    viewModel.setLocation(_ongoingSelection.value);
     _selectedLocation.value = _ongoingSelection.value;
   }
 
@@ -30,13 +31,9 @@ class LocationStep extends StepSection<AddPlantViewModel> {
   String get title => appLocalizations.location;
 
   @override
-  String get value {
-    String location = _ongoingSelection.value ?? "";
-    if (location.length > 20) {
-      location = "${location.substring(0, 20)}...";
-    }
-    return location.replaceAll("\n", " ");
-  }
+  String get value => _ongoingSelection.value == null
+      ? ""
+      : PlantLocation.label(appLocalizations, _ongoingSelection.value!);
 
   @override
   void cancel() {
@@ -48,49 +45,10 @@ class LocationStep extends StepSection<AddPlantViewModel> {
 
   @override
   Future<void> action(BuildContext context, AddPlantViewModel viewModel) async {
-    final TextEditingController controller =
-        TextEditingController(text: _ongoingSelection.value ?? "");
-    final String? result = await showDialog<String>(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 0),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              labelText: L.of(context).location,
-              border: OutlineInputBorder(),
-            ),
-            maxLines: null,
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text(L.of(context).cancel),
-            ),
-            TextButton(
-              onPressed: () {
-                _ongoingSelection.value = null;
-                Navigator.of(context).pop();
-              },
-              child: Text(L.of(context).remove),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(controller.text);
-              },
-              child: Text(L.of(context).save),
-            ),
-          ],
-        );
-      },
-    );
-
+    final String? result =
+        await showPlantLocationDialog(context, _ongoingSelection.value);
     if (result != null) {
-      _ongoingSelection.value = result;
+      _ongoingSelection.value = result.isEmpty ? null : result;
     }
   }
 }

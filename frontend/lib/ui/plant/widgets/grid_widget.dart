@@ -35,17 +35,30 @@ class _InfoGridWidgetState extends State<InfoGridWidget> {
   // Computed on every build, so new values are shown after a reload
   int get _pages => (widget.getInfoChildren().length / widget.maxNum).ceil();
 
+  // Size of a tile in two columns on a phone in portrait
+  static const double _tileMaxWidth = 200;
+  static const double _tileHeight = 72;
+
   Widget _buildSinglePage(List<Widget>? tiles) {
     return GridView.builder(
       padding: const EdgeInsets.all(0),
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: 2.5, // 3
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
-      ),
+      // Without pages, tiles keep their size and wider screens get more
+      // columns; pages hold two columns of [maxNum] tiles
+      gridDelegate: widget.paginate
+          ? const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 2.5,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            )
+          : const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: _tileMaxWidth,
+              mainAxisExtent: _tileHeight,
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+            ),
       itemCount: tiles?.length ?? 0,
       itemBuilder: (context, index) {
         return tiles!.elementAt(index);

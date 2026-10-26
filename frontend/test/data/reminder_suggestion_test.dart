@@ -81,10 +81,24 @@ void main() {
       latitude: 40,
     );
     Map<SuggestionKind, ReminderSuggestion> byKind = {
-      for (ReminderSuggestion s in suggestions) s.kind: s
+      for (ReminderSuggestion s in suggestions.reversed) s.kind: s
     };
     expect(byKind.keys.toSet(), SuggestionKind.values.toSet());
-    expect(byKind[SuggestionKind.watering]!.frequencyQuantity, 14);
+    // Watering changes with the seasons of the coming year
+    List<ReminderSuggestion> watering =
+        suggestions.where((s) => s.kind == SuggestionKind.watering).toList();
+    expect(watering.map((s) => (s.season, s.frequencyQuantity)), [
+      (Season.autumn, 14),
+      (Season.winter, 21),
+      (Season.spring, 14),
+      (Season.summer, 7),
+      (Season.autumn, 14),
+    ]);
+    expect(watering[0].start, today);
+    expect(watering[0].end, DateTime(2026, 11, 30));
+    expect(watering[1].start, DateTime(2026, 12, 1));
+    expect(watering[1].end, DateTime(2027, 2, 28));
+    expect(watering.last.end, DateTime(2027, 10, 25));
     // Autumn: fertilizer waits for spring and stops before autumn
     expect(byKind[SuggestionKind.fertilizing]!.start, DateTime(2027, 3, 1));
     expect(byKind[SuggestionKind.fertilizing]!.end, DateTime(2027, 8, 31));
@@ -137,6 +151,45 @@ void main() {
     expect(byKind[SuggestionKind.repotting]!.frequencyQuantity, 3);
     expect(byKind[SuggestionKind.repotting]!.start, DateTime(2027, 3, 1));
     expect(byKind[SuggestionKind.misting]!.frequencyQuantity, 2);
+  });
+
+  test('seasonPeriods covers the coming year by season', () {
+    List<SeasonPeriod> south = seasonPeriods(DateTime(2026, 1, 15), -34);
+    expect(south.map((p) => p.season), [
+      Season.summer,
+      Season.autumn,
+      Season.winter,
+      Season.spring,
+      Season.summer,
+    ]);
+    expect(south.first.end, DateTime(2026, 2, 28));
+    expect(south.last.start, DateTime(2026, 12, 1));
+    expect(south.last.end, DateTime(2027, 1, 14));
+  });
+
+  test(
+      'suggestReminders keeps one watering in the tropics or without '
+      'change between seasons', () {
+    for ((Map<String, CareValue>, double) input in [
+      (
+        {
+          'watering_summer': const CareValue(value: 7),
+          'watering_winter': const CareValue(value: 21),
+        },
+        10
+      ),
+      ({'watering_summer': const CareValue(value: 7)}, 40),
+    ]) {
+      List<ReminderSuggestion> watering = suggestReminders(
+        today: DateTime(2026, 10, 26),
+        plant: _plant(PlantLocation.indoor),
+        values: input.$1,
+        season: Season.autumn,
+        latitude: input.$2,
+      ).where((s) => s.kind == SuggestionKind.watering).toList();
+      expect(watering.length, 1);
+      expect(watering.single.end, isNull);
+    }
   });
 
   test('ScheduleHints round-trips through the schedule categories', () {

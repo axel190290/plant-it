@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/reminder_suggestion.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
+import 'package:plant_it/ui/core/ui/weather_format.dart';
 import 'package:plant_it/ui/settings/view_models/reminder/add_reminder_viewmodel.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -41,24 +42,30 @@ IconData _icon(SuggestionKind kind) => switch (kind) {
       SuggestionKind.moveOutdoors => LucideIcons.sun,
     };
 
-/// "every 2 weeks · from 1 Mar 2027 · until 31 Aug 2027"
+/// "every 2 weeks"
+String suggestionEvery(L l, ReminderSuggestion s) => switch (s.frequencyUnit) {
+      FrequencyUnit.days => l.everyCountDays(s.frequencyQuantity),
+      FrequencyUnit.weeks => l.everyCountWeeks(s.frequencyQuantity),
+      FrequencyUnit.months => l.everyCountMonths(s.frequencyQuantity),
+      FrequencyUnit.years => l.everyCountYears(s.frequencyQuantity),
+    };
+
+/// "Winter: every 2 weeks · from 1 Dec 2026 · until 28 Feb 2027"
 String suggestionSchedule(L l, ReminderSuggestion s) {
-  String every = switch (s.frequencyUnit) {
-    FrequencyUnit.days => l.everyCountDays(s.frequencyQuantity),
-    FrequencyUnit.weeks => l.everyCountWeeks(s.frequencyQuantity),
-    FrequencyUnit.months => l.everyCountMonths(s.frequencyQuantity),
-    FrequencyUnit.years => l.everyCountYears(s.frequencyQuantity),
-  };
   DateFormat date = DateFormat.yMMMd(l.localeName);
-  return [
-    every,
+  String schedule = [
+    suggestionEvery(l, s),
     l.fromDate(date.format(s.start)),
     if (s.end != null) l.untilDate(date.format(s.end!)),
   ].join(' · ');
+  return s.season == null
+      ? schedule
+      : "${seasonLabel(l, s.season!)}: $schedule";
 }
 
-/// The reminders suggested for [plant]; tapping one creates it.
-class ReminderSuggestionsPanel extends StatefulWidget {
+/// The reminders suggested for [plant], one per care with a reminder for
+/// each season when it changes with them; tapping one creates them.
+class ReminderSuggestionsPanel extends StatelessWidget {
   final AddReminderViewModel viewModel;
   final Plant plant;
 
@@ -68,23 +75,17 @@ class ReminderSuggestionsPanel extends StatefulWidget {
     required this.plant,
   });
 
-  @override
-  State<ReminderSuggestionsPanel> createState() =>
-      _ReminderSuggestionsPanelState();
-}
-
-class _ReminderSuggestionsPanelState extends State<ReminderSuggestionsPanel> {
-  late final Future<List<ReminderSuggestion>> _suggestions =
-      widget.viewModel.suggestionsFor(widget.plant);
-
-  Future<void> _create(ReminderSuggestion suggestion) async {
+  Future<void> _create(
+      BuildContext context, List<ReminderSuggestion> group) async {
     L l = L.of(context);
     bool? confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(
-            "${suggestionTitle(l, suggestion.kind)} · ${widget.plant.name}"),
-        content: Text(suggestionSchedule(l, suggestion)),
+        title: Text("${suggestionTitle(l, group.first.kind)} · ${plant.name}"),
+        content: Text([
+          ...group.map((s) => suggestionSchedule(l, s)),
+          if (group.length > 1) l.remindersToCreate(group.length),
+        ].join('\n\n')),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -97,11 +98,10 @@ class _ReminderSuggestionsPanelState extends State<ReminderSuggestionsPanel> {
         ],
       ),
     );
-    if (confirmed != true || !mounted) return;
+    if (confirmed != true || !context.mounted) return;
 
-    Result<void> result =
-        await widget.viewModel.createSuggested(widget.plant, suggestion);
-    if (!mounted) return;
+    Result<void> result = await viewModel.createSuggested(plant, group);
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(result.isError()
             ? l.errorWithMessage(result.exceptionOrNull().toString())
@@ -114,42 +114,43 @@ class _ReminderSuggestionsPanelState extends State<ReminderSuggestionsPanel> {
   @override
   Widget build(BuildContext context) {
     L l = L.of(context);
-    return FutureBuilder<List<ReminderSuggestion>>(
-      future: _suggestions,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Padding(
-            padding: EdgeInsets.all(16),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        List<ReminderSuggestion> suggestions = snapshot.data!;
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 16),
-            Text(l.suggestionsForPlant(widget.plant.name),
-                style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 4),
-            Text(
-              suggestions.isEmpty ? l.noSuggestions : l.suggestionsHint,
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
-            const SizedBox(height: 8),
-            ...suggestions.map((s) => Card.filled(
-                  child: ListTile(
-                    leading: Icon(_icon(s.kind)),
-                    title: Text(suggestionTitle(l, s.kind)),
-                    subtitle: Text(
-                        "${suggestionSchedule(l, s)}\n${_reason(l, s.kind)}"),
-                    isThreeLine: true,
-                    trailing: const Icon(LucideIcons.plus),
-                    onTap: () => _create(s),
-                  ),
-                )),
-          ],
-        );
-      },
+    List<ReminderSuggestion>? suggestions = viewModel.suggestions;
+    if (suggestions == null) {
+      return const Padding(
+        padding: EdgeInsets.all(16),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    Map<SuggestionKind, List<ReminderSuggestion>> groups = {};
+    for (ReminderSuggestion s in suggestions) {
+      groups.putIfAbsent(s.kind, () => []).add(s);
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 16),
+        Text(l.suggestionsForPlant(plant.name),
+            style: Theme.of(context).textTheme.titleMedium),
+        const SizedBox(height: 4),
+        Text(
+          suggestions.isEmpty ? l.noSuggestions : l.suggestionsHint,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+        const SizedBox(height: 8),
+        ...groups.values.map((group) => Card.filled(
+              child: ListTile(
+                leading: Icon(_icon(group.first.kind)),
+                title: Text(suggestionTitle(l, group.first.kind)),
+                subtitle: Text([
+                  ...group.map((s) => suggestionSchedule(l, s)),
+                  _reason(l, group.first.kind),
+                ].join('\n')),
+                isThreeLine: true,
+                trailing: const Icon(LucideIcons.plus),
+                onTap: () => _create(context, group),
+              ),
+            )),
+      ],
     );
   }
 }

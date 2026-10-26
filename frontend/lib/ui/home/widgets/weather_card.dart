@@ -99,9 +99,9 @@ class _WeatherCardState extends State<WeatherCard> {
             alert.limit.toString()),
         WeatherAlertType.rain => l.rainAlert(alert.plants.join(', ')),
         WeatherAlertType.protectFromRain => l.protectFromRainAlert(
-            dayLabel(l, alert.day!.date),
-            alert.temperature!.round().toString(),
             alert.plants.first,
+            alert.rainyDays.toString(),
+            alert.forecastDays.toString(),
             alert.limit.toString()),
       };
 

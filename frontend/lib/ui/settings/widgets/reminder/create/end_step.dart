@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/step_section.dart';
 import 'package:plant_it/ui/settings/view_models/reminder/add_reminder_viewmodel.dart';
 
+/// The last day to remind, if any; kept in the view model, which fills it
+/// in from the suggestion of the chosen type.
 class EndStep extends StepSection<AddReminderViewModel> {
   final ValueNotifier<bool> _isValidNotifier = ValueNotifier(true);
-  late final ValueNotifier<DateTime?> _selectedDate =
-      ValueNotifier<DateTime?>(null);
-  late final ValueNotifier<DateTime?> _ongoingSelection =
-      ValueNotifier<DateTime?>(null);
+  // The chosen end: a date, or null inside to remove it
+  final ValueNotifier<(DateTime?,)?> _ongoing = ValueNotifier(null);
 
   EndStep({
     super.key,
@@ -23,20 +25,22 @@ class EndStep extends StepSection<AddReminderViewModel> {
 
   @override
   void confirm() {
-    viewModel.setEnd(_ongoingSelection.value!);
-    _selectedDate.value = _ongoingSelection.value;
+    if (_ongoing.value == null) return;
+    viewModel.setEnd(_ongoing.value!.$1);
+    _ongoing.value = null;
   }
 
   @override
   String get title => appLocalizations.end;
 
   @override
-  String get value => _ongoingSelection.value?.toString() ?? "";
+  String get value => viewModel.endDate == null
+      ? ""
+      : DateFormat.yMMMd(appLocalizations.localeName)
+          .format(viewModel.endDate!);
 
   @override
-  void cancel() {
-    _ongoingSelection.value = _selectedDate.value;
-  }
+  void cancel() => _ongoing.value = null;
 
   @override
   bool get isActionSection => true;
@@ -44,15 +48,40 @@ class EndStep extends StepSection<AddReminderViewModel> {
   @override
   Future<void> action(
       BuildContext context, AddReminderViewModel viewModel) async {
-    final DateTime? picked = await showDatePicker(
+    if (viewModel.endDate != null) {
+      // An end can be changed or removed
+      L l = L.of(context);
+      bool? change = await showDialog<bool>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: Text(l.end),
+          content: Text(value),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: Text(l.remove),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text(l.edit),
+            ),
+          ],
+        ),
+      );
+      if (change == null || !context.mounted) return;
+      if (!change) {
+        _ongoing.value = (null,);
+        return;
+      }
+    }
+    DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _ongoingSelection.value,
+      initialDate: viewModel.endDate ?? viewModel.startDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-
     if (picked != null) {
-      _ongoingSelection.value = picked;
+      _ongoing.value = (picked,);
     }
   }
 }

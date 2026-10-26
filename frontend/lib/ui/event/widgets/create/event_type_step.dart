@@ -47,6 +47,7 @@ class EventTypeStep extends StepSection<CreateEventFormViewModel> {
   @override
   void confirm() {
     viewModel.setEventTypeList(_ongoingSelection.value);
+    viewModel.fillNote(appLocalizations);
     _selectedEventTypes.value = _ongoingSelection.value;
   }
 
@@ -91,16 +92,12 @@ class _EventTypeStepState extends State<EventTypeStep> {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         SizedBox(height: 10),
-        AnimatedBuilder(
-            animation: widget._ongoingSelection,
-            builder: (context, _) {
-              return SingleChildScrollView(
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height * .7,
-                  child: GridView.count(
+        Expanded(
+            child: AnimatedBuilder(
+                animation: widget._ongoingSelection,
+                builder: (context, _) {
+                  return GridView.count(
                     crossAxisCount: 2,
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
                     mainAxisSpacing: 8,
                     crossAxisSpacing: 8,
                     childAspectRatio: 3.7 / 2,
@@ -139,10 +136,8 @@ class _EventTypeStepState extends State<EventTypeStep> {
                             )),
                       );
                     }),
-                  ),
-                ),
-              );
-            })
+                  );
+                }))
       ],
     );
   }

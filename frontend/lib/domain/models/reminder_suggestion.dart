@@ -32,6 +32,8 @@ class ReminderSuggestion {
   final FrequencyUnit frequencyUnit;
   final DateTime start;
   final DateTime? end;
+  // The season the suggestion is for, when it changes with the seasons
+  final Season? season;
 
   const ReminderSuggestion({
     required this.kind,
@@ -39,7 +41,81 @@ class ReminderSuggestion {
     required this.frequencyUnit,
     required this.start,
     this.end,
+    this.season,
   });
+
+  /// Whether [day] is within the suggestion dates.
+  bool covers(DateTime day) =>
+      !day.isBefore(start) && (end == null || !day.isAfter(end!));
+}
+
+/// A part of the coming year in one season.
+class SeasonPeriod {
+  final DateTime start;
+  final DateTime end;
+  final Season season;
+
+  const SeasonPeriod(this.start, this.end, this.season);
+}
+
+/// The seasons of the year starting on [today] at [latitude], outside the
+/// tropics, where seasons follow the calendar: the rest of the current
+/// season, then each season until the day before a year from today.
+List<SeasonPeriod> seasonPeriods(DateTime today, double latitude) {
+  DateTime day = DateTime(today.year, today.month, today.day);
+  DateTime yearEnd = DateTime(day.year + 1, day.month, day.day)
+      .subtract(const Duration(days: 1));
+  List<SeasonPeriod> periods = [];
+  DateTime start = day;
+  Season season = Weather.seasonFor(day, latitude);
+  DateTime month = DateTime(day.year, day.month + 1, 1);
+  while (!month.isAfter(yearEnd)) {
+    Season next = Weather.seasonFor(month, latitude);
+    if (next != season) {
+      periods.add(
+          SeasonPeriod(start, month.subtract(const Duration(days: 1)), season));
+      start = month;
+      season = next;
+    }
+    month = DateTime(month.year, month.month + 1, 1);
+  }
+  periods.add(SeasonPeriod(start, yearEnd, season));
+  return periods;
+}
+
+/// A suggestion per season of the coming year, with the frequency in days
+/// of each season, joining the seasons with the same frequency. Null when
+/// the seasons are not known by the calendar or do not change it.
+List<ReminderSuggestion>? _bySeason(SuggestionKind kind, DateTime today,
+    double? latitude, int Function(Season) daysIn) {
+  if (latitude == null || latitude.abs() < 23.5) {
+    return null;
+  }
+  List<ReminderSuggestion> result = [];
+  for (SeasonPeriod period in seasonPeriods(today, latitude)) {
+    int days = daysIn(period.season);
+    ReminderSuggestion? last = result.isEmpty ? null : result.last;
+    if (last != null && last.frequencyQuantity == days) {
+      result.last = ReminderSuggestion(
+        kind: kind,
+        frequencyQuantity: days,
+        frequencyUnit: FrequencyUnit.days,
+        start: last.start,
+        end: period.end,
+        season: last.season,
+      );
+    } else {
+      result.add(ReminderSuggestion(
+        kind: kind,
+        frequencyQuantity: days,
+        frequencyUnit: FrequencyUnit.days,
+        start: period.start,
+        end: period.end,
+        season: period.season,
+      ));
+    }
+  }
+  return result.length < 2 ? null : result;
 }
 
 /// What the schedule texts of a species mean, read by rules or by the AI.
@@ -251,15 +327,19 @@ List<ReminderSuggestion> suggestReminders({
   (int, int) seasons = _springAndAutumn(latitude);
   List<ReminderSuggestion> result = [];
 
-  // Watering of the current season
+  // Watering of each season, or of the current one
   int? days = wateringDays(values, season);
   if (days != null) {
-    result.add(ReminderSuggestion(
-      kind: SuggestionKind.watering,
-      frequencyQuantity: days,
-      frequencyUnit: FrequencyUnit.days,
-      start: day,
-    ));
+    result.addAll(_bySeason(SuggestionKind.watering, day, latitude,
+            (s) => wateringDays(values, s)!) ??
+        [
+          ReminderSuggestion(
+            kind: SuggestionKind.watering,
+            frequencyQuantity: days,
+            frequencyUnit: FrequencyUnit.days,
+            start: day,
+          )
+        ]);
   }
 
   // Fertilizer during the growing season
@@ -321,13 +401,17 @@ List<ReminderSuggestion> suggestReminders({
     ));
   } else if ((minHumidity != null && minHumidity > 60) ||
       (minHumidity == null && (care?.humidity ?? 0) >= 7)) {
-    bool dry = season == Season.summer || season == Season.dry;
-    result.add(ReminderSuggestion(
-      kind: SuggestionKind.misting,
-      frequencyQuantity: dry ? 3 : 5,
-      frequencyUnit: FrequencyUnit.days,
-      start: day,
-    ));
+    // More often when the air is drier
+    int mistingIn(Season? s) => s == Season.summer || s == Season.dry ? 3 : 5;
+    result.addAll(_bySeason(SuggestionKind.misting, day, latitude, mistingIn) ??
+        [
+          ReminderSuggestion(
+            kind: SuggestionKind.misting,
+            frequencyQuantity: mistingIn(season),
+            frequencyUnit: FrequencyUnit.days,
+            start: day,
+          )
+        ]);
   }
 
   // Outdoor plants that do not withstand the cold of winter

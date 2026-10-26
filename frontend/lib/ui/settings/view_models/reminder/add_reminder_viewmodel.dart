@@ -50,14 +50,19 @@ class AddReminderViewModel extends ChangeNotifier {
   late final Command<void, void> load;
   late final Command<void, void> insert;
 
-  RemindersCompanion _remindersCompanion = RemindersCompanion(
-    startDate: Value(DateTime.now()),
-    frequencyQuantity: Value(1),
-    frequencyUnit: Value(FrequencyUnit.weeks),
-    repeatAfterQuantity: Value(3),
-    repeatAfterUnit: Value(FrequencyUnit.days),
-    enabled: Value(true),
-  );
+  static RemindersCompanion _defaults() => RemindersCompanion(
+        startDate: Value(DateTime.now()),
+        frequencyQuantity: const Value(1),
+        frequencyUnit: const Value(FrequencyUnit.weeks),
+        repeatAfterQuantity: const Value(3),
+        repeatAfterUnit: const Value(FrequencyUnit.days),
+        enabled: const Value(true),
+      );
+
+  RemindersCompanion _remindersCompanion = _defaults();
+  Plant? _plant;
+  List<ReminderSuggestion>? _suggestions;
+  ReminderSuggestion? _applied;
   final Map<int, EventType> _eventTypes = {};
   final Map<int, Plant> _plants = {};
   final Map<int, Specy> _species = {};
@@ -65,6 +70,36 @@ class AddReminderViewModel extends ChangeNotifier {
   Map<int, EventType> get eventTypes => _eventTypes;
   Map<int, Plant> get plants => _plants;
   Map<int, Specy> get species => _species;
+
+  Plant? get plant => _plant;
+
+  /// The suggestions for the chosen plant, null while they load.
+  List<ReminderSuggestion>? get suggestions => _suggestions;
+
+  /// The suggestion whose values were filled in for the chosen type.
+  ReminderSuggestion? get appliedSuggestion => _applied;
+
+  int get frequencyQuantity => _remindersCompanion.frequencyQuantity.value;
+  FrequencyUnit get frequencyUnit => _remindersCompanion.frequencyUnit.value;
+  int get repeatAfterQuantity => _remindersCompanion.repeatAfterQuantity.value;
+  FrequencyUnit get repeatAfterUnit =>
+      _remindersCompanion.repeatAfterUnit.value;
+  DateTime get startDate => _remindersCompanion.startDate.value;
+  DateTime? get endDate => _remindersCompanion.endDate.present
+      ? _remindersCompanion.endDate.value
+      : null;
+
+  /// The suggestion for [type]: the one in force today, or the next one.
+  ReminderSuggestion? suggestionForType(EventType type) {
+    List<ReminderSuggestion> matching = (_suggestions ?? [])
+        .where((s) => suggestionEventTypes[s.kind] == type.name)
+        .toList();
+    if (matching.isEmpty) return null;
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    return matching.firstWhere((s) => s.covers(today),
+        orElse: () => matching.first);
+  }
 
   Future<Result<void>> _load() async {
     Result<List<EventType>> eventTypes = await _eventTypeRepository.getAll();
@@ -92,10 +127,6 @@ class AddReminderViewModel extends ChangeNotifier {
     return Success("ok");
   }
 
-  /// Reminders that fit the care of [plant], the season and its location.
-  Future<List<ReminderSuggestion>> suggestionsFor(Plant plant) =>
-      _reminderSuggestionService.suggest(plant);
-
   /// The event type of a suggestion, created if it was deleted or renamed.
   Future<Result<EventType>> _eventTypeFor(SuggestionKind kind) async {
     String name = suggestionEventTypes[kind]!;
@@ -115,29 +146,36 @@ class AddReminderViewModel extends ChangeNotifier {
     return type;
   }
 
-  /// Creates the reminder of [suggestion] for [plant].
+  /// Remind again sooner for frequent care.
+  static (int, FrequencyUnit) _repeatAfter(ReminderSuggestion suggestion) =>
+      switch (suggestion.frequencyUnit) {
+        FrequencyUnit.days => (1, FrequencyUnit.days),
+        FrequencyUnit.weeks => (3, FrequencyUnit.days),
+        _ => (7, FrequencyUnit.days),
+      };
+
+  /// Creates the reminders of [suggestions], the seasons of one care, for
+  /// [plant].
   Future<Result<void>> createSuggested(
-      Plant plant, ReminderSuggestion suggestion) async {
-    Result<EventType> type = await _eventTypeFor(suggestion.kind);
-    if (type.isError()) return type;
-    // Remind again sooner for frequent care
-    (int, FrequencyUnit) repeatAfter = switch (suggestion.frequencyUnit) {
-      FrequencyUnit.days => (1, FrequencyUnit.days),
-      FrequencyUnit.weeks => (3, FrequencyUnit.days),
-      _ => (7, FrequencyUnit.days),
-    };
-    Result<int> inserted = await _reminderRepository.insert(RemindersCompanion(
-      type: Value(type.getOrThrow().id),
-      plant: Value(plant.id),
-      startDate: Value(suggestion.start),
-      endDate: Value(suggestion.end),
-      frequencyQuantity: Value(suggestion.frequencyQuantity),
-      frequencyUnit: Value(suggestion.frequencyUnit),
-      repeatAfterQuantity: Value(repeatAfter.$1),
-      repeatAfterUnit: Value(repeatAfter.$2),
-      enabled: const Value(true),
-    ));
-    if (inserted.isError()) return Failure(inserted.exceptionOrNull()!);
+      Plant plant, List<ReminderSuggestion> suggestions) async {
+    for (ReminderSuggestion suggestion in suggestions) {
+      Result<EventType> type = await _eventTypeFor(suggestion.kind);
+      if (type.isError()) return type;
+      (int, FrequencyUnit) repeatAfter = _repeatAfter(suggestion);
+      Result<int> inserted =
+          await _reminderRepository.insert(RemindersCompanion(
+        type: Value(type.getOrThrow().id),
+        plant: Value(plant.id),
+        startDate: Value(suggestion.start),
+        endDate: Value(suggestion.end),
+        frequencyQuantity: Value(suggestion.frequencyQuantity),
+        frequencyUnit: Value(suggestion.frequencyUnit),
+        repeatAfterQuantity: Value(repeatAfter.$1),
+        repeatAfterUnit: Value(repeatAfter.$2),
+        enabled: const Value(true),
+      ));
+      if (inserted.isError()) return Failure(inserted.exceptionOrNull()!);
+    }
     _streamController.add(StreamCode.insertReminder);
     return Success("ok");
   }
@@ -146,20 +184,54 @@ class AddReminderViewModel extends ChangeNotifier {
     return _reminderRepository.insert(_remindersCompanion);
   }
 
+  /// Chooses the type and fills in the values suggested for it, or the
+  /// defaults when there is no suggestion.
   void setType(EventType eventType) {
-    _remindersCompanion =
-        _remindersCompanion.copyWith(type: Value(eventType.id));
+    ReminderSuggestion? suggestion = suggestionForType(eventType);
+    RemindersCompanion base = _defaults().copyWith(
+      plant: _remindersCompanion.plant,
+      type: Value(eventType.id),
+    );
+    if (suggestion != null) {
+      (int, FrequencyUnit) repeatAfter = _repeatAfter(suggestion);
+      base = base.copyWith(
+        startDate: Value(suggestion.start),
+        endDate: Value(suggestion.end),
+        frequencyQuantity: Value(suggestion.frequencyQuantity),
+        frequencyUnit: Value(suggestion.frequencyUnit),
+        repeatAfterQuantity: Value(repeatAfter.$1),
+        repeatAfterUnit: Value(repeatAfter.$2),
+      );
+    }
+    _remindersCompanion = base;
+    _applied = suggestion;
+    notifyListeners();
   }
 
+  /// Chooses the plant and loads the reminders suggested for it.
   void setPlant(Plant plant) {
     _remindersCompanion = _remindersCompanion.copyWith(plant: Value(plant.id));
+    if (_plant?.id == plant.id) return;
+    _plant = plant;
+    _suggestions = null;
+    notifyListeners();
+    _reminderSuggestionService.suggest(plant).then((suggestions) {
+      if (_plant?.id != plant.id) return;
+      _suggestions = suggestions;
+      notifyListeners();
+    }, onError: (Object e) {
+      _log.warning("Suggestions failed", e);
+      if (_plant?.id != plant.id) return;
+      _suggestions = [];
+      notifyListeners();
+    });
   }
 
   void setStart(DateTime start) {
     _remindersCompanion = _remindersCompanion.copyWith(startDate: Value(start));
   }
 
-  void setEnd(DateTime end) {
+  void setEnd(DateTime? end) {
     _remindersCompanion = _remindersCompanion.copyWith(endDate: Value(end));
   }
 

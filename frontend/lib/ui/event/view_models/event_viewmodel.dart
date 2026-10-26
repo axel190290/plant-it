@@ -4,11 +4,17 @@ import 'package:command_it/command_it.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:plant_it/data/repository/care_field_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
+import 'package:plant_it/data/repository/species_care_repository.dart';
+import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/l10n/generated/app_localizations.dart';
+import 'package:plant_it/ui/core/ui/care_note.dart';
 import 'package:plant_it/utils/stream_code.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -18,8 +24,14 @@ class CreateEventFormViewModel extends ChangeNotifier {
     required PlantRepository plantRepository,
     required EventTypeRepository eventTypeRepository,
     required SpeciesRepository speciesRepository,
+    required CareFieldRepository careFieldRepository,
+    required SpeciesCareRepository speciesCareRepository,
+    required SpeciesCareValueRepository speciesCareValueRepository,
     required StreamController<StreamCode> streamController,
   })  : _eventRepository = eventRepository,
+        _careFieldRepository = careFieldRepository,
+        _speciesCareRepository = speciesCareRepository,
+        _speciesCareValueRepository = speciesCareValueRepository,
         _plantRepository = plantRepository,
         _eventTypeRepository = eventTypeRepository,
         _speciesRepository = speciesRepository,
@@ -41,6 +53,9 @@ class CreateEventFormViewModel extends ChangeNotifier {
   final PlantRepository _plantRepository;
   final EventTypeRepository _eventTypeRepository;
   final SpeciesRepository _speciesRepository;
+  final CareFieldRepository _careFieldRepository;
+  final SpeciesCareRepository _speciesCareRepository;
+  final SpeciesCareValueRepository _speciesCareValueRepository;
   final _log = Logger('EventFormViewModel');
   final StreamController<StreamCode> _streamController;
 
@@ -53,6 +68,11 @@ class CreateEventFormViewModel extends ChangeNotifier {
   List<EventType> _selectedEventTypes = [];
   final Map<int, Specy> _species = {};
   String? _note;
+  // Whether the note was written by the user, and not filled in
+  bool _noteWritten = false;
+  List<CareField> _careFields = [];
+  // Care of the species of the chosen plant, loaded when it is chosen
+  final Map<int, (SpeciesCareData?, Map<String, CareValue>)> _care = {};
   DateTime? _date;
   bool _isSubmitting = false;
   String? errorMessage;
@@ -78,6 +98,7 @@ class CreateEventFormViewModel extends ChangeNotifier {
     if (loadSpecies.isError()) {
       return loadSpecies.exceptionOrNull()!.toFailure();
     }
+    _careFields = (await _careFieldRepository.getAll()).getOrDefault([]);
     notifyListeners();
     return Success("ok");
   }
@@ -119,6 +140,34 @@ class CreateEventFormViewModel extends ChangeNotifier {
   void setPlantList(List<Plant> plants) {
     _selectedPlants = plants;
     notifyListeners();
+    for (int species in plants.map((p) => p.species).toSet()) {
+      _loadCare(species);
+    }
+  }
+
+  Future<void> _loadCare(int species) async {
+    if (_care.containsKey(species)) return;
+    SpeciesCareData? care =
+        (await _speciesCareRepository.get(species)).getOrNull();
+    Map<String, CareValue> values =
+        (await _speciesCareValueRepository.getBySpeciesKeyed(species))
+            .getOrDefault({});
+    _care[species] = (care, values);
+  }
+
+  /// Fills in the note with the care of the chosen plants that matters
+  /// for the chosen types, unless the user wrote one. Only when the plants
+  /// are of one species, since the note is the same for all of them.
+  void fillNote(L l) {
+    if (_noteWritten) return;
+    Set<int> species = _selectedPlants.map((p) => p.species).toSet();
+    (SpeciesCareData?, Map<String, CareValue>)? care =
+        species.length == 1 ? _care[species.first] : null;
+    _note = care == null
+        ? null
+        : careNote(l, _selectedEventTypes.map((t) => t.name), _careFields,
+            care.$2, care.$1);
+    notifyListeners();
   }
 
   bool isPlantSelected(Plant plant) {
@@ -139,7 +188,8 @@ class CreateEventFormViewModel extends ChangeNotifier {
   }
 
   void setNote(String newNote) {
-    _note = newNote;
+    _note = newNote.trim().isEmpty ? null : newNote;
+    _noteWritten = true;
     notifyListeners();
   }
 

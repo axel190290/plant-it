@@ -383,6 +383,9 @@ GoRouter router() => GoRouter(
               plantRepository: context.read(),
               eventTypeRepository: context.read(),
               speciesRepository: context.read(),
+              careFieldRepository: context.read(),
+              speciesCareRepository: context.read(),
+              speciesCareValueRepository: context.read(),
               streamController: context.read(),
             );
             viewModel.load.execute();

@@ -1583,8 +1583,8 @@ class LIt extends L {
 
   @override
   String protectFromRainAlert(
-      String day, String rain, String plant, String days) {
-    return '$day: $rain mm di pioggia. $plant si annaffia ogni $days giorni: proteggila dalla pioggia';
+      String plant, String rain, String days, String watering) {
+    return '$plant: pioggia in $rain dei prossimi $days giorni, più spesso di quanto si annaffia (ogni $watering giorni). Proteggila dalla pioggia';
   }
 
   @override
@@ -1633,4 +1633,9 @@ class LIt extends L {
 
   @override
   String get careFieldUnitYears => 'anni';
+
+  @override
+  String remindersToCreate(int count) {
+    return 'Verranno creati $count promemoria, uno per stagione';
+  }
 }

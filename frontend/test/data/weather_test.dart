@@ -79,28 +79,34 @@ void main() {
     expect(weatherAlerts(weather, const []), isEmpty);
   });
 
-  test('weatherAlerts asks to protect from heavy rain the plants that fear it',
-      () {
+  test(
+      'weatherAlerts asks to protect the plants it rains on more often than '
+      'they are watered', () {
     Weather weather = Weather(
       place: 'Madrid',
       latitude: 40.42,
       days: [
-        DayForecast(date: DateTime(2026, 10, 26), precipitation: 3),
-        DayForecast(date: DateTime(2026, 10, 27), precipitation: 12),
+        for (int i = 0; i < 7; i++)
+          DayForecast(
+              date: DateTime(2026, 10, 26 + i),
+              precipitation: i == 0 || i == 3 || i == 5 ? 4 : 0),
       ],
     );
     List<WeatherAlert> alerts = weatherAlerts(weather, const [
       OutdoorPlant('Echeveria', null, null, 15),
-      OutdoorPlant('Helecho', null, null, 3),
+      OutdoorPlant('Helecho', null, null, 2),
+      OutdoorPlant('Rosal', null, null),
     ]);
     expect(alerts.length, 2);
+    // Rain every 7 / 3 days, more often than every 15 days
     expect(alerts[0].type, WeatherAlertType.protectFromRain);
     expect(alerts[0].plants, ['Echeveria']);
-    expect(alerts[0].temperature, 15);
-    expect(alerts[0].day!.date, DateTime(2026, 10, 27));
+    expect(alerts[0].rainyDays, 3);
+    expect(alerts[0].forecastDays, 7);
+    expect(alerts[0].day!.date, DateTime(2026, 10, 26));
     expect(alerts[0].limit, 15);
     // Today it rains, but the protected plant is not told to skip watering
     expect(alerts[1].type, WeatherAlertType.rain);
-    expect(alerts[1].plants, ['Helecho']);
+    expect(alerts[1].plants, ['Helecho', 'Rosal']);
   });
 }

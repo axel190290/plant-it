@@ -1475,8 +1475,8 @@ class LEn extends L {
 
   @override
   String protectFromRainAlert(
-      String day, String rain, String plant, String days) {
-    return '$day: $rain mm of rain. $plant is watered every $days days: protect it from the rain';
+      String plant, String rain, String days, String watering) {
+    return '$plant: rain on $rain of the next $days days, more often than it is watered (every $watering days). Protect it from the rain';
   }
 
   @override
@@ -1525,4 +1525,9 @@ class LEn extends L {
 
   @override
   String get careFieldUnitYears => 'years';
+
+  @override
+  String remindersToCreate(int count) {
+    return '$count reminders will be created, one per season';
+  }
 }

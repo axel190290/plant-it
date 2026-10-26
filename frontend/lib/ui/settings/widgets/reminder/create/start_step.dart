@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:plant_it/ui/core/ui/step_section.dart';
 import 'package:plant_it/ui/settings/view_models/reminder/add_reminder_viewmodel.dart';
 
+/// The first day to remind; kept in the view model, which fills it in from
+/// the suggestion of the chosen type.
 class StartStep extends StepSection<AddReminderViewModel> {
   final ValueNotifier<bool> _isValidNotifier = ValueNotifier(true);
-  late final ValueNotifier<DateTime> _selectedDate =
-      ValueNotifier<DateTime>(DateTime.now());
-  late final ValueNotifier<DateTime> _ongoingSelection =
-      ValueNotifier<DateTime>(DateTime.now());
+  final ValueNotifier<DateTime?> _ongoing = ValueNotifier(null);
 
   StartStep({
     super.key,
@@ -23,20 +23,20 @@ class StartStep extends StepSection<AddReminderViewModel> {
 
   @override
   void confirm() {
-    viewModel.setStart(_ongoingSelection.value);
-    _selectedDate.value = _ongoingSelection.value;
+    if (_ongoing.value == null) return;
+    viewModel.setStart(_ongoing.value!);
+    _ongoing.value = null;
   }
 
   @override
   String get title => appLocalizations.start;
 
   @override
-  String get value => _ongoingSelection.value.toString();
+  String get value =>
+      DateFormat.yMMMd(appLocalizations.localeName).format(viewModel.startDate);
 
   @override
-  void cancel() {
-    _ongoingSelection.value = _selectedDate.value;
-  }
+  void cancel() => _ongoing.value = null;
 
   @override
   bool get isActionSection => true;
@@ -44,16 +44,12 @@ class StartStep extends StepSection<AddReminderViewModel> {
   @override
   Future<void> action(
       BuildContext context, AddReminderViewModel viewModel) async {
-    final DateTime? picked = await showDatePicker(
+    _ongoing.value = await showDatePicker(
       context: context,
-      initialDate: _ongoingSelection.value,
+      initialDate: viewModel.startDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2100),
     );
-
-    if (picked != null) {
-      _ongoingSelection.value = picked;
-    }
   }
 }
 

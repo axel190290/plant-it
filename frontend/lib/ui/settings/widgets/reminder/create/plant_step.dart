@@ -3,7 +3,6 @@ import 'package:plant_it/database/database.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/step_section.dart';
 import 'package:plant_it/ui/settings/view_models/reminder/add_reminder_viewmodel.dart';
-import 'package:plant_it/ui/settings/widgets/reminder/create/reminder_suggestions_panel.dart';
 
 class PlantStep extends StepSection<AddReminderViewModel> {
   final ValueNotifier<bool> _isValidNotifier = ValueNotifier(false);
@@ -56,7 +55,6 @@ class _PlantStepState extends State<PlantStep> {
           child: AnimatedBuilder(
               animation: widget._ongoingSelection,
               builder: (context, _) {
-                Plant? selected = widget._ongoingSelection.value;
                 return ListView(
                   children: [
                     GridView.count(
@@ -112,13 +110,6 @@ class _PlantStepState extends State<PlantStep> {
                         );
                       }),
                     ),
-                    // Reminders that fit the chosen plant
-                    if (selected != null)
-                      ReminderSuggestionsPanel(
-                        key: ValueKey(selected.id),
-                        viewModel: widget.viewModel,
-                        plant: selected,
-                      ),
                   ],
                 );
               }),

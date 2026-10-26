@@ -41,11 +41,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           summary: true,
           stepsInFocus: 2,
           steps: [
-            EventTypeStep(
+            // The plants first: their care fills in the note of the types
+            PlantStep(
               viewModel: widget.viewModel,
               appLocalizations: appLocalizations,
             ),
-            PlantStep(
+            EventTypeStep(
               viewModel: widget.viewModel,
               appLocalizations: appLocalizations,
             ),

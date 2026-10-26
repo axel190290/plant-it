@@ -5,7 +5,8 @@ import 'package:plant_it/ui/event/view_models/event_viewmodel.dart';
 
 class NoteStep extends StepSection<CreateEventFormViewModel> {
   final ValueNotifier<bool> _isValidNotifier = ValueNotifier(true);
-  final ValueNotifier<String?> _selectedNote = ValueNotifier(null);
+  // The note written in the dialog, until confirmed; the note itself is
+  // kept in the view model, which fills it in from the care
   final ValueNotifier<String?> _ongoingSelection = ValueNotifier(null);
 
   NoteStep({
@@ -22,8 +23,9 @@ class NoteStep extends StepSection<CreateEventFormViewModel> {
 
   @override
   void confirm() {
+    if (_ongoingSelection.value == null) return;
     viewModel.setNote(_ongoingSelection.value!);
-    _selectedNote.value = _ongoingSelection.value;
+    _ongoingSelection.value = null;
   }
 
   @override
@@ -31,7 +33,7 @@ class NoteStep extends StepSection<CreateEventFormViewModel> {
 
   @override
   String get value {
-    String note = _ongoingSelection.value ?? "";
+    String note = viewModel.note ?? "";
     if (note.length > 20) {
       note = "${note.substring(0, 20)}...";
     }
@@ -40,7 +42,7 @@ class NoteStep extends StepSection<CreateEventFormViewModel> {
 
   @override
   void cancel() {
-    _ongoingSelection.value = _selectedNote.value;
+    _ongoingSelection.value = null;
   }
 
   @override
@@ -50,7 +52,7 @@ class NoteStep extends StepSection<CreateEventFormViewModel> {
   Future<void> action(
       BuildContext context, CreateEventFormViewModel viewModel) async {
     final TextEditingController controller =
-        TextEditingController(text: _ongoingSelection.value ?? "");
+        TextEditingController(text: viewModel.note ?? "");
     final String? result = await showDialog<String>(
       context: context,
       builder: (context) {

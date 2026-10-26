@@ -2356,9 +2356,9 @@ abstract class L {
   /// No description provided for @protectFromRainAlert.
   ///
   /// In en, this message translates to:
-  /// **'{day}: {rain} mm of rain. {plant} is watered every {days} days: protect it from the rain'**
+  /// **'{plant}: rain on {rain} of the next {days} days, more often than it is watered (every {watering} days). Protect it from the rain'**
   String protectFromRainAlert(
-      String day, String rain, String plant, String days);
+      String plant, String rain, String days, String watering);
 
   /// No description provided for @careFieldMistingEvery.
   ///
@@ -2431,6 +2431,12 @@ abstract class L {
   /// In en, this message translates to:
   /// **'years'**
   String get careFieldUnitYears;
+
+  /// No description provided for @remindersToCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} reminders will be created, one per season'**
+  String remindersToCreate(int count);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

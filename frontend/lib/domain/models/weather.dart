@@ -87,11 +87,14 @@ class WeatherAlert {
   final WeatherAlertType type;
   final List<String> plants;
   // Frost and heat: the day, its temperature and the plant limit.
-  // Protection from rain: the rainiest day, the total rain in mm and the
-  // days between waterings.
+  // Protection from rain: the first rainy day and the days between
+  // waterings.
   final DayForecast? day;
   final double? temperature;
   final int? limit;
+  // Protection from rain: rainy days among the forecast days
+  final int? rainyDays;
+  final int? forecastDays;
 
   const WeatherAlert({
     required this.type,
@@ -99,6 +102,8 @@ class WeatherAlert {
     this.day,
     this.temperature,
     this.limit,
+    this.rainyDays,
+    this.forecastDays,
   });
 }
 
@@ -112,13 +117,7 @@ class OutdoorPlant {
 
   const OutdoorPlant(this.name, this.tempMin, this.tempMax,
       [this.wateringDays]);
-
-  /// Plants watered this rarely, like succulents, suffer with heavy rain.
-  bool get fearsRain => (wateringDays ?? 0) >= 7;
 }
-
-/// Rain, in mm, from which plants that fear it should be protected.
-const double heavyRain = 10;
 
 /// Frost and heat alerts for the outdoor plants whose species does not
 /// withstand the forecast temperatures, and a rain alert when it rains
@@ -153,21 +152,23 @@ List<WeatherAlert> weatherAlerts(Weather weather, List<OutdoorPlant> plants) {
       }
     }
   }
-  // Heavy rain in the forecast: protect the plants that fear it
-  double rain = weather.days.fold(0, (sum, d) => sum + (d.precipitation ?? 0));
-  List<OutdoorPlant> protect =
-      rain >= heavyRain ? plants.where((p) => p.fearsRain).toList() : [];
-  DayForecast? rainiest = weather.days.isEmpty
-      ? null
-      : weather.days.reduce(
-          (a, b) => (b.precipitation ?? 0) > (a.precipitation ?? 0) ? b : a);
+  // Rain more often than a plant is watered: protect it from the rain
+  List<DayForecast> rainyDays = weather.days.where((d) => d.rainy).toList();
+  List<OutdoorPlant> protect = rainyDays.isEmpty
+      ? []
+      : plants
+          .where((p) =>
+              p.wateringDays != null &&
+              weather.days.length / rainyDays.length < p.wateringDays!)
+          .toList();
   for (OutdoorPlant plant in protect) {
     alerts.add(WeatherAlert(
       type: WeatherAlertType.protectFromRain,
       plants: [plant.name],
-      day: rainiest,
-      temperature: rain,
+      day: rainyDays.first,
       limit: plant.wateringDays,
+      rainyDays: rainyDays.length,
+      forecastDays: weather.days.length,
     ));
   }
   List<OutdoorPlant> others =

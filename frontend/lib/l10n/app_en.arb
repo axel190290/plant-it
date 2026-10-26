@@ -661,19 +661,19 @@
       }
     }
   },
-  "protectFromRainAlert": "{day}: {rain} mm of rain. {plant} is watered every {days} days: protect it from the rain",
+  "protectFromRainAlert": "{plant}: rain on {rain} of the next {days} days, more often than it is watered (every {watering} days). Protect it from the rain",
   "@protectFromRainAlert": {
     "placeholders": {
-      "day": {
+      "plant": {
         "type": "String"
       },
       "rain": {
         "type": "String"
       },
-      "plant": {
+      "days": {
         "type": "String"
       },
-      "days": {
+      "watering": {
         "type": "String"
       }
     }
@@ -696,5 +696,13 @@
     }
   },
   "aiNotConfigured": "Choose an AI provider and its key in Settings > Data sources",
-  "careFieldUnitYears": "years"
+  "careFieldUnitYears": "years",
+  "remindersToCreate": "{count} reminders will be created, one per season",
+  "@remindersToCreate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

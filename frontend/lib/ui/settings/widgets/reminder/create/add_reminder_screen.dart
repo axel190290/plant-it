@@ -35,11 +35,12 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
         mainCommand: widget.viewModel.load,
         actionText: appLocalizations.create,
         steps: [
-          EventTypeStep(
+          // The plant first: its suggestions fill in the chosen type
+          PlantStep(
             viewModel: widget.viewModel,
             appLocalizations: appLocalizations,
           ),
-          PlantStep(
+          EventTypeStep(
             viewModel: widget.viewModel,
             appLocalizations: appLocalizations,
           ),

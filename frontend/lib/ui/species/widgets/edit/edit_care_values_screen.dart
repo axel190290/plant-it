@@ -49,12 +49,17 @@ class EditCareValuesScreen extends StatelessWidget {
     }
   }
 
+  IconData _icon(String key, IconData fallback) {
+    CareField? field = viewModel.basicField(key);
+    return field == null ? fallback : careFieldIcon(field);
+  }
+
   List<Widget> _basicCare(BuildContext context) {
     L l = L.of(context);
     SpeciesCareCompanion care = viewModel.care;
     return [
       _BasicCareEditor(
-        icon: LucideIcons.sun,
+        icon: _icon(basicLightKey, LucideIcons.sun),
         title: l.sunlight,
         isSet: care.light.value != null,
         valueText: care.light.value?.toString(),
@@ -72,7 +77,7 @@ class EditCareValuesScreen extends StatelessWidget {
         ),
       ),
       _BasicCareEditor(
-        icon: LucideIcons.spray_can,
+        icon: _icon(basicHumidityKey, LucideIcons.spray_can),
         title: l.humidity,
         isSet: care.humidity.value != null,
         valueText:
@@ -91,7 +96,7 @@ class EditCareValuesScreen extends StatelessWidget {
         ),
       ),
       _BasicCareEditor(
-        icon: LucideIcons.thermometer,
+        icon: _icon(basicTemperatureKey, LucideIcons.thermometer),
         title: l.temperature,
         isSet: care.tempMin.value != null || care.tempMax.value != null,
         valueText: care.tempMin.value == null && care.tempMax.value == null
@@ -114,7 +119,7 @@ class EditCareValuesScreen extends StatelessWidget {
         ),
       ),
       _BasicCareEditor(
-        icon: LucideIcons.test_tube,
+        icon: _icon(basicPhKey, LucideIcons.test_tube),
         title: l.ph,
         isSet: care.phMin.value != null || care.phMax.value != null,
         valueText: care.phMin.value == null && care.phMax.value == null

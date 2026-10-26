@@ -7,7 +7,39 @@ import 'package:plant_it/utils/icons.dart';
 
 /// The name of a care field: translated for built-in fields, as written by
 /// the user for the others.
+/// Keys of the categories of the basic care, whose values are stored in
+/// the species care and not as care values.
+const String basicLightKey = 'basic_light';
+const String basicHumidityKey = 'basic_humidity';
+const String basicTemperatureKey = 'basic_temperature';
+const String basicPhKey = 'basic_ph';
+
+bool isBasicCareField(CareField field) =>
+    field.key != null && field.key!.startsWith('basic_');
+
+/// The basic care categories with their default order, icon and state, used
+/// when the care fields could not be loaded.
+final List<CareField> basicCareFieldPlaceholders = [
+  for (String key in [
+    basicLightKey,
+    basicHumidityKey,
+    basicTemperatureKey,
+    basicPhKey
+  ])
+    CareField(
+      id: -1,
+      key: key,
+      type: CareFieldType.number,
+      enabled: true,
+      position: 0,
+    ),
+];
+
 String careFieldName(L l, CareField field) => switch (field.key) {
+      basicLightKey => l.sunlight,
+      basicHumidityKey => l.humidity,
+      basicTemperatureKey => l.temperature,
+      basicPhKey => l.ph,
       'light_lux' => l.careFieldLightLux,
       'light_hours' => l.careFieldLightHours,
       'env_humidity' => l.careFieldEnvHumidity,
@@ -94,6 +126,8 @@ const List<String> careFieldIcons = [
   'cloud_rain',
   'snowflake',
   'thermometer',
+  'spray_can',
+  'test_tube',
   'wind',
   'zap',
   'shovel',
@@ -112,6 +146,10 @@ const List<String> careFieldIcons = [
 
 /// The icon of a built-in category when the user has not chosen another.
 String? defaultCareFieldIcon(String? key) => switch (key) {
+      basicLightKey => 'sun',
+      basicHumidityKey => 'spray_can',
+      basicTemperatureKey => 'thermometer',
+      basicPhKey => 'test_tube',
       'light_lux' => 'sun_medium',
       'light_hours' => 'sunrise',
       'env_humidity' => 'droplets',

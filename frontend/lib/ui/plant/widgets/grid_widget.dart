@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/ui/core/ui/care_field_format.dart';
@@ -102,7 +101,7 @@ class _InfoGridWidgetState extends State<InfoGridWidget> {
 }
 
 class SpeciesCareInfoGridWidget extends InfoGridWidget {
-  // The care categories and their values, shown after the basic care
+  // The care categories, basic care included, in display order
   final List<CareField> careFields;
   final Map<int, CareValue> careValues;
   final void Function(String title, String value, bool estimated)? onTapValue;
@@ -118,83 +117,69 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
     this.onTapValue,
   });
 
-  List<InfoWidget> _categoryChildren() {
-    List<InfoWidget> result = [];
-    for (CareField field in careFields) {
-      CareValue? value = careValues[field.id];
-      if (!field.enabled || value == null) continue;
-      String? text = formatCareValue(appLocalizations, field, value);
-      if (text == null) continue;
-      String title = careFieldName(appLocalizations, field);
-      result.add(InfoWidget(
-        icon: careFieldIcon(field),
-        title: value.estimated ? "$title ✨" : title,
-        value: text,
-        onTap: onTapValue == null
-            ? null
-            : () => onTapValue!(title, text, value.estimated),
-      ));
+  /// The value of a basic care category, or null if it is not set.
+  String? _basicValue(String key) {
+    switch (key) {
+      case basicLightKey:
+        if (care.light.value == null) return null;
+        if (care.light.value! > 5) return appLocalizations.high;
+        if (care.light.value! > 3) return appLocalizations.medium;
+        return appLocalizations.low;
+      case basicHumidityKey:
+        return care.humidity.value == null ? null : "${care.humidity.value!}0%";
+      case basicTemperatureKey:
+        int? min = care.tempMin.value;
+        int? max = care.tempMax.value;
+        if (min != null && max != null) return "$min - $max °C";
+        if (min != null) return "${appLocalizations.min} $min °C";
+        if (max != null) return "${appLocalizations.max} $max °C";
+        return null;
+      case basicPhKey:
+        int? min = care.phMin.value;
+        int? max = care.phMax.value;
+        if (min != null && max != null) return "$min - $max";
+        if (min != null) return "${appLocalizations.min} $min";
+        if (max != null) return "${appLocalizations.max} $max";
+        return null;
     }
-    return result;
+    return null;
+  }
+
+  InfoWidget _tile(String title, String text, IconData icon, bool estimated) {
+    return InfoWidget(
+      icon: icon,
+      title: estimated ? "$title ✨" : title,
+      value: text,
+      onTap:
+          onTapValue == null ? null : () => onTapValue!(title, text, estimated),
+    );
   }
 
   @override
   List<InfoWidget> getInfoChildren() {
+    List<CareField> fields = careFields;
+    if (!fields.any((f) => isBasicCareField(f))) {
+      // Care fields not loaded: show the basic care first, as before
+      fields = [...basicCareFieldPlaceholders, ...careFields];
+    }
     List<InfoWidget> result = [];
-
-    if (care.light.value != null) {
-      String sunLightValue = appLocalizations.low;
-      if (care.light.value! > 3 && care.light.value! < 5) {
-        sunLightValue = appLocalizations.medium;
-      } else if (care.light.value != null && care.light.value! > 5) {
-        sunLightValue = appLocalizations.high;
+    for (CareField field in fields) {
+      if (!field.enabled) continue;
+      String title = careFieldName(appLocalizations, field);
+      if (isBasicCareField(field)) {
+        String? text = _basicValue(field.key!);
+        if (text != null) {
+          result.add(_tile(title, text, careFieldIcon(field), false));
+        }
+        continue;
       }
-      result.add(InfoWidget(
-          title: appLocalizations.sunlight,
-          value: sunLightValue,
-          icon: LucideIcons.sun));
+      CareValue? value = careValues[field.id];
+      if (value == null) continue;
+      String? text = formatCareValue(appLocalizations, field, value);
+      if (text != null) {
+        result.add(_tile(title, text, careFieldIcon(field), value.estimated));
+      }
     }
-
-    if (care.humidity.value != null) {
-      result.add(InfoWidget(
-          title: appLocalizations.humidity,
-          value: "${care.humidity.value!}0%",
-          icon: LucideIcons.spray_can));
-    }
-
-    String? tempValue;
-    if (care.tempMax.value != null && care.tempMin.value != null) {
-      tempValue = "${care.tempMin.value} - ${care.tempMax.value} °C";
-    } else if (care.tempMax.value == null && care.tempMin.value != null) {
-      tempValue = "${appLocalizations.min} ${care.tempMin.value} °C";
-    } else if (care.tempMax.value != null && care.tempMin.value == null) {
-      tempValue = "${appLocalizations.max} ${care.tempMax.value} °C";
-    }
-    if (tempValue != null) {
-      result.add(InfoWidget(
-        title: appLocalizations.temperature,
-        value: tempValue,
-        icon: LucideIcons.thermometer,
-      ));
-    }
-
-    String? phValue;
-    if (care.phMax.value != null && care.phMin.value != null) {
-      phValue = "${care.phMin.value} - ${care.phMax.value}";
-    } else if (care.phMax.value == null && care.phMin.value != null) {
-      phValue = "${appLocalizations.min} ${care.phMin.value}";
-    } else if (care.phMax.value != null && care.phMin.value == null) {
-      phValue = "${appLocalizations.max} ${care.phMax.value}";
-    }
-    if (phValue != null) {
-      result.add(InfoWidget(
-        title: appLocalizations.ph,
-        value: phValue,
-        icon: LucideIcons.test_tube,
-      ));
-    }
-
-    result.addAll(_categoryChildren());
     return result;
   }
 }

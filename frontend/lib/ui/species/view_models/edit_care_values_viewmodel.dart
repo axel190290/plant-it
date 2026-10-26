@@ -10,6 +10,7 @@ import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/ui/core/ui/care_field_format.dart';
 import 'package:plant_it/ui/core/ui/create_care_field_dialog.dart';
 import 'package:plant_it/utils/stream_code.dart';
 import 'package:result_dart/result_dart.dart';
@@ -54,12 +55,16 @@ class EditCareValuesViewModel extends ChangeNotifier {
   late SpeciesCareCompanion _originalCare;
   late SpeciesCareCompanion _care;
   List<CareField> _fields = [];
+  Map<String, CareField> _basicFields = {};
   Map<int, CareValue> _original = {};
   final Map<int, CareValue> _values = {};
 
   /// The enabled categories, in display order.
   List<CareField> get fields => _fields;
   SpeciesCareCompanion get care => _care;
+
+  /// The basic care category of [key], if loaded.
+  CareField? basicField(String key) => _basicFields[key];
 
   CareValue valueOf(int fieldId) => _values[fieldId] ?? const CareValue();
 
@@ -103,7 +108,15 @@ class EditCareValuesViewModel extends ChangeNotifier {
     if (fields.isError()) {
       return Failure(fields.exceptionOrNull()!);
     }
-    _fields = fields.getOrThrow().where((f) => f.enabled).toList();
+    // The basic care is edited with its own controls
+    _fields = fields
+        .getOrThrow()
+        .where((f) => f.enabled && !isBasicCareField(f))
+        .toList();
+    _basicFields = {
+      for (CareField f in fields.getOrThrow())
+        if (isBasicCareField(f)) f.key!: f
+    };
     return Success("ok");
   }
 

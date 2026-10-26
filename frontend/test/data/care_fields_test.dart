@@ -157,6 +157,34 @@ void main() {
     }
   });
 
+  test('upgrading a version 4 database puts the basic care first', () async {
+    Directory dir = await Directory.systemTemp.createTemp('plant_it_test');
+    File file = File('${dir.path}/db.sqlite');
+    try {
+      AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
+      await db.customStatement('SELECT 1');
+      await db.customStatement(
+          "DELETE FROM care_fields WHERE key LIKE 'basic_%'");
+      await db.customStatement('PRAGMA user_version = 4');
+      await db.close();
+
+      db = AppDatabase.forTesting(NativeDatabase(file));
+      List<CareField> fields =
+          (await CareFieldRepository(db: db).getAll()).getOrThrow();
+      expect(fields.take(4).map((f) => f.key), [
+        basicLightKey,
+        basicHumidityKey,
+        basicTemperatureKey,
+        basicPhKey,
+      ]);
+      expect(fields[4].key, 'light_lux');
+      expect(careFieldIconName(fields[0]), 'sun');
+      await db.close();
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
   test('CareFieldDraft keeps options only for list categories', () {
     CareFieldsCompanion choice = const CareFieldDraft(
       name: 'Light exposure',

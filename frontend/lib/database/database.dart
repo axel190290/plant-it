@@ -200,7 +200,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -240,6 +240,9 @@ class AppDatabase extends _$AppDatabase {
         }
         if (from < 4) {
           await m.addColumn(species, species.description);
+        }
+        if (from >= 2 && from < 5) {
+          await initBasicCareFields();
         }
       },
       beforeOpen: (details) async {
@@ -310,6 +313,11 @@ class AppDatabase extends _$AppDatabase {
   /// The built-in care fields. Their names are translated in the app from
   /// their key.
   static const List<(String, CareFieldType, String?)> builtInCareFields = [
+    // The basic care, whose values are in SpeciesCare
+    ('basic_light', CareFieldType.number, null),
+    ('basic_humidity', CareFieldType.number, null),
+    ('basic_temperature', CareFieldType.range, null),
+    ('basic_ph', CareFieldType.range, null),
     ('light_lux', CareFieldType.range, 'lux'),
     ('light_hours', CareFieldType.number, 'h'),
     ('env_humidity', CareFieldType.range, '%'),
@@ -339,6 +347,22 @@ class AppDatabase extends _$AppDatabase {
           type: field.$2,
           unit: Value(field.$3),
           position: Value(i),
+        ),
+        mode: InsertMode.insertOrIgnore,
+      );
+    }
+  }
+
+  /// Adds the basic care categories before the existing ones, for databases
+  /// created before they were care fields.
+  Future<void> initBasicCareFields() async {
+    for (int i = 0; i < 4; i++) {
+      (String, CareFieldType, String?) field = builtInCareFields[i];
+      await into(careFields).insert(
+        CareFieldsCompanion.insert(
+          key: Value(field.$1),
+          type: field.$2,
+          position: Value(i - 4),
         ),
         mode: InsertMode.insertOrIgnore,
       );

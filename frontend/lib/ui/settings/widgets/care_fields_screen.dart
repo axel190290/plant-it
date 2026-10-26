@@ -66,7 +66,9 @@ class CareFieldsScreen extends StatelessWidget {
   Widget _fieldTile(BuildContext context, CareField field, int index) {
     L l = L.of(context);
     bool custom = field.key == null;
-    String subtitle = careFieldTypeName(l, field.type);
+    String subtitle = isBasicCareField(field)
+        ? l.basicCare
+        : careFieldTypeName(l, field.type);
     if (custom) {
       subtitle = "$subtitle · ${l.customCareField}";
     }

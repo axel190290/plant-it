@@ -1149,7 +1149,7 @@ class LFr extends L {
 
   @override
   String get careFieldsDescription =>
-      'Les catégories activées sont affichées et modifiables dans la section Entretien de chaque espèce et plante. Les ravageurs et traitements d\'une plante précise sont enregistrés comme événements (types « pest » et « treatment ») dans son historique.';
+      'Les catégories activées sont affichées dans la section Entretien de chaque espèce et plante, dans cet ordre : faites-les glisser pour les réordonner et touchez une icône pour la changer. Les ravageurs et traitements d\'une plante précise sont enregistrés comme événements (types « pest » et « treatment ») dans son historique.';
 
   @override
   String get addCareField => 'Nouvelle catégorie';
@@ -1218,4 +1218,10 @@ class LFr extends L {
   @override
   String get descriptionSharedWarning =>
       'La description appartient à l\'espèce, elle est donc partagée par vos plantes de cette espèce.';
+
+  @override
+  String get changeIcon => 'Changer l\'icône';
+
+  @override
+  String get restoreDefaultIcon => 'Icône d\'origine';
 }

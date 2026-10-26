@@ -46,6 +46,21 @@ class CareFieldsViewModel extends ChangeNotifier {
   Future<Result<void>> add(CareFieldDraft draft) async =>
       _reload(await _careFieldRepository.insertCustom(draft.toCompanion()));
 
+  Future<Result<void>> setIcon(CareField field, String? icon) async =>
+      _reload(await _careFieldRepository.setIcon(field.id, icon));
+
+  /// Moves a field, as reported by a ReorderableListView.
+  Future<Result<void>> move(int oldIndex, int newIndex) async {
+    if (newIndex > oldIndex) newIndex--;
+    List<CareField> fields = List.of(_fields);
+    fields.insert(newIndex, fields.removeAt(oldIndex));
+    // Shown at once; saved in the background
+    _fields = fields;
+    notifyListeners();
+    return _reload(
+        await _careFieldRepository.reorder(fields.map((f) => f.id).toList()));
+  }
+
   Future<Result<void>> delete(CareField field) async =>
       _reload(await _careFieldRepository.delete(field.id));
 }

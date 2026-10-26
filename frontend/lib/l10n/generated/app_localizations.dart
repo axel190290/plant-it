@@ -1810,7 +1810,7 @@ abstract class L {
   /// No description provided for @careFieldsDescription.
   ///
   /// In en, this message translates to:
-  /// **'Enabled categories are shown and can be edited in the Care section of every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.'**
+  /// **'Enabled categories are shown in the Care section of every species and plant, in this order: drag them to reorder them and tap an icon to change it. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.'**
   String get careFieldsDescription;
 
   /// No description provided for @addCareField.
@@ -1938,6 +1938,18 @@ abstract class L {
   /// In en, this message translates to:
   /// **'The description belongs to the species, so it is shared by your plants of this species.'**
   String get descriptionSharedWarning;
+
+  /// No description provided for @changeIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Change icon'**
+  String get changeIcon;
+
+  /// No description provided for @restoreDefaultIcon.
+  ///
+  /// In en, this message translates to:
+  /// **'Default icon'**
+  String get restoreDefaultIcon;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

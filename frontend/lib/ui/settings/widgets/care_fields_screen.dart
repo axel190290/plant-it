@@ -55,6 +55,58 @@ class CareFieldsScreen extends StatelessWidget {
     if (context.mounted) _showError(context, result);
   }
 
+  Future<void> _changeIcon(BuildContext context, CareField field) async {
+    String? icon = await showCareIconPicker(context, field);
+    if (icon == null) return;
+    Result<void> result =
+        await viewModel.setIcon(field, icon.isEmpty ? null : icon);
+    if (context.mounted) _showError(context, result);
+  }
+
+  Widget _fieldTile(BuildContext context, CareField field, int index) {
+    L l = L.of(context);
+    bool custom = field.key == null;
+    String subtitle = careFieldTypeName(l, field.type);
+    if (custom) {
+      subtitle = "$subtitle · ${l.customCareField}";
+    }
+    return ListTile(
+      key: ValueKey(field.id),
+      title: Text(careFieldName(l, field)),
+      subtitle: Text(subtitle),
+      leading: IconButton(
+        icon: Icon(careFieldIcon(field)),
+        tooltip: l.changeIcon,
+        onPressed: () => _changeIcon(context, field),
+      ),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (custom)
+            IconButton(
+              icon: const Icon(LucideIcons.trash),
+              tooltip: l.delete,
+              onPressed: () => _delete(context, field),
+            ),
+          Switch(
+            value: field.enabled,
+            onChanged: (enabled) async {
+              Result<void> result = await viewModel.setEnabled(field, enabled);
+              if (context.mounted) _showError(context, result);
+            },
+          ),
+          ReorderableDragStartListener(
+            index: index,
+            child: const Padding(
+              padding: EdgeInsets.all(8),
+              child: Icon(LucideIcons.grip_vertical),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     L l = L.of(context);
@@ -70,9 +122,11 @@ class CareFieldsScreen extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: ValueListenableBuilder<CommandResult<void, void>>(
-          valueListenable: viewModel.load.results,
-          builder: (context, command, _) {
+        // Also rebuilt by the view model, which reorders before saving
+        child: ListenableBuilder(
+          listenable: Listenable.merge([viewModel.load.results, viewModel]),
+          builder: (context, _) {
+            CommandResult<void, void> command = viewModel.load.results.value;
             if (command.isExecuting && viewModel.fields.isEmpty) {
               return const Center(child: CircularProgressIndicator());
             }
@@ -83,47 +137,20 @@ class CareFieldsScreen extends StatelessWidget {
                 onPressed: viewModel.load.execute,
               );
             }
-            return ListView(
+            return ReorderableListView(
               padding: const EdgeInsets.symmetric(vertical: 8),
+              buildDefaultDragHandles: false,
+              header: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                child: Text(l.careFieldsDescription),
+              ),
+              onReorder: (oldIndex, newIndex) async {
+                Result<void> result = await viewModel.move(oldIndex, newIndex);
+                if (context.mounted) _showError(context, result);
+              },
               children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                  child: Text(l.careFieldsDescription),
-                ),
-                ...viewModel.fields.map((field) {
-                  bool custom = field.key == null;
-                  String subtitle = careFieldTypeName(l, field.type);
-                  if (custom) {
-                    subtitle = "$subtitle · ${l.customCareField}";
-                  }
-                  Widget toggle = Switch(
-                    value: field.enabled,
-                    onChanged: (enabled) async {
-                      Result<void> result =
-                          await viewModel.setEnabled(field, enabled);
-                      if (context.mounted) _showError(context, result);
-                    },
-                  );
-                  return ListTile(
-                    title: Text(careFieldName(l, field)),
-                    subtitle: Text(subtitle),
-                    leading: Icon(careFieldIcon(field)),
-                    onLongPress: custom ? () => _delete(context, field) : null,
-                    trailing: custom
-                        ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: const Icon(LucideIcons.trash),
-                                tooltip: l.delete,
-                                onPressed: () => _delete(context, field),
-                              ),
-                              toggle,
-                            ],
-                          )
-                        : toggle,
-                  );
-                }),
+                for (int i = 0; i < viewModel.fields.length; i++)
+                  _fieldTile(context, viewModel.fields[i], i),
               ],
             );
           },

@@ -430,7 +430,7 @@
   "careSaved": "Cuidados guardados",
   "careFields": "Categorías de cuidado",
   "manageCareFields": "Elige qué cuidados mostrar y crea los tuyos",
-  "careFieldsDescription": "Las categorías activadas se muestran y se pueden editar en la sección Cuidados de todas las especies y plantas. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.",
+  "careFieldsDescription": "Las categorías activadas se muestran en la sección Cuidados de todas las especies y plantas, en este orden: arrástralas para reordenarlas y toca un icono para cambiarlo. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.",
   "addCareField": "Nueva categoría",
   "careFieldUnit": "Unidad (opcional)",
   "careFieldOptions": "Opciones, separadas por comas",
@@ -451,5 +451,7 @@
   "fillAutomatically": "Rellenar automáticamente",
   "noDescriptionFound": "No se ha encontrado ninguna descripción para esta especie.",
   "descriptionSaved": "Descripción guardada",
-  "descriptionSharedWarning": "La descripción pertenece a la especie, así que la comparten tus plantas de esta especie."
+  "descriptionSharedWarning": "La descripción pertenece a la especie, así que la comparten tus plantas de esta especie.",
+  "changeIcon": "Cambiar icono",
+  "restoreDefaultIcon": "Icono original"
 }

@@ -443,7 +443,7 @@
   "careSaved": "Cure salvate",
   "careFields": "Categorie di cura",
   "manageCareFields": "Scegli quali cure mostrare e crea le tue",
-  "careFieldsDescription": "Le categorie attive sono mostrate e modificabili nella sezione Cura di ogni specie e pianta. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.",
+  "careFieldsDescription": "Le categorie attive sono mostrate nella sezione Cura di ogni specie e pianta, in questo ordine: trascinale per riordinarle e tocca un'icona per cambiarla. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.",
   "addCareField": "Nuova categoria",
   "careFieldUnit": "Unità (facoltativa)",
   "careFieldOptions": "Opzioni, separate da virgole",
@@ -464,5 +464,7 @@
   "fillAutomatically": "Compila automaticamente",
   "noDescriptionFound": "Nessuna descrizione trovata per questa specie.",
   "descriptionSaved": "Descrizione salvata",
-  "descriptionSharedWarning": "La descrizione appartiene alla specie, quindi è condivisa dalle tue piante di questa specie."
+  "descriptionSharedWarning": "La descrizione appartiene alla specie, quindi è condivisa dalle tue piante di questa specie.",
+  "changeIcon": "Cambia icona",
+  "restoreDefaultIcon": "Icona originale"
 }

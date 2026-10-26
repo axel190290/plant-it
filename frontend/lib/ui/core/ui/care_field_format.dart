@@ -76,47 +76,66 @@ Map<int, CareValue> careValuesByFieldId(
   };
 }
 
-/// Icons offered for the care categories created by the user.
-const List<String> customCareFieldIcons = [
+/// Icons a care category can use.
+const List<String> careFieldIcons = [
   'sprout',
   'leaf',
   'flower',
+  'flower_2',
   'tree_pine',
   'sun',
+  'sun_medium',
+  'sunrise',
+  'moon',
   'droplet',
+  'droplets',
+  'glass_water',
+  'shower_head',
+  'cloud_rain',
+  'snowflake',
   'thermometer',
   'wind',
-  'bug',
-  'scissors',
+  'zap',
+  'shovel',
+  'layers',
   'flask_conical',
+  'scissors',
+  'package_open',
+  'bug',
+  'shield_alert',
+  'skull',
   'ruler',
   'heart',
   'star',
   'tag',
-  'package_open',
 ];
 
-IconData careFieldIcon(CareField field) {
-  String name = switch (field.key) {
-    'light_lux' => 'sun_medium',
-    'light_hours' => 'sunrise',
-    'env_humidity' => 'droplets',
-    'watering_summer' => 'droplet',
-    'watering_winter' => 'snowflake',
-    'soil_moisture' => 'shovel',
-    'conductivity' => 'zap',
-    'water_type' => 'glass_water',
-    'watering_method' => 'shower_head',
-    'substrate' => 'layers',
-    'fertilizer' => 'flask_conical',
-    'pruning' => 'scissors',
-    'repotting' => 'package_open',
-    'flowering_season' => 'flower',
-    'dormancy_season' => 'moon',
-    'common_pests' => 'bug',
-    'diseases' => 'shield_alert',
-    'toxicity' => 'skull',
-    _ => field.icon ?? 'sprout',
-  };
-  return appIcons[name] ?? LucideIcons.sprout;
-}
+/// The icon of a built-in category when the user has not chosen another.
+String? defaultCareFieldIcon(String? key) => switch (key) {
+      'light_lux' => 'sun_medium',
+      'light_hours' => 'sunrise',
+      'env_humidity' => 'droplets',
+      'watering_summer' => 'droplet',
+      'watering_winter' => 'snowflake',
+      'soil_moisture' => 'shovel',
+      'conductivity' => 'zap',
+      'water_type' => 'glass_water',
+      'watering_method' => 'shower_head',
+      'substrate' => 'layers',
+      'fertilizer' => 'flask_conical',
+      'pruning' => 'scissors',
+      'repotting' => 'package_open',
+      'flowering_season' => 'flower',
+      'dormancy_season' => 'moon',
+      'common_pests' => 'bug',
+      'diseases' => 'shield_alert',
+      'toxicity' => 'skull',
+      _ => null,
+    };
+
+/// The icon chosen by the user, or else the default one of the category.
+String careFieldIconName(CareField field) =>
+    field.icon ?? defaultCareFieldIcon(field.key) ?? 'sprout';
+
+IconData careFieldIcon(CareField field) =>
+    appIcons[careFieldIconName(field)] ?? LucideIcons.sprout;

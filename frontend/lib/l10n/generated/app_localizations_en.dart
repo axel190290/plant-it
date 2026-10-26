@@ -1143,7 +1143,7 @@ class LEn extends L {
 
   @override
   String get careFieldsDescription =>
-      'Enabled categories are shown and can be edited in the Care section of every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.';
+      'Enabled categories are shown in the Care section of every species and plant, in this order: drag them to reorder them and tap an icon to change it. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.';
 
   @override
   String get addCareField => 'New category';
@@ -1211,4 +1211,10 @@ class LEn extends L {
   @override
   String get descriptionSharedWarning =>
       'The description belongs to the species, so it is shared by your plants of this species.';
+
+  @override
+  String get changeIcon => 'Change icon';
+
+  @override
+  String get restoreDefaultIcon => 'Default icon';
 }

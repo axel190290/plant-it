@@ -1249,7 +1249,7 @@ class LIt extends L {
 
   @override
   String get careFieldsDescription =>
-      'Le categorie attive sono mostrate e modificabili nella sezione Cura di ogni specie e pianta. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.';
+      'Le categorie attive sono mostrate nella sezione Cura di ogni specie e pianta, in questo ordine: trascinale per riordinarle e tocca un\'icona per cambiarla. Parassiti e trattamenti di una pianta specifica si registrano come eventi (tipi \"pest\" e \"treatment\") nella sua cronologia.';
 
   @override
   String get addCareField => 'Nuova categoria';
@@ -1318,4 +1318,10 @@ class LIt extends L {
   @override
   String get descriptionSharedWarning =>
       'La descrizione appartiene alla specie, quindi è condivisa dalle tue piante di questa specie.';
+
+  @override
+  String get changeIcon => 'Cambia icona';
+
+  @override
+  String get restoreDefaultIcon => 'Icona originale';
 }

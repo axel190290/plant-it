@@ -9,6 +9,7 @@ import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/data/service/care/open_plantbook_client.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/ui/core/ui/care_field_format.dart';
 import 'package:plant_it/ui/core/ui/create_care_field_dialog.dart';
 
 void main() {
@@ -59,6 +60,32 @@ void main() {
       expect(saved.containsKey(lux), isFalse);
       expect(saved[toxicity]!.text, 'Safe');
       expect(saved[toxicity]!.estimated, isFalse);
+    });
+
+    test('changes the icon of a built-in field and restores it', () async {
+      CareFieldRepository repository = CareFieldRepository(db: db);
+      CareField lux = (await repository.getAll())
+          .getOrThrow()
+          .firstWhere((f) => f.key == 'light_lux');
+      expect(careFieldIconName(lux), 'sun_medium');
+
+      await repository.setIcon(lux.id, 'star');
+      lux = (await repository.get(lux.id)).getOrThrow();
+      expect(careFieldIconName(lux), 'star');
+
+      await repository.setIcon(lux.id, null);
+      lux = (await repository.get(lux.id)).getOrThrow();
+      expect(careFieldIconName(lux), 'sun_medium');
+    });
+
+    test('saves the order of the fields', () async {
+      CareFieldRepository repository = CareFieldRepository(db: db);
+      List<int> ids =
+          (await repository.getAll()).getOrThrow().map((f) => f.id).toList();
+      List<int> reversed = ids.reversed.toList();
+      await repository.reorder(reversed);
+      expect((await repository.getAll()).getOrThrow().map((f) => f.id),
+          reversed);
     });
 
     test('adds a custom field after the built-in ones', () async {

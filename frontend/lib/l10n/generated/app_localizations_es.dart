@@ -1154,7 +1154,7 @@ class LEs extends L {
 
   @override
   String get careFieldsDescription =>
-      'Las categorías activadas se muestran y se pueden editar en la sección Cuidados de todas las especies y plantas. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.';
+      'Las categorías activadas se muestran en la sección Cuidados de todas las especies y plantas, en este orden: arrástralas para reordenarlas y toca un icono para cambiarlo. Las plagas y tratamientos de una planta concreta se registran como eventos (tipos \"pest\" y \"treatment\") en su historial.';
 
   @override
   String get addCareField => 'Nueva categoría';
@@ -1223,4 +1223,10 @@ class LEs extends L {
   @override
   String get descriptionSharedWarning =>
       'La descripción pertenece a la especie, así que la comparten tus plantas de esta especie.';
+
+  @override
+  String get changeIcon => 'Cambiar icono';
+
+  @override
+  String get restoreDefaultIcon => 'Icono original';
 }

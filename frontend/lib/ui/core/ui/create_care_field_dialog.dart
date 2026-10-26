@@ -53,7 +53,7 @@ Future<CareFieldDraft?> showCreateCareFieldDialog(BuildContext context) {
   TextEditingController unit = TextEditingController();
   TextEditingController options = TextEditingController();
   CareFieldType type = CareFieldType.text;
-  String icon = customCareFieldIcons.first;
+  String icon = careFieldIcons.first;
 
   return showDialog<CareFieldDraft>(
     context: context,
@@ -95,22 +95,9 @@ Future<CareFieldDraft?> showCreateCareFieldDialog(BuildContext context) {
               const SizedBox(height: 16),
               Text(l.icon, style: Theme.of(ctx).textTheme.titleSmall),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 4,
-                runSpacing: 4,
-                children: customCareFieldIcons.map((name) {
-                  bool selected = name == icon;
-                  return IconButton(
-                    isSelected: selected,
-                    style: IconButton.styleFrom(
-                      backgroundColor: selected
-                          ? Theme.of(ctx).colorScheme.primaryContainer
-                          : null,
-                    ),
-                    icon: Icon(appIcons[name]),
-                    onPressed: () => setState(() => icon = name),
-                  );
-                }).toList(),
+              CareIconGrid(
+                selected: icon,
+                onSelected: (name) => setState(() => icon = name),
               ),
             ],
           ),
@@ -134,6 +121,69 @@ Future<CareFieldDraft?> showCreateCareFieldDialog(BuildContext context) {
           ),
         ],
       ),
+    ),
+  );
+}
+
+/// The icons a care category can use; [selected] is highlighted.
+class CareIconGrid extends StatelessWidget {
+  final String? selected;
+  final ValueChanged<String> onSelected;
+
+  const CareIconGrid({
+    super.key,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: 4,
+      runSpacing: 4,
+      children: careFieldIcons.map((name) {
+        bool isSelected = name == selected;
+        return IconButton(
+          isSelected: isSelected,
+          style: IconButton.styleFrom(
+            backgroundColor: isSelected
+                ? Theme.of(context).colorScheme.primaryContainer
+                : null,
+          ),
+          icon: Icon(appIcons[name]),
+          onPressed: () => onSelected(name),
+        );
+      }).toList(),
+    );
+  }
+}
+
+/// Asks a new icon for [field]. Returns the chosen icon name, or an empty
+/// string to go back to the default icon of a built-in category.
+Future<String?> showCareIconPicker(BuildContext context, CareField field) {
+  L l = L.of(context);
+  String current = careFieldIconName(field);
+  return showDialog<String>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: Text(careFieldName(l, field)),
+      content: SingleChildScrollView(
+        child: CareIconGrid(
+          selected: current,
+          onSelected: (name) => Navigator.of(ctx).pop(name),
+        ),
+      ),
+      actions: [
+        if (field.key != null && field.icon != null)
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(''),
+            child: Text(l.restoreDefaultIcon),
+          ),
+        TextButton(
+          onPressed: () => Navigator.of(ctx).pop(),
+          child: Text(l.cancel),
+        ),
+      ],
     ),
   );
 }

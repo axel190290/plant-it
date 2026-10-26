@@ -35,6 +35,32 @@ class CareFieldRepository extends CRUDRepository<CareField> {
     }
   }
 
+  /// Sets the icon of a field; null goes back to its default icon.
+  Future<Result<void>> setIcon(int id, String? icon) async {
+    try {
+      await (db.update(db.careFields)..where((f) => f.id.equals(id)))
+          .write(CareFieldsCompanion(icon: Value(icon)));
+      return Success("ok");
+    } catch (e) {
+      return Failure(Exception(e.toString()));
+    }
+  }
+
+  /// Saves the display order, given as field ids from first to last.
+  Future<Result<void>> reorder(List<int> ids) async {
+    try {
+      await db.transaction(() async {
+        for (int i = 0; i < ids.length; i++) {
+          await (db.update(db.careFields)..where((f) => f.id.equals(ids[i])))
+              .write(CareFieldsCompanion(position: Value(i)));
+        }
+      });
+      return Success("ok");
+    } catch (e) {
+      return Failure(Exception(e.toString()));
+    }
+  }
+
   /// Adds a field created by the user after the existing ones.
   Future<Result<int>> insertCustom(CareFieldsCompanion field) async {
     try {

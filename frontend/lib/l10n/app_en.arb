@@ -475,7 +475,7 @@
   "careSaved": "Care saved",
   "careFields": "Care categories",
   "manageCareFields": "Choose which care to show and create your own",
-  "careFieldsDescription": "Enabled categories are shown and can be edited in the Care section of every species and plant. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.",
+  "careFieldsDescription": "Enabled categories are shown in the Care section of every species and plant, in this order: drag them to reorder them and tap an icon to change it. Pests and treatments of a specific plant are recorded as events (\"pest\" and \"treatment\" types) in its history.",
   "addCareField": "New category",
   "careFieldUnit": "Unit (optional)",
   "careFieldOptions": "Options, separated by commas",
@@ -496,5 +496,7 @@
   "fillAutomatically": "Fill in automatically",
   "noDescriptionFound": "No description was found for this species.",
   "descriptionSaved": "Description saved",
-  "descriptionSharedWarning": "The description belongs to the species, so it is shared by your plants of this species."
+  "descriptionSharedWarning": "The description belongs to the species, so it is shared by your plants of this species.",
+  "changeIcon": "Change icon",
+  "restoreDefaultIcon": "Default icon"
 }

@@ -1,6 +1,7 @@
 import 'package:plant_it/data/repository/species_care_repository.dart';
 import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/service/care/ai_care_estimator.dart';
+import 'package:plant_it/data/service/care/suggestion_care_filler.dart';
 import 'package:plant_it/data/service/weather/weather_service.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
@@ -15,8 +16,10 @@ class ReminderSuggestionService {
   final SpeciesCareValueRepository _speciesCareValueRepository;
   final WeatherService _weatherService;
   final AiCareEstimator _aiCareEstimator;
+  final SuggestionCareFiller _suggestionCareFiller;
 
   ReminderSuggestionService({
+    required SuggestionCareFiller suggestionCareFiller,
     required SpeciesCareRepository speciesCareRepository,
     required SpeciesCareValueRepository speciesCareValueRepository,
     required WeatherService weatherService,
@@ -24,9 +27,12 @@ class ReminderSuggestionService {
   })  : _speciesCareRepository = speciesCareRepository,
         _speciesCareValueRepository = speciesCareValueRepository,
         _weatherService = weatherService,
-        _aiCareEstimator = aiCareEstimator;
+        _aiCareEstimator = aiCareEstimator,
+        _suggestionCareFiller = suggestionCareFiller;
 
   Future<List<ReminderSuggestion>> suggest(Plant plant) async {
+    // What no source gave, from the typical care of the plant group
+    await _suggestionCareFiller.fillMissing(plant.species, useAi: false);
     SpeciesCareData? care =
         (await _speciesCareRepository.get(plant.species)).getOrNull();
     Map<String, CareValue> values =

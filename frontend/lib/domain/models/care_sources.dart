@@ -1,7 +1,7 @@
 /// Where the data of a species downloaded from an external source comes
 /// from. It is stored in the species bibliography (so it is kept when the
 /// species is added to the collection) with the format
-/// `plantit-sources:species=gbif;care=openplantbook;ai=gemini:light,ph`.
+/// `plantit-sources:species=gbif;care=openplantbook;ai=gemini:light,ph;group=aroids`.
 class CareSources {
   static const String _prefix = "plantit-sources:";
   static const String openPlantbook = "openplantbook";
@@ -16,12 +16,15 @@ class CareSources {
   final String? care;
   final String? aiProvider;
   final List<String> aiFields;
+  // The plant group whose typical care filled in missing values
+  final String? group;
 
   const CareSources({
     this.species,
     this.care,
     this.aiProvider,
     this.aiFields = const [],
+    this.group,
   });
 
   bool get hasAiEstimate => aiProvider != null && aiFields.isNotEmpty;
@@ -31,12 +34,14 @@ class CareSources {
     String? care,
     String? aiProvider,
     List<String>? aiFields,
+    String? group,
   }) {
     return CareSources(
       species: species ?? this.species,
       care: care ?? this.care,
       aiProvider: aiProvider ?? this.aiProvider,
       aiFields: aiFields ?? this.aiFields,
+      group: group ?? this.group,
     );
   }
 
@@ -56,6 +61,7 @@ class CareSources {
       if (care != null) "care=$care",
       // Kept without fields too: the AI may have filled only care fields
       if (aiProvider != null) "ai=$aiProvider:${aiFields.join(',')}",
+      if (group != null) "group=$group",
     ];
     return "$_prefix${parts.join(';')}";
   }
@@ -69,6 +75,7 @@ class CareSources {
     String? care;
     String? aiProvider;
     List<String> aiFields = [];
+    String? group;
     for (String part in bibliography.substring(_prefix.length).split(';')) {
       int eq = part.indexOf('=');
       if (eq < 0) {
@@ -80,6 +87,8 @@ class CareSources {
         species = value;
       } else if (key == "care") {
         care = value;
+      } else if (key == "group") {
+        group = value;
       } else if (key == "ai") {
         int colon = value.indexOf(':');
         if (colon > 0) {
@@ -97,6 +106,7 @@ class CareSources {
       care: care,
       aiProvider: aiProvider,
       aiFields: aiFields,
+      group: group,
     );
   }
 }

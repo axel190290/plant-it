@@ -58,9 +58,12 @@ String suggestionSchedule(L l, ReminderSuggestion s) {
     l.fromDate(date.format(s.start)),
     if (s.end != null) l.untilDate(date.format(s.end!)),
   ].join(' · ');
-  return s.season == null
-      ? schedule
-      : "${seasonLabel(l, s.season!)}: $schedule";
+  String? period = s.dormant
+      ? l.periodDormancy
+      : s.season == null
+          ? null
+          : seasonLabel(l, s.season!);
+  return period == null ? schedule : "$period: $schedule";
 }
 
 /// The reminders suggested for [plant], one per care with a reminder for

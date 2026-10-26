@@ -153,6 +153,8 @@ void main() {
       await db.customStatement('SELECT 1');
       await db.customStatement('ALTER TABLE care_fields DROP COLUMN icon');
       await db.customStatement('ALTER TABLE species DROP COLUMN description');
+      await db.customStatement(
+          'ALTER TABLE species_care_values DROP COLUMN source');
       await db.customStatement('PRAGMA user_version = 2');
       await db.close();
 
@@ -181,6 +183,8 @@ void main() {
       await db.customStatement('SELECT 1');
       await db
           .customStatement("DELETE FROM care_fields WHERE key LIKE 'basic_%'");
+      await db.customStatement(
+          'ALTER TABLE species_care_values DROP COLUMN source');
       await db.customStatement('PRAGMA user_version = 4');
       await db.close();
 
@@ -210,6 +214,8 @@ void main() {
       await db.customStatement('SELECT 1');
       await db.customStatement("DELETE FROM event_types WHERE name IN "
           "('repotting', 'inspection', 'misting', 'protect', 'move outdoors')");
+      await db.customStatement(
+          'ALTER TABLE species_care_values DROP COLUMN source');
       await db.customStatement('PRAGMA user_version = 5');
       await db.close();
 
@@ -244,6 +250,8 @@ void main() {
       await db.customStatement("DELETE FROM care_fields WHERE key IN "
           "('misting_every', 'fertilizer_every', 'pruning_month', "
           "'repotting_years', 'repotting_month')");
+      await db.customStatement(
+          'ALTER TABLE species_care_values DROP COLUMN source');
       await db.customStatement('PRAGMA user_version = 6');
       await db.close();
 
@@ -252,8 +260,48 @@ void main() {
           (await CareFieldRepository(db: db).getAll()).getOrThrow();
       expect(fields.length, AppDatabase.builtInCareFields.length);
       expect(fields.reversed.take(5).map((f) => f.key).toList().reversed,
-          AppDatabase.scheduleCareFields);
+          AppDatabase.scheduleCareFields.take(5));
       expect(fields.firstWhere((f) => f.key == 'pruning_month').unit, 'month');
+      await db.close();
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
+  test(
+      'upgrading a version 7 database adds the value source and the month '
+      'categories', () async {
+    Directory dir = await Directory.systemTemp.createTemp('plant_it_test');
+    File file = File('${dir.path}/db.sqlite');
+    try {
+      AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
+      await db.customStatement('SELECT 1');
+      await db.customStatement(
+          'ALTER TABLE species_care_values DROP COLUMN source');
+      await db.customStatement("DELETE FROM care_fields WHERE key IN "
+          "('flowering_months', 'dormancy_months')");
+      await db.customStatement('PRAGMA user_version = 7');
+      await db.close();
+
+      db = AppDatabase.forTesting(NativeDatabase(file));
+      List<CareField> fields =
+          (await CareFieldRepository(db: db).getAll()).getOrThrow();
+      expect(fields.length, AppDatabase.builtInCareFields.length);
+      expect(fields.reversed.take(2).map((f) => f.key).toList(),
+          ['dormancy_months', 'flowering_months']);
+      int species = await db.into(db.species).insert(SpeciesCompanion.insert(
+            scientificName: 'Opuntia ficus-indica',
+            species: 'Opuntia ficus-indica',
+          ));
+      SpeciesCareValueRepository values = SpeciesCareValueRepository(db: db);
+      await values.saveByKeys(species, {
+        'dormancy_months':
+            const CareValue(value: 11, maxValue: 2, source: 'group:cacti'),
+      });
+      CareValue saved = (await values.getBySpeciesKeyed(species))
+          .getOrThrow()['dormancy_months']!;
+      expect(saved.source, 'group:cacti');
+      expect(saved.maxValue, 2);
       await db.close();
     } finally {
       await dir.delete(recursive: true);
@@ -313,5 +361,11 @@ void main() {
     expect(extra['repotting_years']!.value, 2);
     expect(extra.containsKey('fertilizer_every'), isFalse);
     expect(extra['misting_every']!.estimated, isTrue);
+    Map<String, CareValue> months = AiCareEstimator.parseExtraCare(
+        '{"flowering_from": 4, "flowering_to": 6, "dormancy_from": 11, '
+        '"dormancy_to": null}');
+    expect(months['flowering_months']!.value, 4);
+    expect(months['flowering_months']!.maxValue, 6);
+    expect(months.containsKey('dormancy_months'), isFalse);
   });
 }

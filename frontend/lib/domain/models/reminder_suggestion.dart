@@ -34,6 +34,8 @@ class ReminderSuggestion {
   final DateTime? end;
   // The season the suggestion is for, when it changes with the seasons
   final Season? season;
+  // Whether it is for the rest period of the plant
+  final bool dormant;
 
   const ReminderSuggestion({
     required this.kind,
@@ -42,6 +44,7 @@ class ReminderSuggestion {
     required this.start,
     this.end,
     this.season,
+    this.dormant = false,
   });
 
   /// Whether [day] is within the suggestion dates.
@@ -49,53 +52,94 @@ class ReminderSuggestion {
       !day.isBefore(start) && (end == null || !day.isAfter(end!));
 }
 
-/// A part of the coming year in one season.
+/// A part of the coming year in one season, in or out of the rest period
+/// of a plant.
 class SeasonPeriod {
   final DateTime start;
   final DateTime end;
-  final Season season;
+  // Null when the seasons do not follow the calendar
+  final Season? season;
+  final bool dormant;
 
-  const SeasonPeriod(this.start, this.end, this.season);
+  const SeasonPeriod(this.start, this.end, this.season, {this.dormant = false});
 }
 
 /// The seasons of the year starting on [today] at [latitude], outside the
 /// tropics, where seasons follow the calendar: the rest of the current
 /// season, then each season until the day before a year from today.
-List<SeasonPeriod> seasonPeriods(DateTime today, double latitude) {
+List<SeasonPeriod> seasonPeriods(DateTime today, double latitude) =>
+    carePeriods(today, latitude, const {});
+
+/// The periods of the year starting on [today] with the same season, when
+/// [latitude] is given and outside the tropics, and in or out of the
+/// [dormantMonths] (1-12) of a plant.
+List<SeasonPeriod> carePeriods(
+    DateTime today, double? latitude, Set<int> dormantMonths) {
   DateTime day = DateTime(today.year, today.month, today.day);
   DateTime yearEnd = DateTime(day.year + 1, day.month, day.day)
       .subtract(const Duration(days: 1));
+  bool calendar = latitude != null && latitude.abs() >= 23.5;
+  (Season?, bool) keyOf(DateTime date) => (
+        calendar ? Weather.seasonFor(date, latitude) : null,
+        dormantMonths.contains(date.month)
+      );
   List<SeasonPeriod> periods = [];
   DateTime start = day;
-  Season season = Weather.seasonFor(day, latitude);
+  (Season?, bool) key = keyOf(day);
   DateTime month = DateTime(day.year, day.month + 1, 1);
   while (!month.isAfter(yearEnd)) {
-    Season next = Weather.seasonFor(month, latitude);
-    if (next != season) {
-      periods.add(
-          SeasonPeriod(start, month.subtract(const Duration(days: 1)), season));
+    (Season?, bool) next = keyOf(month);
+    if (next != key) {
+      periods.add(SeasonPeriod(
+          start, month.subtract(const Duration(days: 1)), key.$1,
+          dormant: key.$2));
       start = month;
-      season = next;
+      key = next;
     }
     month = DateTime(month.year, month.month + 1, 1);
   }
-  periods.add(SeasonPeriod(start, yearEnd, season));
+  periods.add(SeasonPeriod(start, yearEnd, key.$1, dormant: key.$2));
   return periods;
 }
 
-/// A suggestion per season of the coming year, with the frequency in days
-/// of each season, joining the seasons with the same frequency. Null when
-/// the seasons are not known by the calendar or do not change it.
-List<ReminderSuggestion>? _bySeason(SuggestionKind kind, DateTime today,
-    double? latitude, int Function(Season) daysIn) {
-  if (latitude == null || latitude.abs() < 23.5) {
+/// The months (1-12) of a month range value, such as November to
+/// February.
+Set<int> monthsOf(CareValue? range) {
+  int? from = range?.value?.round();
+  int? to = (range?.maxValue ?? range?.value)?.round();
+  if (from == null || to == null || from < 1 || from > 12 || to < 1) {
+    return {};
+  }
+  if (to > 12) return {};
+  Set<int> months = {};
+  for (int m = from;; m = m % 12 + 1) {
+    months.add(m);
+    if (m == to || months.length == 12) break;
+  }
+  return months;
+}
+
+/// A suggestion per period of the coming year, with the frequency in
+/// days of each one, joining the periods with the same frequency. Null
+/// when neither the seasons nor a rest period change it during the year.
+List<ReminderSuggestion>? _byPeriod(
+    SuggestionKind kind,
+    DateTime today,
+    double? latitude,
+    Set<int> dormantMonths,
+    Season? currentSeason,
+    int Function(Season? season, bool dormant) daysIn) {
+  bool calendar = latitude != null && latitude.abs() >= 23.5;
+  if (!calendar && dormantMonths.isEmpty) {
     return null;
   }
   List<ReminderSuggestion> result = [];
-  for (SeasonPeriod period in seasonPeriods(today, latitude)) {
-    int days = daysIn(period.season);
+  for (SeasonPeriod period in carePeriods(today, latitude, dormantMonths)) {
+    int days = daysIn(period.season ?? currentSeason, period.dormant);
     ReminderSuggestion? last = result.isEmpty ? null : result.last;
-    if (last != null && last.frequencyQuantity == days) {
+    if (last != null &&
+        last.frequencyQuantity == days &&
+        last.dormant == period.dormant) {
       result.last = ReminderSuggestion(
         kind: kind,
         frequencyQuantity: days,
@@ -103,6 +147,7 @@ List<ReminderSuggestion>? _bySeason(SuggestionKind kind, DateTime today,
         start: last.start,
         end: period.end,
         season: last.season,
+        dormant: last.dormant,
       );
     } else {
       result.add(ReminderSuggestion(
@@ -112,6 +157,7 @@ List<ReminderSuggestion>? _bySeason(SuggestionKind kind, DateTime today,
         start: period.start,
         end: period.end,
         season: period.season,
+        dormant: period.dormant,
       ));
     }
   }
@@ -327,11 +373,22 @@ List<ReminderSuggestion> suggestReminders({
   (int, int) seasons = _springAndAutumn(latitude);
   List<ReminderSuggestion> result = [];
 
-  // Watering of each season, or of the current one
+  Set<int> dormant = monthsOf(values['dormancy_months']);
+
+  // Watering of each season, less in the rest period, or of the current
+  // season
   int? days = wateringDays(values, season);
   if (days != null) {
-    result.addAll(_bySeason(SuggestionKind.watering, day, latitude,
-            (s) => wateringDays(values, s)!) ??
+    double? winter = values['watering_winter']?.value;
+    int wateringIn(Season? s, bool resting) {
+      int base = wateringDays(values, s)!;
+      if (!resting) return base;
+      int rest = winter?.round() ?? base * 2;
+      return (rest > base ? rest : base).clamp(1, 365);
+    }
+
+    result.addAll(_byPeriod(SuggestionKind.watering, day, latitude, dormant,
+            season, wateringIn) ??
         [
           ReminderSuggestion(
             kind: SuggestionKind.watering,
@@ -342,21 +399,38 @@ List<ReminderSuggestion> suggestReminders({
         ]);
   }
 
-  // Fertilizer during the growing season
-  if (values['fertilizer'] != null || values['fertilizer_every'] != null) {
-    bool growing = tropical ||
-        season == null ||
-        season == Season.spring ||
-        season == Season.summer;
-    DateTime start = growing ? day : nextMonthStart(day, seasons.$1);
+  // Fertilizer out of the rest period, if known, else during the growing
+  // season
+  if ((values['fertilizer'] != null || values['fertilizer_every'] != null) &&
+      dormant.length < 12) {
+    DateTime start;
+    DateTime? end;
+    if (dormant.isNotEmpty) {
+      start = day;
+      while (dormant.contains(start.month)) {
+        start = DateTime(start.year, start.month + 1, 1);
+      }
+      DateTime next = DateTime(start.year, start.month + 1, 1);
+      while (!dormant.contains(next.month)) {
+        next = DateTime(next.year, next.month + 1, 1);
+      }
+      end = next.subtract(const Duration(days: 1));
+    } else {
+      bool growing = tropical ||
+          season == null ||
+          season == Season.spring ||
+          season == Season.summer;
+      start = growing ? day : nextMonthStart(day, seasons.$1);
+      end = tropical
+          ? null
+          : nextMonthStart(start, seasons.$2).subtract(const Duration(days: 1));
+    }
     result.add(ReminderSuggestion(
       kind: SuggestionKind.fertilizing,
       frequencyQuantity: hints.fertilizerQuantity ?? 1,
       frequencyUnit: hints.fertilizerUnit ?? FrequencyUnit.months,
       start: start,
-      end: tropical
-          ? null
-          : nextMonthStart(start, seasons.$2).subtract(const Duration(days: 1)),
+      end: end,
     ));
   }
 
@@ -403,7 +477,8 @@ List<ReminderSuggestion> suggestReminders({
       (minHumidity == null && (care?.humidity ?? 0) >= 7)) {
     // More often when the air is drier
     int mistingIn(Season? s) => s == Season.summer || s == Season.dry ? 3 : 5;
-    result.addAll(_bySeason(SuggestionKind.misting, day, latitude, mistingIn) ??
+    result.addAll(_byPeriod(SuggestionKind.misting, day, latitude, dormant,
+            season, (s, resting) => resting ? 5 : mistingIn(s)) ??
         [
           ReminderSuggestion(
             kind: SuggestionKind.misting,

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
 import 'package:plant_it/data/repository/notifications_lang_repository.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
@@ -123,6 +124,47 @@ class _AppMainViewState extends State<AppMainView> {
     await widget.pref.setBool('translationsInserted', true);
   }
 
+  /// Asks whether to create an event or a reminder.
+  void _showCreateMenu(BuildContext context) {
+    L l = L.of(context);
+    showModalBottomSheet<void>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheet) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
+              child: Text(l.createEventOrReminder,
+                  style: Theme.of(sheet).textTheme.titleMedium),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.calendar_check),
+              title: Text(l.createEvent),
+              subtitle: Text(l.createEventHint),
+              onTap: () {
+                Navigator.of(sheet).pop();
+                context.push(Routes.event);
+              },
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.bell_plus),
+              title: Text(l.createReminder),
+              subtitle: Text(l.createReminderHint),
+              onTap: () {
+                Navigator.of(sheet).pop();
+                context.push(Routes.reminder);
+              },
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     _insertTranslationsInDB();
@@ -131,7 +173,7 @@ class _AppMainViewState extends State<AppMainView> {
       floatingActionButton: _selectedIndex == 3
           ? null
           : FloatingActionButton(
-              onPressed: () => context.push(Routes.event),
+              onPressed: () => _showCreateMenu(context),
               child: const Icon(Icons.add),
             ),
       body: SafeArea(

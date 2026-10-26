@@ -160,6 +160,7 @@ List<SingleChildWidget> get providersLocal {
     ),
     Provider(
       create: (context) => ReminderSuggestionService(
+        suggestionCareFiller: context.read(),
         speciesCareRepository: context.read(),
         speciesCareValueRepository: context.read(),
         weatherService: context.read(),

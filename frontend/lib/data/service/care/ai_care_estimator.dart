@@ -227,6 +227,13 @@ class AiCareEstimator {
     'repotting_month',
   ];
 
+  /// Month ranges, asked as their first and last month: key, then the
+  /// names of both in the answer.
+  static const List<(String, String, String)> monthRangeFields = [
+    ('flowering_months', 'flowering_from', 'flowering_to'),
+    ('dormancy_months', 'dormancy_from', 'dormancy_to'),
+  ];
+
   /// Valid range of each number field; values outside it are dropped.
   static const Map<String, (double, double)> _numberRanges = {
     'light_hours': (0, 24),
@@ -292,6 +299,12 @@ class AiCareEstimator {
         "- repotting_years: integer, years between repottings\n"
         "- repotting_month: integer 1-12, best month to repot it in the "
         "$hemisphere hemisphere\n"
+        "- flowering_from, flowering_to: integers 1-12, first and last month "
+        "of its flowering in the $hemisphere hemisphere; null if it does "
+        "not flower at home\n"
+        "- dormancy_from, dormancy_to: integers 1-12, first and last month "
+        "of its rest period, when it needs less water and no fertilizer, in "
+        "the $hemisphere hemisphere; null if it has none\n"
         "- water_type: the kind of water it prefers\n"
         "- watering_method: how to water it\n"
         "- substrate: the soil or mix it needs\n"
@@ -337,12 +350,25 @@ class AiCareEstimator {
         f: {
           'type': ['number', 'null']
         },
+      for ((String, String, String) f in monthRangeFields) ...{
+        f.$2: {
+          'type': ['integer', 'null']
+        },
+        f.$3: {
+          'type': ['integer', 'null']
+        },
+      },
       for (String f in textFields)
         f: {
           'type': ['string', 'null']
         },
     },
-    'required': [...fields, ...numberFields, ...textFields],
+    'required': [
+      ...fields,
+      ...numberFields,
+      for ((String, String, String) f in monthRangeFields) ...[f.$2, f.$3],
+      ...textFields
+    ],
     'additionalProperties': false,
   };
 
@@ -527,6 +553,20 @@ class AiCareEstimator {
           number = number.roundToDouble();
         }
         result[field] = CareValue(value: number, estimated: true);
+      }
+    }
+    for ((String, String, String) field in monthRangeFields) {
+      int? month(String name) {
+        dynamic v = values[name];
+        int? n = v is num ? v.round() : (v is String ? int.tryParse(v) : null);
+        return n == null || n < 1 || n > 12 ? null : n;
+      }
+
+      int? from = month(field.$2);
+      int? to = month(field.$3);
+      if (from != null && to != null) {
+        result[field.$1] = CareValue(
+            value: from.toDouble(), maxValue: to.toDouble(), estimated: true);
       }
     }
     for (String field in textFields) {

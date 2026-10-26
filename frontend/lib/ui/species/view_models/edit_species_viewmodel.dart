@@ -135,6 +135,7 @@ class EditSpeciesViewModel extends ChangeNotifier {
     CareSources updated = CareSources(
       species: sources.species,
       care: sources.care,
+      group: sources.group,
       aiProvider: aiFields.isEmpty ? null : sources.aiProvider,
       aiFields: aiFields,
     );

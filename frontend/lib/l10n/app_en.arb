@@ -685,7 +685,7 @@
   "careFieldRepottingMonth": "Repotting month",
   "careFieldMonth": "Month",
   "fillWithAi": "Fill in with AI",
-  "fillWithAiHint": "Fills the empty categories used to suggest reminders, marked with a bell. Review them and save.",
+  "fillWithAiHint": "Fills the empty categories used to suggest reminders, marked with a bell, with the AI or with the typical values of the plant group. Review them and save.",
   "usedForSuggestions": "Used to suggest reminders",
   "aiFilledValues": "{count, plural, =0{The AI did not give new values} =1{1 value filled in by AI. Review it and save.} other{{count} values filled in by AI. Review them and save.}}",
   "@aiFilledValues": {
@@ -697,8 +697,64 @@
   },
   "aiNotConfigured": "Choose an AI provider and its key in Settings > Data sources",
   "careFieldUnitYears": "years",
-  "remindersToCreate": "{count} reminders will be created, one per season",
+  "remindersToCreate": "{count} reminders will be created, one per period",
   "@remindersToCreate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "plantGroupCacti": "Cacti",
+  "plantGroupSucculents": "Succulents",
+  "plantGroupZamioculcas": "ZZ plants",
+  "plantGroupAroids": "Aroids",
+  "plantGroupFerns": "Ferns",
+  "plantGroupOrchids": "Orchids",
+  "plantGroupAirPlants": "Air plants",
+  "plantGroupBromeliads": "Bromeliads",
+  "plantGroupPalms": "Palms",
+  "plantGroupPrayerPlants": "Prayer plants",
+  "plantGroupFicus": "Ficus",
+  "plantGroupDracaenas": "Dracaenas and relatives",
+  "plantGroupHerbs": "Aromatic herbs",
+  "plantGroupRoses": "Roses",
+  "plantGroupBegonias": "Begonias",
+  "plantGroupGesneriads": "African violets and relatives",
+  "plantGroupCitrus": "Citrus",
+  "plantGroupCarnivorous": "Carnivorous plants",
+  "careFieldFloweringMonths": "Flowering months",
+  "careFieldDormancyMonths": "Rest months",
+  "typicalCareSource": "Typical values of {group}",
+  "typicalValueOf": "Typical value of {group}",
+  "fillWithGroup": "Typical values: {group}",
+  "groupFilledValues": "{count, plural, =0{No empty category to fill in} =1{1 typical value filled in. Review it and save.} other{{count} typical values filled in. Review them and save.}}",
+  "periodDormancy": "Rest",
+  "createEventOrReminder": "What do you want to create?",
+  "createEventHint": "Record a care already done",
+  "createReminderHint": "Get reminded of a care",
+  "@typicalCareSource": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "@typicalValueOf": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "@fillWithGroup": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "@groupFilledValues": {
     "placeholders": {
       "count": {
         "type": "int"

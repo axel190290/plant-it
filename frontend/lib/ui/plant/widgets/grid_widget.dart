@@ -3,6 +3,7 @@ import 'package:flutter_carousel_widget/flutter_carousel_widget.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/ui/core/ui/care_field_format.dart';
+import 'package:plant_it/ui/core/ui/plant_group_format.dart';
 import 'package:plant_it/domain/models/reminder_occurrence.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/plant/view_models/plant_view_model.dart';
@@ -117,7 +118,8 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
   // The care categories, basic care included, in display order
   final List<CareField> careFields;
   final Map<int, CareValue> careValues;
-  final void Function(String title, String value, bool estimated)? onTapValue;
+  final void Function(String title, String value, bool estimated, String? note)?
+      onTapValue;
   // Keys of the categories that apply now, like the watering of the season
   final Set<String> currentKeys;
 
@@ -162,16 +164,23 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
   }
 
   InfoWidget _tile(String title, String text, IconData icon, bool estimated,
-      {bool current = false}) {
+      {bool current = false, String? note}) {
     String shown =
         current ? "$title · ${appLocalizations.currentSeason}" : title;
+    // ✨ estimated by the AI, 📖 typical value of the plant group
+    String mark = estimated
+        ? " ✨"
+        : note != null
+            ? " 📖"
+            : "";
     return InfoWidget(
       icon: icon,
       highlighted: current,
-      title: estimated ? "$shown ✨" : shown,
+      title: "$shown$mark",
       value: text,
-      onTap:
-          onTapValue == null ? null : () => onTapValue!(title, text, estimated),
+      onTap: onTapValue == null
+          ? null
+          : () => onTapValue!(title, text, estimated, note),
     );
   }
 
@@ -198,7 +207,8 @@ class SpeciesCareInfoGridWidget extends InfoGridWidget {
       String? text = formatCareValue(appLocalizations, field, value);
       if (text != null) {
         result.add(_tile(title, text, careFieldIcon(field), value.estimated,
-            current: currentKeys.contains(field.key)));
+            current: currentKeys.contains(field.key),
+            note: typicalValueNote(appLocalizations, value.source)));
       }
     }
     return result;

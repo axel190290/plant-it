@@ -1610,7 +1610,7 @@ class LIt extends L {
 
   @override
   String get fillWithAiHint =>
-      'Compila le categorie vuote usate per suggerire promemoria, segnate con una campana. Controllale e salva.';
+      'Compila le categorie vuote usate per suggerire promemoria, segnate con una campana, con l\'IA o con i valori tipici del gruppo della pianta. Controllale e salva.';
 
   @override
   String get usedForSuggestions => 'Usato per suggerire promemoria';
@@ -1636,6 +1636,105 @@ class LIt extends L {
 
   @override
   String remindersToCreate(int count) {
-    return 'Verranno creati $count promemoria, uno per stagione';
+    return 'Verranno creati $count promemoria, uno per periodo';
   }
+
+  @override
+  String get plantGroupCacti => 'Cactus';
+
+  @override
+  String get plantGroupSucculents => 'Succulente';
+
+  @override
+  String get plantGroupZamioculcas => 'Zamioculcas';
+
+  @override
+  String get plantGroupAroids => 'Aracee';
+
+  @override
+  String get plantGroupFerns => 'Felci';
+
+  @override
+  String get plantGroupOrchids => 'Orchidee';
+
+  @override
+  String get plantGroupAirPlants => 'Tillandsie';
+
+  @override
+  String get plantGroupBromeliads => 'Bromeliacee';
+
+  @override
+  String get plantGroupPalms => 'Palme';
+
+  @override
+  String get plantGroupPrayerPlants => 'Maranta e calathea';
+
+  @override
+  String get plantGroupFicus => 'Ficus';
+
+  @override
+  String get plantGroupDracaenas => 'Dracene e simili';
+
+  @override
+  String get plantGroupHerbs => 'Erbe aromatiche';
+
+  @override
+  String get plantGroupRoses => 'Rose';
+
+  @override
+  String get plantGroupBegonias => 'Begonie';
+
+  @override
+  String get plantGroupGesneriads => 'Violette africane e simili';
+
+  @override
+  String get plantGroupCitrus => 'Agrumi';
+
+  @override
+  String get plantGroupCarnivorous => 'Piante carnivore';
+
+  @override
+  String get careFieldFloweringMonths => 'Mesi di fioritura';
+
+  @override
+  String get careFieldDormancyMonths => 'Mesi di riposo';
+
+  @override
+  String typicalCareSource(String group) {
+    return 'Valori tipici di $group';
+  }
+
+  @override
+  String typicalValueOf(String group) {
+    return 'Valore tipico di $group';
+  }
+
+  @override
+  String fillWithGroup(String group) {
+    return 'Valori tipici: $group';
+  }
+
+  @override
+  String groupFilledValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count valori tipici compilati. Controllali e salva.',
+      one: '1 valore tipico compilato. Controllalo e salva.',
+      zero: 'Nessuna categoria vuota da compilare',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get periodDormancy => 'Riposo';
+
+  @override
+  String get createEventOrReminder => 'Cosa vuoi creare?';
+
+  @override
+  String get createEventHint => 'Registra una cura già fatta';
+
+  @override
+  String get createReminderHint => 'Ricevi un promemoria per una cura';
 }

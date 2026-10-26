@@ -2589,9 +2589,16 @@ class $SpeciesCareValuesTable extends SpeciesCareValues
       defaultConstraints:
           GeneratedColumn.constraintIsAlways('CHECK ("estimated" IN (0, 1))'),
       defaultValue: const Constant(false));
+  static const VerificationMeta _sourceMeta = const VerificationMeta('source');
+  @override
+  late final GeneratedColumn<String> source = GeneratedColumn<String>(
+      'source', aliasedName, true,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 30),
+      type: DriftSqlType.string,
+      requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns =>
-      [species, field, value, maxValue, textValue, estimated];
+      [species, field, value, maxValue, textValue, estimated, source];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -2630,6 +2637,10 @@ class $SpeciesCareValuesTable extends SpeciesCareValues
       context.handle(_estimatedMeta,
           estimated.isAcceptableOrUnknown(data['estimated']!, _estimatedMeta));
     }
+    if (data.containsKey('source')) {
+      context.handle(_sourceMeta,
+          source.isAcceptableOrUnknown(data['source']!, _sourceMeta));
+    }
     return context;
   }
 
@@ -2651,6 +2662,8 @@ class $SpeciesCareValuesTable extends SpeciesCareValues
           .read(DriftSqlType.string, data['${effectivePrefix}text_value']),
       estimated: attachedDatabase.typeMapping
           .read(DriftSqlType.bool, data['${effectivePrefix}estimated'])!,
+      source: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}source']),
     );
   }
 
@@ -2668,13 +2681,15 @@ class SpeciesCareValue extends DataClass
   final double? maxValue;
   final String? textValue;
   final bool estimated;
+  final String? source;
   const SpeciesCareValue(
       {required this.species,
       required this.field,
       this.value,
       this.maxValue,
       this.textValue,
-      required this.estimated});
+      required this.estimated,
+      this.source});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -2690,6 +2705,9 @@ class SpeciesCareValue extends DataClass
       map['text_value'] = Variable<String>(textValue);
     }
     map['estimated'] = Variable<bool>(estimated);
+    if (!nullToAbsent || source != null) {
+      map['source'] = Variable<String>(source);
+    }
     return map;
   }
 
@@ -2706,6 +2724,8 @@ class SpeciesCareValue extends DataClass
           ? const Value.absent()
           : Value(textValue),
       estimated: Value(estimated),
+      source:
+          source == null && nullToAbsent ? const Value.absent() : Value(source),
     );
   }
 
@@ -2719,6 +2739,7 @@ class SpeciesCareValue extends DataClass
       maxValue: serializer.fromJson<double?>(json['maxValue']),
       textValue: serializer.fromJson<String?>(json['textValue']),
       estimated: serializer.fromJson<bool>(json['estimated']),
+      source: serializer.fromJson<String?>(json['source']),
     );
   }
   @override
@@ -2731,6 +2752,7 @@ class SpeciesCareValue extends DataClass
       'maxValue': serializer.toJson<double?>(maxValue),
       'textValue': serializer.toJson<String?>(textValue),
       'estimated': serializer.toJson<bool>(estimated),
+      'source': serializer.toJson<String?>(source),
     };
   }
 
@@ -2740,7 +2762,8 @@ class SpeciesCareValue extends DataClass
           Value<double?> value = const Value.absent(),
           Value<double?> maxValue = const Value.absent(),
           Value<String?> textValue = const Value.absent(),
-          bool? estimated}) =>
+          bool? estimated,
+          Value<String?> source = const Value.absent()}) =>
       SpeciesCareValue(
         species: species ?? this.species,
         field: field ?? this.field,
@@ -2748,6 +2771,7 @@ class SpeciesCareValue extends DataClass
         maxValue: maxValue.present ? maxValue.value : this.maxValue,
         textValue: textValue.present ? textValue.value : this.textValue,
         estimated: estimated ?? this.estimated,
+        source: source.present ? source.value : this.source,
       );
   SpeciesCareValue copyWithCompanion(SpeciesCareValuesCompanion data) {
     return SpeciesCareValue(
@@ -2757,6 +2781,7 @@ class SpeciesCareValue extends DataClass
       maxValue: data.maxValue.present ? data.maxValue.value : this.maxValue,
       textValue: data.textValue.present ? data.textValue.value : this.textValue,
       estimated: data.estimated.present ? data.estimated.value : this.estimated,
+      source: data.source.present ? data.source.value : this.source,
     );
   }
 
@@ -2768,14 +2793,15 @@ class SpeciesCareValue extends DataClass
           ..write('value: $value, ')
           ..write('maxValue: $maxValue, ')
           ..write('textValue: $textValue, ')
-          ..write('estimated: $estimated')
+          ..write('estimated: $estimated, ')
+          ..write('source: $source')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(species, field, value, maxValue, textValue, estimated);
+  int get hashCode => Object.hash(
+      species, field, value, maxValue, textValue, estimated, source);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -2785,7 +2811,8 @@ class SpeciesCareValue extends DataClass
           other.value == this.value &&
           other.maxValue == this.maxValue &&
           other.textValue == this.textValue &&
-          other.estimated == this.estimated);
+          other.estimated == this.estimated &&
+          other.source == this.source);
 }
 
 class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
@@ -2795,6 +2822,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
   final Value<double?> maxValue;
   final Value<String?> textValue;
   final Value<bool> estimated;
+  final Value<String?> source;
   final Value<int> rowid;
   const SpeciesCareValuesCompanion({
     this.species = const Value.absent(),
@@ -2803,6 +2831,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
     this.maxValue = const Value.absent(),
     this.textValue = const Value.absent(),
     this.estimated = const Value.absent(),
+    this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   SpeciesCareValuesCompanion.insert({
@@ -2812,6 +2841,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
     this.maxValue = const Value.absent(),
     this.textValue = const Value.absent(),
     this.estimated = const Value.absent(),
+    this.source = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : species = Value(species),
         field = Value(field);
@@ -2822,6 +2852,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
     Expression<double>? maxValue,
     Expression<String>? textValue,
     Expression<bool>? estimated,
+    Expression<String>? source,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -2831,6 +2862,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
       if (maxValue != null) 'max_value': maxValue,
       if (textValue != null) 'text_value': textValue,
       if (estimated != null) 'estimated': estimated,
+      if (source != null) 'source': source,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -2842,6 +2874,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
       Value<double?>? maxValue,
       Value<String?>? textValue,
       Value<bool>? estimated,
+      Value<String?>? source,
       Value<int>? rowid}) {
     return SpeciesCareValuesCompanion(
       species: species ?? this.species,
@@ -2850,6 +2883,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
       maxValue: maxValue ?? this.maxValue,
       textValue: textValue ?? this.textValue,
       estimated: estimated ?? this.estimated,
+      source: source ?? this.source,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -2875,6 +2909,9 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
     if (estimated.present) {
       map['estimated'] = Variable<bool>(estimated.value);
     }
+    if (source.present) {
+      map['source'] = Variable<String>(source.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -2890,6 +2927,7 @@ class SpeciesCareValuesCompanion extends UpdateCompanion<SpeciesCareValue> {
           ..write('maxValue: $maxValue, ')
           ..write('textValue: $textValue, ')
           ..write('estimated: $estimated, ')
+          ..write('source: $source, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -7131,6 +7169,7 @@ typedef $$SpeciesCareValuesTableCreateCompanionBuilder
   Value<double?> maxValue,
   Value<String?> textValue,
   Value<bool> estimated,
+  Value<String?> source,
   Value<int> rowid,
 });
 typedef $$SpeciesCareValuesTableUpdateCompanionBuilder
@@ -7141,6 +7180,7 @@ typedef $$SpeciesCareValuesTableUpdateCompanionBuilder
   Value<double?> maxValue,
   Value<String?> textValue,
   Value<bool> estimated,
+  Value<String?> source,
   Value<int> rowid,
 });
 
@@ -7200,6 +7240,9 @@ class $$SpeciesCareValuesTableFilterComposer
 
   ColumnFilters<bool> get estimated => $composableBuilder(
       column: $table.estimated, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnFilters(column));
 
   $$SpeciesTableFilterComposer get species {
     final $$SpeciesTableFilterComposer composer = $composerBuilder(
@@ -7263,6 +7306,9 @@ class $$SpeciesCareValuesTableOrderingComposer
   ColumnOrderings<bool> get estimated => $composableBuilder(
       column: $table.estimated, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get source => $composableBuilder(
+      column: $table.source, builder: (column) => ColumnOrderings(column));
+
   $$SpeciesTableOrderingComposer get species {
     final $$SpeciesTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -7324,6 +7370,9 @@ class $$SpeciesCareValuesTableAnnotationComposer
 
   GeneratedColumn<bool> get estimated =>
       $composableBuilder(column: $table.estimated, builder: (column) => column);
+
+  GeneratedColumn<String> get source =>
+      $composableBuilder(column: $table.source, builder: (column) => column);
 
   $$SpeciesTableAnnotationComposer get species {
     final $$SpeciesTableAnnotationComposer composer = $composerBuilder(
@@ -7397,6 +7446,7 @@ class $$SpeciesCareValuesTableTableManager extends RootTableManager<
             Value<double?> maxValue = const Value.absent(),
             Value<String?> textValue = const Value.absent(),
             Value<bool> estimated = const Value.absent(),
+            Value<String?> source = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               SpeciesCareValuesCompanion(
@@ -7406,6 +7456,7 @@ class $$SpeciesCareValuesTableTableManager extends RootTableManager<
             maxValue: maxValue,
             textValue: textValue,
             estimated: estimated,
+            source: source,
             rowid: rowid,
           ),
           createCompanionCallback: ({
@@ -7415,6 +7466,7 @@ class $$SpeciesCareValuesTableTableManager extends RootTableManager<
             Value<double?> maxValue = const Value.absent(),
             Value<String?> textValue = const Value.absent(),
             Value<bool> estimated = const Value.absent(),
+            Value<String?> source = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
               SpeciesCareValuesCompanion.insert(
@@ -7424,6 +7476,7 @@ class $$SpeciesCareValuesTableTableManager extends RootTableManager<
             maxValue: maxValue,
             textValue: textValue,
             estimated: estimated,
+            source: source,
             rowid: rowid,
           ),
           withReferenceMapper: (p0) => p0

@@ -6,6 +6,7 @@ import 'package:plant_it/data/service/weather/weather_service.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/domain/models/plant_groups.dart';
 import 'package:result_dart/result_dart.dart';
 
 /// Completes the care of an external species: first with the measured
@@ -26,8 +27,10 @@ class SpeciesCareEnricher {
         _weatherService = weatherService;
 
   /// Never fails: a source that is not configured or not reachable is
-  /// skipped and the values it would give stay empty. Returns the basic
-  /// care, the values of built-in care fields by key, and the sources used.
+  /// skipped and the values it would give stay empty. What no source
+  /// gives is filled in with the typical care of the plant group, if
+  /// known. Returns the basic care, the values of built-in care fields by
+  /// key, and the sources used.
   Future<(SpeciesCareCompanion, Map<String, CareValue>, CareSources)> enrich({
     required String scientificName,
     String? family,
@@ -35,6 +38,36 @@ class SpeciesCareEnricher {
     Map<String, CareValue> extra = const {},
     required CareSources sources,
   }) async {
+    bool? southern = await _weatherService.southernHemisphere();
+    (SpeciesCareCompanion, Map<String, CareValue>, CareSources) result =
+        await _fromSources(
+            scientificName, family, care, extra, sources, southern);
+    PlantGroup? group = plantGroupFor(scientificName, family);
+    if (group == null) {
+      return result;
+    }
+    SpeciesCareCompanion withGroup = _fillMissing(result.$1, group.care);
+    Map<String, CareValue> values = Map.of(result.$2);
+    int valuesBefore = values.length;
+    _fillMissingExtra(
+        values, group.values(southernHemisphere: southern ?? false));
+    bool used = values.length != valuesBefore ||
+        _missingFields(withGroup).length != _missingFields(result.$1).length;
+    return (
+      withGroup,
+      values,
+      used ? result.$3.copyWith(group: group.id) : result.$3
+    );
+  }
+
+  Future<(SpeciesCareCompanion, Map<String, CareValue>, CareSources)>
+      _fromSources(
+          String scientificName,
+          String? family,
+          SpeciesCareCompanion care,
+          Map<String, CareValue> extra,
+          CareSources sources,
+          bool? southern) async {
     Map<String, CareValue> values = Map.of(extra);
 
     if (await _openPlantbookClient.isConfigured()) {
@@ -57,6 +90,7 @@ class SpeciesCareEnricher {
     List<String> missing = _missingFields(care);
     bool missingExtra = [
       ...AiCareEstimator.numberFields,
+      ...AiCareEstimator.monthRangeFields.map((f) => f.$1),
       ...AiCareEstimator.textFields
     ].any((key) => !values.containsKey(key));
     if (missing.isEmpty && !missingExtra) {

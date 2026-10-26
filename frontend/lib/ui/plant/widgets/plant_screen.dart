@@ -621,9 +621,10 @@ class _PlantScreenState extends State<PlantScreen> {
                             careValues: widget.viewModel.careValues,
                             currentKeys:
                                 currentSeasonCareKeys(widget.viewModel.season),
-                            onTapValue: (title, value, estimated) =>
+                            onTapValue: (title, value, estimated, note) =>
                                 showCareValueDialog(
-                                    context, title, value, estimated),
+                                    context, title, value, estimated,
+                                    note: note),
                           ),
                           const SizedBox(height: 16),
 

@@ -835,6 +835,16 @@ class MockAppDatabase extends _i1.Mock implements _i3.AppDatabase {
       ) as _i5.Future<void>);
 
   @override
+  _i5.Future<void> initMissingCareFields() => (super.noSuchMethod(
+        Invocation.method(
+          #initMissingCareFields,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
   _i5.Future<void> initDummyData() => (super.noSuchMethod(
         Invocation.method(
           #initDummyData,

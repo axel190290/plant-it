@@ -12,6 +12,7 @@ import 'package:plant_it/data/service/care/suggestion_care_filler.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/domain/models/plant_groups.dart';
 import 'package:plant_it/ui/core/ui/care_field_format.dart';
 import 'package:plant_it/ui/core/ui/create_care_field_dialog.dart';
 import 'package:plant_it/utils/stream_code.dart';
@@ -69,6 +70,9 @@ class EditCareValuesViewModel extends ChangeNotifier {
   AiProvider _aiProvider = AiProvider.none;
   int _generation = 0;
   bool _filling = false;
+  PlantGroup? _group;
+  // Whether typical values of the group were filled in
+  bool _groupUsed = false;
 
   /// The enabled categories, in display order.
   List<CareField> get fields => _fields;
@@ -81,6 +85,10 @@ class EditCareValuesViewModel extends ChangeNotifier {
 
   /// Whether an AI provider is configured.
   bool get aiAvailable => _aiProvider != AiProvider.none;
+
+  /// The plant group of the species, whose typical care can fill in the
+  /// empty categories.
+  PlantGroup? get group => _group;
 
   /// Whether the AI is filling in the values.
   bool get filling => _filling;
@@ -120,8 +128,52 @@ class EditCareValuesViewModel extends ChangeNotifier {
       ..clear()
       ..addAll(_original);
     _aiProvider = await _suggestionCareFiller.configuredProvider();
+    Specy? species = (await _speciesRepository.get(speciesId)).getOrNull();
+    _group = species == null
+        ? null
+        : plantGroupFor(species.scientificName, species.family);
     notifyListeners();
     return Success("ok");
+  }
+
+  /// Fills the empty categories, and the empty basic care, with the
+  /// typical care of the plant group. Returns how many values were filled
+  /// in; nothing is saved yet.
+  Future<int> fillWithGroup() async {
+    Specy? species = (await _speciesRepository.get(_speciesId)).getOrNull();
+    (PlantGroup, Map<String, CareValue>)? group = species == null
+        ? null
+        : await _suggestionCareFiller.groupValues(species);
+    if (group == null) return 0;
+    int filled = 0;
+    for (CareField field in _fields) {
+      CareValue? value = group.$2[field.key];
+      if (value != null && valueOf(field.id).isEmpty) {
+        _values[field.id] = value;
+        filled++;
+      }
+    }
+    SpeciesCareCompanion typical = group.$1.care;
+    SpeciesCareCompanion care = _care;
+    if (care.light.value == null && typical.light.value != null) {
+      care = care.copyWith(light: typical.light);
+      filled++;
+    }
+    if (care.humidity.value == null && typical.humidity.value != null) {
+      care = care.copyWith(humidity: typical.humidity);
+      filled++;
+    }
+    if (care.tempMin.value == null &&
+        care.tempMax.value == null &&
+        typical.tempMin.value != null) {
+      care = care.copyWith(tempMin: typical.tempMin, tempMax: typical.tempMax);
+      filled++;
+    }
+    _care = care;
+    _groupUsed = _groupUsed || filled > 0;
+    _generation++;
+    notifyListeners();
+    return filled;
   }
 
   Future<Result<void>> _loadFields() async {
@@ -238,7 +290,28 @@ class EditCareValuesViewModel extends ChangeNotifier {
         return saved;
       }
     }
-    return Success("ok");
+    return _groupUsed ? _markGroup() : Success("ok");
+  }
+
+  /// Records in the sources that the typical care of the group was used.
+  Future<Result<void>> _markGroup() async {
+    Result<Specy> species = await _speciesRepository.get(_speciesId);
+    if (species.isError()) {
+      return Failure(species.exceptionOrNull()!);
+    }
+    String? bibliography = species.getOrThrow().bibliography;
+    CareSources? sources = CareSources.decode(bibliography);
+    if (sources == null && bibliography != null && bibliography.isNotEmpty) {
+      // Written by the user: kept as it is
+      return Success("ok");
+    }
+    sources ??= const CareSources();
+    Result<bool> saved = await _speciesRepository.update(species
+        .getOrThrow()
+        .toCompanion(true)
+        .copyWith(
+            bibliography: Value(sources.copyWith(group: _group!.id).encode())));
+    return saved.isError() ? Failure(saved.exceptionOrNull()!) : Success("ok");
   }
 
   Future<Result<void>> _saveCare() async {
@@ -283,8 +356,12 @@ class EditCareValuesViewModel extends ChangeNotifier {
     if (species.isError()) {
       return Failure(species.exceptionOrNull()!);
     }
-    CareSources? sources =
-        CareSources.decode(species.getOrThrow().bibliography);
+    String? bibliography = species.getOrThrow().bibliography;
+    CareSources? sources = CareSources.decode(bibliography);
+    if (sources == null && bibliography != null && bibliography.isNotEmpty) {
+      // Written by the user: kept as it is
+      return Success("ok");
+    }
     if (byAi.isEmpty &&
         (sources == null || !sources.aiFields.any(fields.contains))) {
       return Success("ok");
@@ -297,6 +374,7 @@ class EditCareValuesViewModel extends ChangeNotifier {
     CareSources updated = CareSources(
       species: sources.species,
       care: sources.care,
+      group: sources.group,
       aiProvider: byAi.isEmpty ? sources.aiProvider : _aiProvider.key,
       aiFields: aiFields,
     );

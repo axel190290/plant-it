@@ -2405,7 +2405,7 @@ abstract class L {
   /// No description provided for @fillWithAiHint.
   ///
   /// In en, this message translates to:
-  /// **'Fills the empty categories used to suggest reminders, marked with a bell. Review them and save.'**
+  /// **'Fills the empty categories used to suggest reminders, marked with a bell, with the AI or with the typical values of the plant group. Review them and save.'**
   String get fillWithAiHint;
 
   /// No description provided for @usedForSuggestions.
@@ -2435,8 +2435,176 @@ abstract class L {
   /// No description provided for @remindersToCreate.
   ///
   /// In en, this message translates to:
-  /// **'{count} reminders will be created, one per season'**
+  /// **'{count} reminders will be created, one per period'**
   String remindersToCreate(int count);
+
+  /// No description provided for @plantGroupCacti.
+  ///
+  /// In en, this message translates to:
+  /// **'Cacti'**
+  String get plantGroupCacti;
+
+  /// No description provided for @plantGroupSucculents.
+  ///
+  /// In en, this message translates to:
+  /// **'Succulents'**
+  String get plantGroupSucculents;
+
+  /// No description provided for @plantGroupZamioculcas.
+  ///
+  /// In en, this message translates to:
+  /// **'ZZ plants'**
+  String get plantGroupZamioculcas;
+
+  /// No description provided for @plantGroupAroids.
+  ///
+  /// In en, this message translates to:
+  /// **'Aroids'**
+  String get plantGroupAroids;
+
+  /// No description provided for @plantGroupFerns.
+  ///
+  /// In en, this message translates to:
+  /// **'Ferns'**
+  String get plantGroupFerns;
+
+  /// No description provided for @plantGroupOrchids.
+  ///
+  /// In en, this message translates to:
+  /// **'Orchids'**
+  String get plantGroupOrchids;
+
+  /// No description provided for @plantGroupAirPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Air plants'**
+  String get plantGroupAirPlants;
+
+  /// No description provided for @plantGroupBromeliads.
+  ///
+  /// In en, this message translates to:
+  /// **'Bromeliads'**
+  String get plantGroupBromeliads;
+
+  /// No description provided for @plantGroupPalms.
+  ///
+  /// In en, this message translates to:
+  /// **'Palms'**
+  String get plantGroupPalms;
+
+  /// No description provided for @plantGroupPrayerPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Prayer plants'**
+  String get plantGroupPrayerPlants;
+
+  /// No description provided for @plantGroupFicus.
+  ///
+  /// In en, this message translates to:
+  /// **'Ficus'**
+  String get plantGroupFicus;
+
+  /// No description provided for @plantGroupDracaenas.
+  ///
+  /// In en, this message translates to:
+  /// **'Dracaenas and relatives'**
+  String get plantGroupDracaenas;
+
+  /// No description provided for @plantGroupHerbs.
+  ///
+  /// In en, this message translates to:
+  /// **'Aromatic herbs'**
+  String get plantGroupHerbs;
+
+  /// No description provided for @plantGroupRoses.
+  ///
+  /// In en, this message translates to:
+  /// **'Roses'**
+  String get plantGroupRoses;
+
+  /// No description provided for @plantGroupBegonias.
+  ///
+  /// In en, this message translates to:
+  /// **'Begonias'**
+  String get plantGroupBegonias;
+
+  /// No description provided for @plantGroupGesneriads.
+  ///
+  /// In en, this message translates to:
+  /// **'African violets and relatives'**
+  String get plantGroupGesneriads;
+
+  /// No description provided for @plantGroupCitrus.
+  ///
+  /// In en, this message translates to:
+  /// **'Citrus'**
+  String get plantGroupCitrus;
+
+  /// No description provided for @plantGroupCarnivorous.
+  ///
+  /// In en, this message translates to:
+  /// **'Carnivorous plants'**
+  String get plantGroupCarnivorous;
+
+  /// No description provided for @careFieldFloweringMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Flowering months'**
+  String get careFieldFloweringMonths;
+
+  /// No description provided for @careFieldDormancyMonths.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest months'**
+  String get careFieldDormancyMonths;
+
+  /// No description provided for @typicalCareSource.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical values of {group}'**
+  String typicalCareSource(String group);
+
+  /// No description provided for @typicalValueOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical value of {group}'**
+  String typicalValueOf(String group);
+
+  /// No description provided for @fillWithGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Typical values: {group}'**
+  String fillWithGroup(String group);
+
+  /// No description provided for @groupFilledValues.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No empty category to fill in} =1{1 typical value filled in. Review it and save.} other{{count} typical values filled in. Review them and save.}}'**
+  String groupFilledValues(int count);
+
+  /// No description provided for @periodDormancy.
+  ///
+  /// In en, this message translates to:
+  /// **'Rest'**
+  String get periodDormancy;
+
+  /// No description provided for @createEventOrReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'What do you want to create?'**
+  String get createEventOrReminder;
+
+  /// No description provided for @createEventHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Record a care already done'**
+  String get createEventHint;
+
+  /// No description provided for @createReminderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Get reminded of a care'**
+  String get createReminderHint;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

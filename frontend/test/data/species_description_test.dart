@@ -39,6 +39,8 @@ void main() {
       AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
       await db.customStatement('SELECT 1');
       await db.customStatement('ALTER TABLE species DROP COLUMN description');
+      await db.customStatement(
+          'ALTER TABLE species_care_values DROP COLUMN source');
       await db.customStatement('PRAGMA user_version = 3');
       await db.close();
 

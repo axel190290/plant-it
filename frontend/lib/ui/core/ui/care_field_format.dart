@@ -60,7 +60,9 @@ String careFieldName(L l, CareField field) => switch (field.key) {
       'repotting_years' => l.careFieldRepottingYears,
       'repotting_month' => l.careFieldRepottingMonth,
       'flowering_season' => l.careFieldFloweringSeason,
+      'flowering_months' => l.careFieldFloweringMonths,
       'dormancy_season' => l.careFieldDormancySeason,
+      'dormancy_months' => l.careFieldDormancyMonths,
       'common_pests' => l.careFieldCommonPests,
       'diseases' => l.careFieldDiseases,
       'toxicity' => l.careFieldToxicity,
@@ -79,6 +81,7 @@ const Set<String> suggestionCareKeys = {
   'pruning_month',
   'repotting_years',
   'repotting_month',
+  'dormancy_months',
   'common_pests',
 };
 
@@ -119,6 +122,16 @@ String? formatCareValue(L l, CareField field, CareValue value) {
   switch (field.type) {
     case CareFieldType.number:
       return value.value == null ? null : withUnit(_number(value.value!));
+    case CareFieldType.range when field.unit == 'month':
+      String? month(double? m) => m == null || m.round() < 1 || m.round() > 12
+          ? null
+          : monthName(l, m.round());
+      String? from = month(value.value);
+      String? to = month(value.maxValue);
+      if (from != null && to != null) {
+        return from == to ? from : '$from - $to';
+      }
+      return from ?? to;
     case CareFieldType.range:
       if (value.value != null && value.maxValue != null) {
         return withUnit(
@@ -177,6 +190,7 @@ const List<String> careFieldIcons = [
   'calendar_days',
   'calendar_range',
   'repeat',
+  'moon_star',
   'bug',
   'shield_alert',
   'skull',
@@ -211,7 +225,9 @@ String? defaultCareFieldIcon(String? key) => switch (key) {
       'repotting_years' => 'repeat',
       'repotting_month' => 'calendar_range',
       'flowering_season' => 'flower',
+      'flowering_months' => 'flower_2',
       'dormancy_season' => 'moon',
+      'dormancy_months' => 'moon_star',
       'common_pests' => 'bug',
       'diseases' => 'shield_alert',
       'toxicity' => 'skull',

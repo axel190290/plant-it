@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
 import 'package:plant_it/database/database.dart';
+import 'package:plant_it/domain/models/plant_groups.dart';
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/care_field_format.dart';
 import 'package:plant_it/ui/core/ui/create_care_field_dialog.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
+import 'package:plant_it/ui/core/ui/plant_group_format.dart';
 import 'package:plant_it/ui/species/view_models/edit_care_values_viewmodel.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -64,8 +66,17 @@ class EditCareValuesScreen extends StatelessWidget {
             : l.errorWithMessage(result.exceptionOrNull().toString()))));
   }
 
+  Future<void> _fillWithGroup(BuildContext context) async {
+    L l = L.of(context);
+    int filled = await viewModel.fillWithGroup();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(l.groupFilledValues(filled))));
+  }
+
   Widget _aiCard(BuildContext context) {
     L l = L.of(context);
+    PlantGroup? group = viewModel.group;
     return Card.outlined(
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -75,6 +86,15 @@ class EditCareValuesScreen extends StatelessWidget {
             Text(l.fillWithAiHint,
                 style: Theme.of(context).textTheme.bodyMedium),
             const SizedBox(height: 8),
+            if (group != null)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton.icon(
+                  onPressed: () => _fillWithGroup(context),
+                  icon: const Icon(LucideIcons.book_open),
+                  label: Text(l.fillWithGroup(plantGroupName(l, group.id))),
+                ),
+              ),
             Align(
               alignment: Alignment.centerRight,
               child: viewModel.filling
@@ -401,6 +421,28 @@ class _CareValueEditorState extends State<_CareValueEditor> {
     widget.onChanged(value);
   }
 
+  /// A month, kept as its number in [controller].
+  Widget _monthPicker(L l, TextEditingController controller, String label) {
+    int? month = _parse(controller.text)?.round();
+    return DropdownButtonFormField<int?>(
+      value: month != null && month >= 1 && month <= 12 ? month : null,
+      isExpanded: true,
+      decoration: InputDecoration(
+        labelText: label,
+        border: const OutlineInputBorder(),
+      ),
+      items: [
+        const DropdownMenuItem<int?>(value: null, child: Text('—')),
+        for (int m = 1; m <= 12; m++)
+          DropdownMenuItem<int?>(value: m, child: Text(monthName(l, m))),
+      ],
+      onChanged: (m) {
+        setState(() => controller.text = m?.toString() ?? '');
+        _notify();
+      },
+    );
+  }
+
   String? _unitSuffix(L l) {
     String? unit = widget.field.unit;
     if (unit == null || unit.isEmpty) return null;
@@ -454,6 +496,29 @@ class _CareValueEditorState extends State<_CareValueEditor> {
             border: const OutlineInputBorder(),
           ),
           onChanged: (_) => _notify(),
+        );
+      case CareFieldType.range when widget.field.unit == 'month':
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Flexible(
+                  child: Text(label,
+                      style: Theme.of(context).textTheme.titleSmall),
+                ),
+                if (mark != null) mark,
+              ],
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(child: _monthPicker(l, _first, l.start)),
+                const SizedBox(width: 12),
+                Expanded(child: _monthPicker(l, _second, l.end)),
+              ],
+            ),
+          ],
         );
       case CareFieldType.range:
         return Column(

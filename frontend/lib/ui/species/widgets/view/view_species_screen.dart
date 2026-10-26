@@ -8,6 +8,7 @@ import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
+import 'package:plant_it/ui/core/ui/plant_group_format.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/core/ui/care_value_dialog.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
@@ -224,9 +225,10 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
                             appLocalizations: appLocalizations,
                             careFields: widget.viewModel.careFields,
                             careValues: widget.viewModel.careValues,
-                            onTapValue: (title, value, estimated) =>
+                            onTapValue: (title, value, estimated, note) =>
                                 showCareValueDialog(
-                                    context, title, value, estimated),
+                                    context, title, value, estimated,
+                                    note: note),
                           ),
                           ..._getCareSources(appLocalizations),
                           const SizedBox(height: 16),
@@ -356,6 +358,9 @@ class _ViewSpeciesScreenState extends State<ViewSpeciesScreen> {
       if (sources.species == SpeciesDataSource.floraCodex.name)
         appLocalizations.floraCodex,
       if (sources.care == CareSources.openPlantbook) "Open Plantbook",
+      if (sources.group != null)
+        appLocalizations.typicalCareSource(
+            plantGroupName(appLocalizations, sources.group!)),
     ];
     String fieldName(String field) => switch (field) {
           CareSources.light => appLocalizations.sunlight,

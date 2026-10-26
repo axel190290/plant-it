@@ -8,22 +8,30 @@ class CareValue {
   final String? text;
   // Estimated by an AI and not edited since
   final bool estimated;
+  // Where a value not written by the user comes from, such as
+  // "group:araceae" for the typical care of a plant group
+  final String? source;
 
   const CareValue({
     this.value,
     this.maxValue,
     this.text,
     this.estimated = false,
+    this.source,
   });
 
   bool get isEmpty =>
       value == null && maxValue == null && (text == null || text!.isEmpty);
 
-  CareValue copyWith({bool? estimated}) => CareValue(
+  /// [source] is replaced when given; pass [clearSource] to remove it.
+  CareValue copyWith(
+          {bool? estimated, String? source, bool clearSource = false}) =>
+      CareValue(
         value: value,
         maxValue: maxValue,
         text: text,
         estimated: estimated ?? this.estimated,
+        source: clearSource ? null : source ?? this.source,
       );
 
   Map<String, dynamic> toJson() => {
@@ -31,6 +39,7 @@ class CareValue {
         'maxValue': maxValue,
         'text': text,
         'estimated': estimated,
+        'source': source,
       };
 
   factory CareValue.fromJson(Map<String, dynamic> json) => CareValue(
@@ -38,6 +47,7 @@ class CareValue {
         maxValue: (json['maxValue'] as num?)?.toDouble(),
         text: json['text'],
         estimated: json['estimated'] ?? false,
+        source: json['source'],
       );
 }
 

@@ -21,6 +21,7 @@ class SpeciesCareValueRepository {
             maxValue: row.maxValue,
             text: row.textValue,
             estimated: row.estimated,
+            source: row.source,
           )
       });
     } catch (e) {
@@ -46,6 +47,7 @@ class SpeciesCareValueRepository {
             maxValue: row.readTable(db.speciesCareValues).maxValue,
             text: row.readTable(db.speciesCareValues).textValue,
             estimated: row.readTable(db.speciesCareValues).estimated,
+            source: row.readTable(db.speciesCareValues).source,
           )
       });
     } catch (e) {
@@ -70,6 +72,7 @@ class SpeciesCareValueRepository {
                 maxValue: Value(value.maxValue),
                 textValue: Value(value.text),
                 estimated: Value(value.estimated),
+                source: Value(value.source),
               ),
             );
       }

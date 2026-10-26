@@ -105,6 +105,9 @@ class SpeciesCareValues extends Table {
   TextColumn get textValue => text().withLength(max: 1000).nullable()();
   // Set when the value was estimated by an AI and not edited since
   BoolColumn get estimated => boolean().withDefault(const Constant(false))();
+  // Where a value not written by the user comes from, such as
+  // "group:araceae" for the typical care of a plant group
+  TextColumn get source => text().withLength(max: 30).nullable()();
 
   @override
   Set<Column<Object>> get primaryKey => {species, field};
@@ -204,7 +207,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -251,8 +254,9 @@ class AppDatabase extends _$AppDatabase {
         if (from < 6) {
           await initHealthEventTypes();
         }
-        if (from >= 2 && from < 7) {
-          await initScheduleCareFields();
+        if (from >= 2 && from < 8) {
+          await m.addColumn(speciesCareValues, speciesCareValues.source);
+          await initMissingCareFields();
         }
       },
       beforeOpen: (details) async {
@@ -374,7 +378,9 @@ class AppDatabase extends _$AppDatabase {
     ('repotting_years', CareFieldType.number, 'years'),
     ('repotting_month', CareFieldType.number, 'month'),
     ('flowering_season', CareFieldType.text, null),
+    ('flowering_months', CareFieldType.range, 'month'),
     ('dormancy_season', CareFieldType.text, null),
+    ('dormancy_months', CareFieldType.range, 'month'),
     ('common_pests', CareFieldType.text, null),
     ('diseases', CareFieldType.text, null),
     ('toxicity', CareFieldType.text, null),
@@ -419,18 +425,21 @@ class AppDatabase extends _$AppDatabase {
     'pruning_month',
     'repotting_years',
     'repotting_month',
+    'flowering_months',
+    'dormancy_months',
   ];
 
-  /// Adds the schedule categories after the existing ones, for databases
-  /// created before they existed.
-  Future<void> initScheduleCareFields() async {
+  /// Adds the built-in categories a database lacks after the existing
+  /// ones, for databases created before they existed.
+  Future<void> initMissingCareFields() async {
     int last = await customSelect(
             'SELECT COALESCE(MAX(position), 0) AS last FROM care_fields')
         .map((row) => row.read<int>('last'))
         .getSingle();
-    for (String key in scheduleCareFields) {
-      (String, CareFieldType, String?) field =
-          builtInCareFields.firstWhere((f) => f.$1 == key);
+    Set<String?> existing =
+        (await select(careFields).get()).map((f) => f.key).toSet();
+    for ((String, CareFieldType, String?) field in builtInCareFields) {
+      if (existing.contains(field.$1)) continue;
       await into(careFields).insert(
         CareFieldsCompanion.insert(
           key: Value(field.$1),

@@ -677,5 +677,24 @@
         "type": "String"
       }
     }
-  }
+  },
+  "careFieldMistingEvery": "Misting frequency",
+  "careFieldFertilizerEvery": "Fertilizer frequency",
+  "careFieldPruningMonth": "Pruning month",
+  "careFieldRepottingYears": "Repotting frequency",
+  "careFieldRepottingMonth": "Repotting month",
+  "careFieldMonth": "Month",
+  "fillWithAi": "Fill in with AI",
+  "fillWithAiHint": "Fills the empty categories used to suggest reminders, marked with a bell. Review them and save.",
+  "usedForSuggestions": "Used to suggest reminders",
+  "aiFilledValues": "{count, plural, =0{The AI did not give new values} =1{1 value filled in by AI. Review it and save.} other{{count} values filled in by AI. Review them and save.}}",
+  "@aiFilledValues": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "aiNotConfigured": "Choose an AI provider and its key in Settings > Data sources",
+  "careFieldUnitYears": "years"
 }

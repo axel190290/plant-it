@@ -37,8 +37,15 @@ class ReminderSuggestionService {
     double? latitude =
         weather?.latitude ?? (await _weatherService.currentPlace())?.latitude;
 
-    ScheduleHints hints = readScheduleTexts(values, latitude);
-    hints = hints.merge(await _askAi(values, hints, latitude));
+    // The texts are read only for what the schedule categories lack
+    ScheduleHints read = ScheduleHints.fromValues(values)
+        .merge(readScheduleTexts(values, latitude));
+    ScheduleHints fromAi = await _askAi(values, read, latitude);
+    ScheduleHints hints = read.merge(fromAi);
+    values = {
+      ...values,
+      ...await _store(plant.species, values, read, fromAi),
+    };
 
     return suggestReminders(
       today: DateTime.now(),
@@ -49,6 +56,28 @@ class ReminderSuggestionService {
       latitude: latitude,
       hints: hints,
     );
+  }
+
+  /// Saves in the empty schedule categories what was read from the texts,
+  /// so they are read only once and shown in the plant page. Returns the
+  /// values saved.
+  Future<Map<String, CareValue>> _store(
+      int speciesId,
+      Map<String, CareValue> values,
+      ScheduleHints read,
+      ScheduleHints fromAi) async {
+    Map<String, CareValue> byRules = read.toValues();
+    Map<String, CareValue> byAi = fromAi.toValues(estimated: true);
+    Map<String, CareValue> found = {
+      for (String key in {...byRules.keys, ...byAi.keys})
+        if (values[key] == null) key: byRules[key] ?? byAi[key]!
+    };
+    if (found.isEmpty) {
+      return {};
+    }
+    Result<void> saved =
+        await _speciesCareValueRepository.saveByKeys(speciesId, found);
+    return saved.isSuccess() ? found : {};
   }
 
   /// The AI reading of the texts the rules could not read, if configured.

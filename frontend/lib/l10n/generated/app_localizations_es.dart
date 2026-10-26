@@ -1490,4 +1490,51 @@ class LEs extends L {
       String day, String rain, String plant, String days) {
     return '$day: $rain mm de lluvia. $plant se riega cada $days días: protégela de la lluvia';
   }
+
+  @override
+  String get careFieldMistingEvery => 'Frecuencia de pulverización';
+
+  @override
+  String get careFieldFertilizerEvery => 'Frecuencia de abono';
+
+  @override
+  String get careFieldPruningMonth => 'Mes de poda';
+
+  @override
+  String get careFieldRepottingYears => 'Frecuencia de trasplante';
+
+  @override
+  String get careFieldRepottingMonth => 'Mes de trasplante';
+
+  @override
+  String get careFieldMonth => 'Mes';
+
+  @override
+  String get fillWithAi => 'Completar con IA';
+
+  @override
+  String get fillWithAiHint =>
+      'Rellena las categorías vacías que se usan para sugerir recordatorios, marcadas con una campana. Revísalas y guarda.';
+
+  @override
+  String get usedForSuggestions => 'Se usa para sugerir recordatorios';
+
+  @override
+  String aiFilledValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count valores completados con IA. Revísalos y guarda.',
+      one: '1 valor completado con IA. Revísalo y guarda.',
+      zero: 'La IA no dio valores nuevos',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiNotConfigured =>
+      'Elige un proveedor de IA y su clave en Ajustes > Fuentes de datos';
+
+  @override
+  String get careFieldUnitYears => 'años';
 }

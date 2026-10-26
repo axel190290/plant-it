@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:command_it/command_it.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
@@ -8,9 +10,11 @@ import 'package:plant_it/data/repository/species_care_repository.dart';
 import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/data/repository/species_synonym_repository.dart';
+import 'package:plant_it/data/service/care/suggestion_care_filler.dart';
 import 'package:plant_it/data/service/search/cache/app_cache.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
+import 'package:plant_it/utils/stream_code.dart';
 import 'package:result_dart/result_dart.dart';
 
 class AddPlantViewModel extends ChangeNotifier {
@@ -22,8 +26,12 @@ class AddPlantViewModel extends ChangeNotifier {
     required ImageRepository imageRepository,
     required AppCache appCache,
     required SpeciesCareValueRepository speciesCareValueRepository,
+    required SuggestionCareFiller suggestionCareFiller,
+    required StreamController<StreamCode> streamController,
     Map<String, Object?>? speciesToCreate,
   })  : _speciesCareValueRepository = speciesCareValueRepository,
+        _suggestionCareFiller = suggestionCareFiller,
+        _streamController = streamController,
         _plantRepository = plantRepository,
         _speciesToCreate = speciesToCreate,
         _speciesRepository = speciesRepository,
@@ -51,6 +59,8 @@ class AddPlantViewModel extends ChangeNotifier {
   final SpeciesSynonymsRepository _speciesSynonymsRepository;
   final ImageRepository _imageRepository;
   final AppCache _appCache;
+  final SuggestionCareFiller _suggestionCareFiller;
+  final StreamController<StreamCode> _streamController;
   final _log = Logger('AddPlantViewmodel');
 
   late final Command<void, int> insert;
@@ -93,13 +103,25 @@ class AddPlantViewModel extends ChangeNotifier {
       _plant = _plant.copyWith(species: Value(speciesId.getOrThrow()));
     }
 
-    return _plantRepository.insert(
+    Result<int> plantId = await _plantRepository.insert(
       _plant.copyWith(
         createdAt: Value(
           DateTime.now(),
         ),
       ),
     );
+    if (plantId.isSuccess()) {
+      // In the background, not to delay the new plant
+      unawaited(_fillSuggestionCare(_plant.species.value));
+    }
+    return plantId;
+  }
+
+  /// Fills with AI the care the reminder suggestions read, if missing.
+  Future<void> _fillSuggestionCare(int speciesId) async {
+    if (await _suggestionCareFiller.fillMissing(speciesId)) {
+      _streamController.add(StreamCode.editSpecies);
+    }
   }
 
   Future<Result<int>> _createSpecies() async {

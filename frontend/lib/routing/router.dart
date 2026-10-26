@@ -173,6 +173,8 @@ GoRouter router() => GoRouter(
                     imageRepository: context.read(),
                     appCache: context.read(),
                     speciesCareValueRepository: context.read(),
+                    suggestionCareFiller: context.read(),
+                    streamController: context.read(),
                   );
                   viewModel.load.execute(input);
                   return AddPlantScreen(
@@ -471,6 +473,7 @@ GoRouter router() => GoRouter(
               speciesCareValueRepository: context.read(),
               speciesCareRepository: context.read(),
               speciesRepository: context.read(),
+              suggestionCareFiller: context.read(),
               streamController: context.read(),
             );
             viewModel.load.execute(id);

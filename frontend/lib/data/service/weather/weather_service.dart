@@ -44,6 +44,13 @@ class WeatherService {
     return Place(name, latitude, longitude);
   }
 
+  /// Whether the chosen place is in the southern hemisphere, null when no
+  /// place is chosen.
+  Future<bool?> southernHemisphere() async {
+    Place? place = await currentPlace();
+    return place == null ? null : place.latitude < 0;
+  }
+
   Future<Result<void>> setPlace(Place? place) async {
     _cached = null;
     for ((UserSettingsKeys, String?) setting in [

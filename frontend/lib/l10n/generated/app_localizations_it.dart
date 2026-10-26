@@ -1586,4 +1586,51 @@ class LIt extends L {
       String day, String rain, String plant, String days) {
     return '$day: $rain mm di pioggia. $plant si annaffia ogni $days giorni: proteggila dalla pioggia';
   }
+
+  @override
+  String get careFieldMistingEvery => 'Frequenza di nebulizzazione';
+
+  @override
+  String get careFieldFertilizerEvery => 'Frequenza di concimazione';
+
+  @override
+  String get careFieldPruningMonth => 'Mese di potatura';
+
+  @override
+  String get careFieldRepottingYears => 'Frequenza di rinvaso';
+
+  @override
+  String get careFieldRepottingMonth => 'Mese di rinvaso';
+
+  @override
+  String get careFieldMonth => 'Mese';
+
+  @override
+  String get fillWithAi => 'Completa con l\'IA';
+
+  @override
+  String get fillWithAiHint =>
+      'Compila le categorie vuote usate per suggerire promemoria, segnate con una campana. Controllale e salva.';
+
+  @override
+  String get usedForSuggestions => 'Usato per suggerire promemoria';
+
+  @override
+  String aiFilledValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count valori compilati dall\'IA. Controllali e salva.',
+      one: '1 valore compilato dall\'IA. Controllalo e salva.',
+      zero: 'L\'IA non ha dato nuovi valori',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiNotConfigured =>
+      'Scegli un fornitore di IA e la sua chiave in Impostazioni > Sorgenti dei dati';
+
+  @override
+  String get careFieldUnitYears => 'anni';
 }

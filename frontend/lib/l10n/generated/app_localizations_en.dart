@@ -1478,4 +1478,51 @@ class LEn extends L {
       String day, String rain, String plant, String days) {
     return '$day: $rain mm of rain. $plant is watered every $days days: protect it from the rain';
   }
+
+  @override
+  String get careFieldMistingEvery => 'Misting frequency';
+
+  @override
+  String get careFieldFertilizerEvery => 'Fertilizer frequency';
+
+  @override
+  String get careFieldPruningMonth => 'Pruning month';
+
+  @override
+  String get careFieldRepottingYears => 'Repotting frequency';
+
+  @override
+  String get careFieldRepottingMonth => 'Repotting month';
+
+  @override
+  String get careFieldMonth => 'Month';
+
+  @override
+  String get fillWithAi => 'Fill in with AI';
+
+  @override
+  String get fillWithAiHint =>
+      'Fills the empty categories used to suggest reminders, marked with a bell. Review them and save.';
+
+  @override
+  String get usedForSuggestions => 'Used to suggest reminders';
+
+  @override
+  String aiFilledValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count values filled in by AI. Review them and save.',
+      one: '1 value filled in by AI. Review it and save.',
+      zero: 'The AI did not give new values',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiNotConfigured =>
+      'Choose an AI provider and its key in Settings > Data sources';
+
+  @override
+  String get careFieldUnitYears => 'years';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:intl/intl.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
@@ -43,6 +44,7 @@ String careFieldName(L l, CareField field) => switch (field.key) {
       'light_lux' => l.careFieldLightLux,
       'light_hours' => l.careFieldLightHours,
       'env_humidity' => l.careFieldEnvHumidity,
+      'misting_every' => l.careFieldMistingEvery,
       'watering_summer' => l.careFieldWateringSummer,
       'watering_winter' => l.careFieldWateringWinter,
       'soil_moisture' => l.careFieldSoilMoisture,
@@ -51,8 +53,12 @@ String careFieldName(L l, CareField field) => switch (field.key) {
       'watering_method' => l.careFieldWateringMethod,
       'substrate' => l.careFieldSubstrate,
       'fertilizer' => l.careFieldFertilizer,
+      'fertilizer_every' => l.careFieldFertilizerEvery,
       'pruning' => l.careFieldPruning,
+      'pruning_month' => l.careFieldPruningMonth,
       'repotting' => l.careFieldRepotting,
+      'repotting_years' => l.careFieldRepottingYears,
+      'repotting_month' => l.careFieldRepottingMonth,
       'flowering_season' => l.careFieldFloweringSeason,
       'dormancy_season' => l.careFieldDormancySeason,
       'common_pests' => l.careFieldCommonPests,
@@ -60,6 +66,30 @@ String careFieldName(L l, CareField field) => switch (field.key) {
       'toxicity' => l.careFieldToxicity,
       _ => field.name ?? field.key ?? '',
     };
+
+/// Keys of the categories that the reminder suggestions read.
+const Set<String> suggestionCareKeys = {
+  basicHumidityKey,
+  basicTemperatureKey,
+  'env_humidity',
+  'misting_every',
+  'watering_summer',
+  'watering_winter',
+  'fertilizer_every',
+  'pruning_month',
+  'repotting_years',
+  'repotting_month',
+  'common_pests',
+};
+
+bool isSuggestionCareField(CareField field) =>
+    suggestionCareKeys.contains(field.key);
+
+/// The name of [month] (1-12) in the language of the app.
+String monthName(L l, int month) {
+  String name = DateFormat.MMMM(l.localeName).format(DateTime(2000, month));
+  return name.isEmpty ? name : name[0].toUpperCase() + name.substring(1);
+}
 
 String _number(double n) =>
     n == n.roundToDouble() ? n.round().toString() : n.toStringAsFixed(1);
@@ -72,6 +102,13 @@ String? formatCareValue(L l, CareField field, CareValue value) {
   String withUnit(String number) {
     if (field.unit == 'days') {
       return l.everyNDays(number);
+    }
+    if (field.unit == 'years' && value.value != null) {
+      return l.everyCountYears(value.value!.round());
+    }
+    if (field.unit == 'month' && value.value != null) {
+      int month = value.value!.round();
+      return month >= 1 && month <= 12 ? monthName(l, month) : number;
     }
     if (field.unit == null || field.unit!.isEmpty) {
       return number;
@@ -135,6 +172,11 @@ const List<String> careFieldIcons = [
   'flask_conical',
   'scissors',
   'package_open',
+  'cloud_drizzle',
+  'calendar_clock',
+  'calendar_days',
+  'calendar_range',
+  'repeat',
   'bug',
   'shield_alert',
   'skull',
@@ -153,6 +195,7 @@ String? defaultCareFieldIcon(String? key) => switch (key) {
       'light_lux' => 'sun_medium',
       'light_hours' => 'sunrise',
       'env_humidity' => 'droplets',
+      'misting_every' => 'cloud_drizzle',
       'watering_summer' => 'droplet',
       'watering_winter' => 'snowflake',
       'soil_moisture' => 'shovel',
@@ -161,8 +204,12 @@ String? defaultCareFieldIcon(String? key) => switch (key) {
       'watering_method' => 'shower_head',
       'substrate' => 'layers',
       'fertilizer' => 'flask_conical',
+      'fertilizer_every' => 'calendar_clock',
       'pruning' => 'scissors',
+      'pruning_month' => 'calendar_days',
       'repotting' => 'package_open',
+      'repotting_years' => 'repeat',
+      'repotting_month' => 'calendar_range',
       'flowering_season' => 'flower',
       'dormancy_season' => 'moon',
       'common_pests' => 'bug',

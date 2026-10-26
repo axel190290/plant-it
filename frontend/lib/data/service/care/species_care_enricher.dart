@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:logging/logging.dart';
 import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/data/service/care/open_plantbook_client.dart';
+import 'package:plant_it/data/service/weather/weather_service.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/care_value.dart';
@@ -13,13 +14,16 @@ import 'package:result_dart/result_dart.dart';
 class SpeciesCareEnricher {
   final OpenPlantbookClient _openPlantbookClient;
   final AiCareEstimator _aiCareEstimator;
+  final WeatherService _weatherService;
   final Logger _log = Logger("SpeciesCareEnricher");
 
   SpeciesCareEnricher({
     required OpenPlantbookClient openPlantbookClient,
     required AiCareEstimator aiCareEstimator,
+    required WeatherService weatherService,
   })  : _openPlantbookClient = openPlantbookClient,
-        _aiCareEstimator = aiCareEstimator;
+        _aiCareEstimator = aiCareEstimator,
+        _weatherService = weatherService;
 
   /// Never fails: a source that is not configured or not reachable is
   /// skipped and the values it would give stay empty. Returns the basic
@@ -62,8 +66,9 @@ class SpeciesCareEnricher {
     if (provider == AiProvider.none) {
       return (care, values, sources);
     }
-    Result<CareData> estimate =
-        await _aiCareEstimator.estimate(provider, scientificName, family);
+    Result<CareData> estimate = await _aiCareEstimator.estimate(
+        provider, scientificName, family,
+        southernHemisphere: await _weatherService.southernHemisphere());
     if (estimate.isError()) {
       _log.warning(estimate.exceptionOrNull());
       return (care, values, sources);

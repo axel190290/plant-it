@@ -101,10 +101,13 @@ class AiCareEstimator {
     }
   }
 
+  /// Estimates the care of a species. The months of the year depend on
+  /// the hemisphere, northern when [southernHemisphere] is unknown.
   Future<Result<CareData>> estimate(
-      AiProvider provider, String scientificName, String? family) async {
-    Result<String> answer =
-        await _ask(provider, _prompt(scientificName, family), _schema);
+      AiProvider provider, String scientificName, String? family,
+      {bool? southernHemisphere}) async {
+    Result<String> answer = await _ask(provider,
+        _prompt(scientificName, family, southernHemisphere ?? false), _schema);
     if (answer.isError()) {
       return Failure(answer.exceptionOrNull()!);
     }
@@ -217,7 +220,24 @@ class AiCareEstimator {
     'light_hours',
     'watering_summer',
     'watering_winter',
+    'misting_every',
+    'fertilizer_every',
+    'pruning_month',
+    'repotting_years',
+    'repotting_month',
   ];
+
+  /// Valid range of each number field; values outside it are dropped.
+  static const Map<String, (double, double)> _numberRanges = {
+    'light_hours': (0, 24),
+    'watering_summer': (1, 365),
+    'watering_winter': (1, 365),
+    'misting_every': (1, 60),
+    'fertilizer_every': (1, 365),
+    'pruning_month': (1, 12),
+    'repotting_years': (1, 10),
+    'repotting_month': (1, 12),
+  };
   static const List<String> textFields = [
     'water_type',
     'watering_method',
@@ -247,8 +267,10 @@ class AiCareEstimator {
     return names[PlatformDispatcher.instance.locale.languageCode] ?? 'English';
   }
 
-  static String _prompt(String scientificName, String? family) {
+  static String _prompt(
+      String scientificName, String? family, bool southernHemisphere) {
     String familyText = family == null ? "" : " (family $family)";
+    String hemisphere = southernHemisphere ? 'southern' : 'northern';
     return "Estimate the typical cultivation requirements of the plant "
         "species $scientificName$familyText, as grown at home or in a garden. "
         "Answer only with a JSON object with these fields:\n"
@@ -261,6 +283,15 @@ class AiCareEstimator {
         "- light_hours: number, hours of light per day it needs\n"
         "- watering_summer, watering_winter: numbers, days between waterings "
         "in summer and in winter\n"
+        "- misting_every: integer, days between mistings of its leaves; null "
+        "if it does not need misting\n"
+        "- fertilizer_every: integer, days between fertilizer applications "
+        "during the growing season; null if it does not need fertilizer\n"
+        "- pruning_month: integer 1-12, best month to prune it in the "
+        "$hemisphere hemisphere; null if it does not need pruning\n"
+        "- repotting_years: integer, years between repottings\n"
+        "- repotting_month: integer 1-12, best month to repot it in the "
+        "$hemisphere hemisphere\n"
         "- water_type: the kind of water it prefers\n"
         "- watering_method: how to water it\n"
         "- substrate: the soil or mix it needs\n"
@@ -489,7 +520,12 @@ class AiCareEstimator {
       dynamic v = values[field];
       double? number =
           v is num ? v.toDouble() : (v is String ? double.tryParse(v) : null);
-      if (number != null && number >= 0) {
+      (double, double) range = _numberRanges[field]!;
+      if (number != null && number >= range.$1 && number <= range.$2) {
+        // Months, years and days between cares are whole numbers
+        if (field != 'light_hours') {
+          number = number.roundToDouble();
+        }
         result[field] = CareValue(value: number, estimated: true);
       }
     }

@@ -60,6 +60,53 @@ class ScheduleHints {
     this.repottingMonth,
   });
 
+  /// The schedule stored in the categories that tell when to do each care.
+  factory ScheduleHints.fromValues(Map<String, CareValue> values) {
+    int? read(String key, int min, int max) {
+      double? v = values[key]?.value;
+      return v == null || v.round() < min || v.round() > max ? null : v.round();
+    }
+
+    int? fertilizerDays = read('fertilizer_every', 1, 365);
+    (int, FrequencyUnit)? fertilizer =
+        fertilizerDays == null ? null : frequencyOfDays(fertilizerDays);
+    return ScheduleHints(
+      fertilizerQuantity: fertilizer?.$1,
+      fertilizerUnit: fertilizer?.$2,
+      pruningMonth: read('pruning_month', 1, 12),
+      repottingYears: read('repotting_years', 1, 10),
+      repottingMonth: read('repotting_month', 1, 12),
+    );
+  }
+
+  /// The values to store in the schedule categories, by key.
+  Map<String, CareValue> toValues({bool estimated = false}) {
+    int? fertilizerDays = fertilizerQuantity == null || fertilizerUnit == null
+        ? null
+        : fertilizerQuantity! *
+            switch (fertilizerUnit!) {
+              FrequencyUnit.days => 1,
+              FrequencyUnit.weeks => 7,
+              FrequencyUnit.months => 30,
+              FrequencyUnit.years => 365,
+            };
+    CareValue value(int n) =>
+        CareValue(value: n.toDouble(), estimated: estimated);
+    return {
+      if (fertilizerDays != null)
+        'fertilizer_every': value(fertilizerDays.clamp(1, 365)),
+      if (pruningMonth != null) 'pruning_month': value(pruningMonth!),
+      if (repottingYears != null) 'repotting_years': value(repottingYears!),
+      if (repottingMonth != null) 'repotting_month': value(repottingMonth!),
+    };
+  }
+
+  bool get isEmpty =>
+      fertilizerQuantity == null &&
+      pruningMonth == null &&
+      repottingYears == null &&
+      repottingMonth == null;
+
   ScheduleHints merge(ScheduleHints other) => ScheduleHints(
         fertilizerQuantity: fertilizerQuantity ?? other.fertilizerQuantity,
         fertilizerUnit: fertilizerUnit ?? other.fertilizerUnit,
@@ -67,6 +114,18 @@ class ScheduleHints {
         repottingYears: repottingYears ?? other.repottingYears,
         repottingMonth: repottingMonth ?? other.repottingMonth,
       );
+}
+
+/// [days] in the largest unit that divides them: months of 30 days,
+/// weeks or days.
+(int, FrequencyUnit) frequencyOfDays(int days) {
+  if (days >= 30 && days % 30 == 0) {
+    return (days ~/ 30, FrequencyUnit.months);
+  }
+  if (days >= 7 && days % 7 == 0) {
+    return (days ~/ 7, FrequencyUnit.weeks);
+  }
+  return (days, FrequencyUnit.days);
 }
 
 /// Reads the usual wordings, in Spanish and English, of the fertilizer,
@@ -186,6 +245,8 @@ List<ReminderSuggestion> suggestReminders({
   ScheduleHints hints = const ScheduleHints(),
 }) {
   DateTime day = DateTime(today.year, today.month, today.day);
+  // The schedule categories win over what was read from the texts
+  hints = ScheduleHints.fromValues(values).merge(hints);
   bool tropical = latitude != null && latitude.abs() < 23.5;
   (int, int) seasons = _springAndAutumn(latitude);
   List<ReminderSuggestion> result = [];
@@ -202,7 +263,7 @@ List<ReminderSuggestion> suggestReminders({
   }
 
   // Fertilizer during the growing season
-  if (values['fertilizer'] != null) {
+  if (values['fertilizer'] != null || values['fertilizer_every'] != null) {
     bool growing = tropical ||
         season == null ||
         season == Season.spring ||
@@ -219,7 +280,7 @@ List<ReminderSuggestion> suggestReminders({
     ));
   }
 
-  if (values['pruning'] != null) {
+  if (values['pruning'] != null || hints.pruningMonth != null) {
     result.add(ReminderSuggestion(
       kind: SuggestionKind.pruning,
       frequencyQuantity: 1,
@@ -228,7 +289,9 @@ List<ReminderSuggestion> suggestReminders({
     ));
   }
 
-  if (values['repotting'] != null) {
+  if (values['repotting'] != null ||
+      hints.repottingYears != null ||
+      hints.repottingMonth != null) {
     result.add(ReminderSuggestion(
       kind: SuggestionKind.repotting,
       frequencyQuantity: hints.repottingYears ?? 2,
@@ -247,8 +310,16 @@ List<ReminderSuggestion> suggestReminders({
   }
 
   // Misting for plants that need a humid air
+  double? mistingDays = values['misting_every']?.value;
   double? minHumidity = values['env_humidity']?.value;
-  if ((minHumidity != null && minHumidity > 60) ||
+  if (mistingDays != null && mistingDays >= 1) {
+    result.add(ReminderSuggestion(
+      kind: SuggestionKind.misting,
+      frequencyQuantity: mistingDays.round().clamp(1, 60),
+      frequencyUnit: FrequencyUnit.days,
+      start: day,
+    ));
+  } else if ((minHumidity != null && minHumidity > 60) ||
       (minHumidity == null && (care?.humidity ?? 0) >= 7)) {
     bool dry = season == Season.summer || season == Season.dry;
     result.add(ReminderSuggestion(

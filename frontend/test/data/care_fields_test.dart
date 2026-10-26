@@ -234,6 +234,32 @@ void main() {
     }
   });
 
+  test('upgrading a version 6 database adds the schedule categories last',
+      () async {
+    Directory dir = await Directory.systemTemp.createTemp('plant_it_test');
+    File file = File('${dir.path}/db.sqlite');
+    try {
+      AppDatabase db = AppDatabase.forTesting(NativeDatabase(file));
+      await db.customStatement('SELECT 1');
+      await db.customStatement("DELETE FROM care_fields WHERE key IN "
+          "('misting_every', 'fertilizer_every', 'pruning_month', "
+          "'repotting_years', 'repotting_month')");
+      await db.customStatement('PRAGMA user_version = 6');
+      await db.close();
+
+      db = AppDatabase.forTesting(NativeDatabase(file));
+      List<CareField> fields =
+          (await CareFieldRepository(db: db).getAll()).getOrThrow();
+      expect(fields.length, AppDatabase.builtInCareFields.length);
+      expect(fields.reversed.take(5).map((f) => f.key).toList().reversed,
+          AppDatabase.scheduleCareFields);
+      expect(fields.firstWhere((f) => f.key == 'pruning_month').unit, 'month');
+      await db.close();
+    } finally {
+      await dir.delete(recursive: true);
+    }
+  });
+
   test('CareFieldDraft keeps options only for list categories', () {
     CareFieldsCompanion choice = const CareFieldDraft(
       name: 'Light exposure',
@@ -276,5 +302,16 @@ void main() {
     expect(extra['toxicity']!.estimated, isTrue);
     expect(extra.containsKey('diseases'), isFalse);
     expect(extra.containsKey('substrate'), isFalse);
+  });
+
+  test('AiCareEstimator.parseExtraCare drops schedule values out of range', () {
+    Map<String, CareValue> extra = AiCareEstimator.parseExtraCare(
+        '{"pruning_month": 4.2, "repotting_month": 13, "repotting_years": 2, '
+        '"fertilizer_every": 0, "misting_every": 3}');
+    expect(extra['pruning_month']!.value, 4);
+    expect(extra.containsKey('repotting_month'), isFalse);
+    expect(extra['repotting_years']!.value, 2);
+    expect(extra.containsKey('fertilizer_every'), isFalse);
+    expect(extra['misting_every']!.estimated, isTrue);
   });
 }

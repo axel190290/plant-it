@@ -149,9 +149,13 @@ class Images extends Table {
   TextColumn get imageUrl => text().withLength(max: 256).nullable()();
   TextColumn get description => text().withLength(max: 250).nullable()();
   DateTimeColumn get createdAt => dateTime().nullable()();
-  IntColumn get plantId => integer().nullable().references(Plants, #id, onDelete: KeyAction.cascade)();
-  IntColumn get speciesId =>
-      integer().nullable().references(Species, #id, onDelete: KeyAction.cascade).unique()();
+  IntColumn get plantId => integer()
+      .nullable()
+      .references(Plants, #id, onDelete: KeyAction.cascade)();
+  IntColumn get speciesId => integer()
+      .nullable()
+      .references(Species, #id, onDelete: KeyAction.cascade)
+      .unique()();
   BoolColumn get isAvatar => boolean().withDefault(const Constant(false))();
 
   @override
@@ -200,7 +204,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -216,7 +220,7 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration {
     const String environment =
-      String.fromEnvironment('ENV', defaultValue: 'prod');
+        String.fromEnvironment('ENV', defaultValue: 'prod');
 
     return MigrationStrategy(
       onCreate: (m) async {
@@ -247,6 +251,9 @@ class AppDatabase extends _$AppDatabase {
         if (from < 6) {
           await initHealthEventTypes();
         }
+        if (from >= 2 && from < 7) {
+          await initScheduleCareFields();
+        }
       },
       beforeOpen: (details) async {
         await customStatement('PRAGMA foreign_keys = ON');
@@ -270,7 +277,7 @@ class AppDatabase extends _$AppDatabase {
     await into(eventTypes).insertOnConflictUpdate(EventTypesCompanion.insert(
       id: const Value(2),
       name: 'seeding',
-      icon: 'bean', 
+      icon: 'bean',
       color: '#8F490B',
     ));
 
@@ -351,6 +358,7 @@ class AppDatabase extends _$AppDatabase {
     ('light_lux', CareFieldType.range, 'lux'),
     ('light_hours', CareFieldType.number, 'h'),
     ('env_humidity', CareFieldType.range, '%'),
+    ('misting_every', CareFieldType.number, 'days'),
     ('watering_summer', CareFieldType.number, 'days'),
     ('watering_winter', CareFieldType.number, 'days'),
     ('soil_moisture', CareFieldType.range, '%'),
@@ -359,8 +367,12 @@ class AppDatabase extends _$AppDatabase {
     ('watering_method', CareFieldType.text, null),
     ('substrate', CareFieldType.text, null),
     ('fertilizer', CareFieldType.text, null),
+    ('fertilizer_every', CareFieldType.number, 'days'),
     ('pruning', CareFieldType.text, null),
+    ('pruning_month', CareFieldType.number, 'month'),
     ('repotting', CareFieldType.text, null),
+    ('repotting_years', CareFieldType.number, 'years'),
+    ('repotting_month', CareFieldType.number, 'month'),
     ('flowering_season', CareFieldType.text, null),
     ('dormancy_season', CareFieldType.text, null),
     ('common_pests', CareFieldType.text, null),
@@ -393,6 +405,38 @@ class AppDatabase extends _$AppDatabase {
           key: Value(field.$1),
           type: field.$2,
           position: Value(i - 4),
+        ),
+        mode: InsertMode.insertOrIgnore,
+      );
+    }
+  }
+
+  /// Keys of the categories that tell when to do each care, read by the
+  /// reminder suggestions.
+  static const List<String> scheduleCareFields = [
+    'misting_every',
+    'fertilizer_every',
+    'pruning_month',
+    'repotting_years',
+    'repotting_month',
+  ];
+
+  /// Adds the schedule categories after the existing ones, for databases
+  /// created before they existed.
+  Future<void> initScheduleCareFields() async {
+    int last = await customSelect(
+            'SELECT COALESCE(MAX(position), 0) AS last FROM care_fields')
+        .map((row) => row.read<int>('last'))
+        .getSingle();
+    for (String key in scheduleCareFields) {
+      (String, CareFieldType, String?) field =
+          builtInCareFields.firstWhere((f) => f.$1 == key);
+      await into(careFields).insert(
+        CareFieldsCompanion.insert(
+          key: Value(field.$1),
+          type: field.$2,
+          unit: Value(field.$3),
+          position: Value(++last),
         ),
         mode: InsertMode.insertOrIgnore,
       );

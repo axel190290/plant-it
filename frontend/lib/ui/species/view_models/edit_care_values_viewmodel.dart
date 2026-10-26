@@ -7,6 +7,8 @@ import 'package:plant_it/data/repository/care_field_repository.dart';
 import 'package:plant_it/data/repository/species_care_repository.dart';
 import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
+import 'package:plant_it/data/service/care/ai_care_estimator.dart';
+import 'package:plant_it/data/service/care/suggestion_care_filler.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/care_sources.dart';
 import 'package:plant_it/domain/models/care_value.dart';
@@ -23,8 +25,10 @@ class EditCareValuesViewModel extends ChangeNotifier {
     required SpeciesCareValueRepository speciesCareValueRepository,
     required SpeciesCareRepository speciesCareRepository,
     required SpeciesRepository speciesRepository,
+    required SuggestionCareFiller suggestionCareFiller,
     required StreamController<StreamCode> streamController,
   })  : _careFieldRepository = careFieldRepository,
+        _suggestionCareFiller = suggestionCareFiller,
         _speciesCareValueRepository = speciesCareValueRepository,
         _speciesCareRepository = speciesCareRepository,
         _speciesRepository = speciesRepository,
@@ -45,6 +49,7 @@ class EditCareValuesViewModel extends ChangeNotifier {
   final SpeciesCareValueRepository _speciesCareValueRepository;
   final SpeciesCareRepository _speciesCareRepository;
   final SpeciesRepository _speciesRepository;
+  final SuggestionCareFiller _suggestionCareFiller;
   final StreamController<StreamCode> _streamController;
 
   late final Command<int, void> load;
@@ -58,6 +63,12 @@ class EditCareValuesViewModel extends ChangeNotifier {
   Map<String, CareField> _basicFields = {};
   Map<int, CareValue> _original = {};
   final Map<int, CareValue> _values = {};
+  // Values filled in by the AI and not saved yet
+  final Map<int, CareValue> _aiValues = {};
+  SpeciesCareCompanion? _aiCare;
+  AiProvider _aiProvider = AiProvider.none;
+  int _generation = 0;
+  bool _filling = false;
 
   /// The enabled categories, in display order.
   List<CareField> get fields => _fields;
@@ -67,6 +78,15 @@ class EditCareValuesViewModel extends ChangeNotifier {
   CareField? basicField(String key) => _basicFields[key];
 
   CareValue valueOf(int fieldId) => _values[fieldId] ?? const CareValue();
+
+  /// Whether an AI provider is configured.
+  bool get aiAvailable => _aiProvider != AiProvider.none;
+
+  /// Whether the AI is filling in the values.
+  bool get filling => _filling;
+
+  /// Changes when the values are replaced, so the editors show them again.
+  int get generation => _generation;
 
   void setValue(int fieldId, CareValue value) {
     _values[fieldId] = value;
@@ -99,6 +119,7 @@ class EditCareValuesViewModel extends ChangeNotifier {
     _values
       ..clear()
       ..addAll(_original);
+    _aiProvider = await _suggestionCareFiller.configuredProvider();
     notifyListeners();
     return Success("ok");
   }
@@ -137,6 +158,63 @@ class EditCareValuesViewModel extends ChangeNotifier {
     return Success("ok");
   }
 
+  /// Fills with the AI the empty categories the reminder suggestions read.
+  /// Returns how many values were filled in; nothing is saved yet.
+  Future<Result<int>> fillWithAi() async {
+    _filling = true;
+    notifyListeners();
+    try {
+      return await _fillWithAi();
+    } finally {
+      _filling = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Result<int>> _fillWithAi() async {
+    Result<Specy> species = await _speciesRepository.get(_speciesId);
+    if (species.isError()) {
+      return Failure(species.exceptionOrNull()!);
+    }
+    Result<CareData> estimate =
+        await _suggestionCareFiller.estimate(species.getOrThrow());
+    if (estimate.isError()) {
+      return Failure(estimate.exceptionOrNull()!);
+    }
+    _aiProvider = await _suggestionCareFiller.configuredProvider();
+    int filled = 0;
+    for (CareField field in _fields.where(isSuggestionCareField)) {
+      CareValue? value = estimate.getOrThrow().extra[field.key];
+      if (value != null && valueOf(field.id).isEmpty) {
+        _values[field.id] = value;
+        _aiValues[field.id] = value;
+        filled++;
+      }
+    }
+
+    SpeciesCareCompanion ai = estimate.getOrThrow().care;
+    SpeciesCareCompanion care = _care;
+    if (_basicFields[basicHumidityKey]?.enabled != false &&
+        care.humidity.value == null &&
+        ai.humidity.value != null) {
+      care = care.copyWith(humidity: ai.humidity);
+      filled++;
+    }
+    if (_basicFields[basicTemperatureKey]?.enabled != false &&
+        care.tempMin.value == null &&
+        care.tempMax.value == null &&
+        ai.tempMin.value != null &&
+        ai.tempMax.value != null) {
+      care = care.copyWith(tempMin: ai.tempMin, tempMax: ai.tempMax);
+      filled++;
+    }
+    _care = care;
+    _aiCare = ai;
+    _generation++;
+    notifyListeners();
+    return Success(filled);
+  }
+
   bool _same(CareValue a, CareValue b) =>
       a.value == b.value && a.maxValue == b.maxValue && a.text == b.text;
 
@@ -152,8 +230,10 @@ class EditCareValuesViewModel extends ChangeNotifier {
         continue;
       }
       // A value written by the user is no longer an AI estimate
+      CareValue? ai = _aiValues[field.id];
+      bool estimated = ai != null && _same(ai, value);
       Result<void> saved = await _speciesCareValueRepository.save(
-          _speciesId, field.id, value.copyWith(estimated: false));
+          _speciesId, field.id, value.copyWith(estimated: estimated));
       if (saved.isError()) {
         return saved;
       }
@@ -179,26 +259,45 @@ class EditCareValuesViewModel extends ChangeNotifier {
     if (saved.isError()) {
       return Failure(saved.exceptionOrNull()!);
     }
-    return _clearAiEstimate(changed);
+    // Values filled in by the AI and kept as they were stay estimates
+    SpeciesCareCompanion? ai = _aiCare;
+    List<String> byAi = ai == null
+        ? []
+        : CareSources.groupFields([
+            if (_care.humidity.value != null &&
+                _care.humidity.value == ai.humidity.value)
+              'humidity',
+            if (_care.tempMin.value != null &&
+                _care.tempMin.value == ai.tempMin.value &&
+                _care.tempMax.value == ai.tempMax.value)
+              'tempMin',
+          ]);
+    return _updateAiEstimate(
+        changed.where((f) => !byAi.contains(f)).toList(), byAi);
   }
 
-  /// Values set by the user are no longer AI estimates.
-  Future<Result<void>> _clearAiEstimate(List<String> fields) async {
+  /// Values set by the user are no longer AI estimates; [byAi] are.
+  Future<Result<void>> _updateAiEstimate(
+      List<String> fields, List<String> byAi) async {
     Result<Specy> species = await _speciesRepository.get(_speciesId);
     if (species.isError()) {
       return Failure(species.exceptionOrNull()!);
     }
     CareSources? sources =
         CareSources.decode(species.getOrThrow().bibliography);
-    if (sources == null || !sources.aiFields.any(fields.contains)) {
+    if (byAi.isEmpty &&
+        (sources == null || !sources.aiFields.any(fields.contains))) {
       return Success("ok");
     }
-    List<String> aiFields =
-        sources.aiFields.where((f) => !fields.contains(f)).toList();
+    sources ??= const CareSources();
+    List<String> aiFields = {
+      ...sources.aiFields.where((f) => !fields.contains(f)),
+      ...byAi,
+    }.toList();
     CareSources updated = CareSources(
       species: sources.species,
       care: sources.care,
-      aiProvider: sources.aiProvider,
+      aiProvider: byAi.isEmpty ? sources.aiProvider : _aiProvider.key,
       aiFields: aiFields,
     );
     Result<bool> saved = await _speciesRepository.update(species

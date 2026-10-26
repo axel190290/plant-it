@@ -112,6 +112,58 @@ void main() {
     }
   });
 
+  test('suggestReminders prefers the schedule categories to the texts', () {
+    List<ReminderSuggestion> suggestions = suggestReminders(
+      today: DateTime(2026, 4, 10),
+      plant: _plant(PlantLocation.indoor),
+      values: {
+        'fertilizer': const CareValue(text: 'mensual'),
+        'fertilizer_every': const CareValue(value: 14),
+        'pruning_month': const CareValue(value: 6),
+        'repotting_years': const CareValue(value: 3),
+        'misting_every': const CareValue(value: 2),
+      },
+      season: Season.spring,
+      latitude: 40,
+    );
+    Map<SuggestionKind, ReminderSuggestion> byKind = {
+      for (ReminderSuggestion s in suggestions) s.kind: s
+    };
+    expect(byKind[SuggestionKind.fertilizing]!.frequencyQuantity, 2);
+    expect(
+        byKind[SuggestionKind.fertilizing]!.frequencyUnit, FrequencyUnit.weeks);
+    expect(byKind[SuggestionKind.fertilizing]!.start, DateTime(2026, 4, 10));
+    expect(byKind[SuggestionKind.pruning]!.start, DateTime(2026, 6, 1));
+    expect(byKind[SuggestionKind.repotting]!.frequencyQuantity, 3);
+    expect(byKind[SuggestionKind.repotting]!.start, DateTime(2027, 3, 1));
+    expect(byKind[SuggestionKind.misting]!.frequencyQuantity, 2);
+  });
+
+  test('ScheduleHints round-trips through the schedule categories', () {
+    ScheduleHints hints = const ScheduleHints(
+      fertilizerQuantity: 1,
+      fertilizerUnit: FrequencyUnit.months,
+      pruningMonth: 3,
+      repottingYears: 2,
+    );
+    Map<String, CareValue> values = hints.toValues(estimated: true);
+    expect(values['fertilizer_every']!.value, 30);
+    expect(values['fertilizer_every']!.estimated, isTrue);
+    expect(values.containsKey('repotting_month'), isFalse);
+    ScheduleHints read = ScheduleHints.fromValues(values);
+    expect(read.fertilizerQuantity, 1);
+    expect(read.fertilizerUnit, FrequencyUnit.months);
+    expect(read.pruningMonth, 3);
+    expect(read.repottingYears, 2);
+    expect(
+        ScheduleHints.fromValues({'pruning_month': const CareValue(value: 13)})
+            .isEmpty,
+        isTrue);
+    expect(frequencyOfDays(10), (10, FrequencyUnit.days));
+    expect(frequencyOfDays(21), (3, FrequencyUnit.weeks));
+    expect(frequencyOfDays(60), (2, FrequencyUnit.months));
+  });
+
   test('AiCareEstimator.parseSchedule ignores values out of range', () {
     ScheduleHints hints = AiCareEstimator.parseSchedule(
             '{"fertilizer_every": 2, "fertilizer_unit": "weeks", '

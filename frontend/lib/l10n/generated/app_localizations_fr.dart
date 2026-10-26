@@ -1486,4 +1486,51 @@ class LFr extends L {
       String day, String rain, String plant, String days) {
     return '$day : $rain mm de pluie. $plant s\'arrose tous les $days jours : protégez-la de la pluie';
   }
+
+  @override
+  String get careFieldMistingEvery => 'Fréquence de brumisation';
+
+  @override
+  String get careFieldFertilizerEvery => 'Fréquence d\'engrais';
+
+  @override
+  String get careFieldPruningMonth => 'Mois de taille';
+
+  @override
+  String get careFieldRepottingYears => 'Fréquence de rempotage';
+
+  @override
+  String get careFieldRepottingMonth => 'Mois de rempotage';
+
+  @override
+  String get careFieldMonth => 'Mois';
+
+  @override
+  String get fillWithAi => 'Compléter avec l\'IA';
+
+  @override
+  String get fillWithAiHint =>
+      'Remplit les catégories vides utilisées pour suggérer des rappels, marquées d\'une cloche. Vérifiez-les et enregistrez.';
+
+  @override
+  String get usedForSuggestions => 'Sert à suggérer des rappels';
+
+  @override
+  String aiFilledValues(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count valeurs remplies par l\'IA. Vérifiez-les et enregistrez.',
+      one: '1 valeur remplie par l\'IA. Vérifiez-la et enregistrez.',
+      zero: 'L\'IA n\'a pas donné de nouvelles valeurs',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get aiNotConfigured =>
+      'Choisissez un fournisseur d\'IA et sa clé dans Paramètres > Sources de données';
+
+  @override
+  String get careFieldUnitYears => 'ans';
 }

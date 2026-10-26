@@ -521,5 +521,17 @@
   "everyCountYears": "{count, plural, =1{cada año} other{cada {count} años}}",
   "fromDate": "desde el {date}",
   "untilDate": "hasta el {date}",
-  "protectFromRainAlert": "{day}: {rain} mm de lluvia. {plant} se riega cada {days} días: protégela de la lluvia"
+  "protectFromRainAlert": "{day}: {rain} mm de lluvia. {plant} se riega cada {days} días: protégela de la lluvia",
+  "careFieldMistingEvery": "Frecuencia de pulverización",
+  "careFieldFertilizerEvery": "Frecuencia de abono",
+  "careFieldPruningMonth": "Mes de poda",
+  "careFieldRepottingYears": "Frecuencia de trasplante",
+  "careFieldRepottingMonth": "Mes de trasplante",
+  "careFieldMonth": "Mes",
+  "fillWithAi": "Completar con IA",
+  "fillWithAiHint": "Rellena las categorías vacías que se usan para sugerir recordatorios, marcadas con una campana. Revísalas y guarda.",
+  "usedForSuggestions": "Se usa para sugerir recordatorios",
+  "aiFilledValues": "{count, plural, =0{La IA no dio valores nuevos} =1{1 valor completado con IA. Revísalo y guarda.} other{{count} valores completados con IA. Revísalos y guarda.}}",
+  "aiNotConfigured": "Elige un proveedor de IA y su clave en Ajustes > Fuentes de datos",
+  "careFieldUnitYears": "años"
 }

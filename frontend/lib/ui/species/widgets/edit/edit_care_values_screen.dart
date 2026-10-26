@@ -49,6 +49,54 @@ class EditCareValuesScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _fillWithAi(BuildContext context) async {
+    L l = L.of(context);
+    if (!viewModel.aiAvailable) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l.aiNotConfigured)));
+      return;
+    }
+    Result<int> result = await viewModel.fillWithAi();
+    if (!context.mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result.isSuccess()
+            ? l.aiFilledValues(result.getOrThrow())
+            : l.errorWithMessage(result.exceptionOrNull().toString()))));
+  }
+
+  Widget _aiCard(BuildContext context) {
+    L l = L.of(context);
+    return Card.outlined(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(l.fillWithAiHint,
+                style: Theme.of(context).textTheme.bodyMedium),
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.centerRight,
+              child: viewModel.filling
+                  ? const Padding(
+                      padding: EdgeInsets.all(8),
+                      child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator()),
+                    )
+                  : FilledButton.tonalIcon(
+                      onPressed: () => _fillWithAi(context),
+                      icon: const Icon(LucideIcons.sparkles),
+                      label: Text(l.fillWithAi),
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   IconData _icon(String key, IconData fallback) {
     CareField? field = viewModel.basicField(key);
     return field == null ? fallback : careFieldIcon(field);
@@ -79,6 +127,7 @@ class EditCareValuesScreen extends StatelessWidget {
       _BasicCareEditor(
         icon: _icon(basicHumidityKey, LucideIcons.spray_can),
         title: l.humidity,
+        forSuggestions: true,
         isSet: care.humidity.value != null,
         valueText:
             care.humidity.value == null ? null : "${care.humidity.value}0%",
@@ -98,6 +147,7 @@ class EditCareValuesScreen extends StatelessWidget {
       _BasicCareEditor(
         icon: _icon(basicTemperatureKey, LucideIcons.thermometer),
         title: l.temperature,
+        forSuggestions: true,
         isSet: care.tempMin.value != null || care.tempMax.value != null,
         valueText: care.tempMin.value == null && care.tempMax.value == null
             ? null
@@ -176,6 +226,8 @@ class EditCareValuesScreen extends StatelessWidget {
               builder: (context, _) => ListView(
                 padding: const EdgeInsets.all(16),
                 children: [
+                  _aiCard(context),
+                  const SizedBox(height: 16),
                   Text(l.basicCare,
                       style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 8),
@@ -202,7 +254,7 @@ class EditCareValuesScreen extends StatelessWidget {
                   ...viewModel.fields.map((field) => Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: _CareValueEditor(
-                          key: ValueKey(field.id),
+                          key: ValueKey('${field.id}-${viewModel.generation}'),
                           field: field,
                           initial: viewModel.valueOf(field.id),
                           onChanged: (v) => viewModel.setValue(field.id, v),
@@ -222,6 +274,7 @@ class EditCareValuesScreen extends StatelessWidget {
 class _BasicCareEditor extends StatelessWidget {
   final IconData icon;
   final String title;
+  final bool forSuggestions;
   final bool isSet;
   final String? valueText;
   final VoidCallback onAdd;
@@ -231,6 +284,7 @@ class _BasicCareEditor extends StatelessWidget {
   const _BasicCareEditor({
     required this.icon,
     required this.title,
+    this.forSuggestions = false,
     required this.isSet,
     required this.valueText,
     required this.onAdd,
@@ -251,8 +305,15 @@ class _BasicCareEditor extends StatelessWidget {
                 Icon(icon),
                 const SizedBox(width: 12),
                 Expanded(
-                  child:
-                      Text(title, style: Theme.of(context).textTheme.bodyLarge),
+                  child: Row(
+                    children: [
+                      Flexible(
+                        child: Text(title,
+                            style: Theme.of(context).textTheme.bodyLarge),
+                      ),
+                      if (forSuggestions) const _SuggestionMark(),
+                    ],
+                  ),
                 ),
                 Text(
                   valueText ?? l.notSet,
@@ -340,10 +401,14 @@ class _CareValueEditorState extends State<_CareValueEditor> {
     widget.onChanged(value);
   }
 
-  String? get _unitSuffix {
+  String? _unitSuffix(L l) {
     String? unit = widget.field.unit;
     if (unit == null || unit.isEmpty) return null;
-    return unit == 'days' ? null : unit;
+    return switch (unit) {
+      'days' => null,
+      'years' => l.careFieldUnitYears,
+      _ => unit,
+    };
   }
 
   @override
@@ -355,15 +420,37 @@ class _CareValueEditorState extends State<_CareValueEditor> {
     }
     const TextInputType numberKeyboard =
         TextInputType.numberWithOptions(decimal: true, signed: true);
+    Widget? mark =
+        isSuggestionCareField(widget.field) ? const _SuggestionMark() : null;
 
     switch (widget.field.type) {
+      case CareFieldType.number when widget.field.unit == 'month':
+        int? month = _parse(_first.text)?.round();
+        return DropdownButtonFormField<int?>(
+          value: month != null && month >= 1 && month <= 12 ? month : null,
+          decoration: InputDecoration(
+            labelText: label,
+            suffixIcon: mark,
+            border: const OutlineInputBorder(),
+          ),
+          items: [
+            const DropdownMenuItem<int?>(value: null, child: Text('—')),
+            for (int m = 1; m <= 12; m++)
+              DropdownMenuItem<int?>(value: m, child: Text(monthName(l, m))),
+          ],
+          onChanged: (m) {
+            setState(() => _first.text = m?.toString() ?? '');
+            _notify();
+          },
+        );
       case CareFieldType.number:
         return TextField(
           controller: _first,
           keyboardType: numberKeyboard,
           decoration: InputDecoration(
             labelText: label,
-            suffixText: _unitSuffix,
+            suffixText: _unitSuffix(l),
+            suffixIcon: mark,
             border: const OutlineInputBorder(),
           ),
           onChanged: (_) => _notify(),
@@ -372,7 +459,15 @@ class _CareValueEditorState extends State<_CareValueEditor> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: Theme.of(context).textTheme.titleSmall),
+            Row(
+              children: [
+                Flexible(
+                  child: Text(label,
+                      style: Theme.of(context).textTheme.titleSmall),
+                ),
+                if (mark != null) mark,
+              ],
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -382,7 +477,7 @@ class _CareValueEditorState extends State<_CareValueEditor> {
                     keyboardType: numberKeyboard,
                     decoration: InputDecoration(
                       labelText: l.min,
-                      suffixText: _unitSuffix,
+                      suffixText: _unitSuffix(l),
                       border: const OutlineInputBorder(),
                     ),
                     onChanged: (_) => _notify(),
@@ -395,7 +490,7 @@ class _CareValueEditorState extends State<_CareValueEditor> {
                     keyboardType: numberKeyboard,
                     decoration: InputDecoration(
                       labelText: l.max,
-                      suffixText: _unitSuffix,
+                      suffixText: _unitSuffix(l),
                       border: const OutlineInputBorder(),
                     ),
                     onChanged: (_) => _notify(),
@@ -413,6 +508,7 @@ class _CareValueEditorState extends State<_CareValueEditor> {
           maxLength: 1000,
           decoration: InputDecoration(
             labelText: label,
+            suffixIcon: mark,
             border: const OutlineInputBorder(),
           ),
           onChanged: (_) => _notify(),
@@ -442,5 +538,23 @@ class _CareValueEditorState extends State<_CareValueEditor> {
           },
         );
     }
+  }
+}
+
+/// Marks the categories that the reminder suggestions read.
+class _SuggestionMark extends StatelessWidget {
+  const _SuggestionMark();
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: L.of(context).usedForSuggestions,
+      triggerMode: TooltipTriggerMode.tap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        child: Icon(LucideIcons.bell_ring,
+            size: 16, color: Theme.of(context).colorScheme.primary),
+      ),
+    );
   }
 }

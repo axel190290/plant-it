@@ -2359,6 +2359,78 @@ abstract class L {
   /// **'{day}: {rain} mm of rain. {plant} is watered every {days} days: protect it from the rain'**
   String protectFromRainAlert(
       String day, String rain, String plant, String days);
+
+  /// No description provided for @careFieldMistingEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Misting frequency'**
+  String get careFieldMistingEvery;
+
+  /// No description provided for @careFieldFertilizerEvery.
+  ///
+  /// In en, this message translates to:
+  /// **'Fertilizer frequency'**
+  String get careFieldFertilizerEvery;
+
+  /// No description provided for @careFieldPruningMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Pruning month'**
+  String get careFieldPruningMonth;
+
+  /// No description provided for @careFieldRepottingYears.
+  ///
+  /// In en, this message translates to:
+  /// **'Repotting frequency'**
+  String get careFieldRepottingYears;
+
+  /// No description provided for @careFieldRepottingMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Repotting month'**
+  String get careFieldRepottingMonth;
+
+  /// No description provided for @careFieldMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Month'**
+  String get careFieldMonth;
+
+  /// No description provided for @fillWithAi.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill in with AI'**
+  String get fillWithAi;
+
+  /// No description provided for @fillWithAiHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fills the empty categories used to suggest reminders, marked with a bell. Review them and save.'**
+  String get fillWithAiHint;
+
+  /// No description provided for @usedForSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Used to suggest reminders'**
+  String get usedForSuggestions;
+
+  /// No description provided for @aiFilledValues.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{The AI did not give new values} =1{1 value filled in by AI. Review it and save.} other{{count} values filled in by AI. Review them and save.}}'**
+  String aiFilledValues(int count);
+
+  /// No description provided for @aiNotConfigured.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose an AI provider and its key in Settings > Data sources'**
+  String get aiNotConfigured;
+
+  /// No description provided for @careFieldUnitYears.
+  ///
+  /// In en, this message translates to:
+  /// **'years'**
+  String get careFieldUnitYears;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

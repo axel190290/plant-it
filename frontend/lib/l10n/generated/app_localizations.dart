@@ -2148,6 +2148,60 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Forecast'**
   String get forecast;
+
+  /// No description provided for @changePlantImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Change image'**
+  String get changePlantImage;
+
+  /// No description provided for @phoneGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone gallery'**
+  String get phoneGallery;
+
+  /// No description provided for @speciesPhotosOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos of the species on the Internet'**
+  String get speciesPhotosOnline;
+
+  /// No description provided for @fromLink.
+  ///
+  /// In en, this message translates to:
+  /// **'From a link'**
+  String get fromLink;
+
+  /// No description provided for @imageLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Image link (https://…)'**
+  String get imageLink;
+
+  /// No description provided for @useSpeciesImage.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the species image'**
+  String get useSpeciesImage;
+
+  /// No description provided for @imageUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Image updated'**
+  String get imageUpdated;
+
+  /// No description provided for @noPhotosFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No photos found for this species'**
+  String get noPhotosFound;
+
+  /// No description provided for @photosFromINaturalist.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos shared on iNaturalist. The one you choose is saved with the plant photos.'**
+  String get photosFromINaturalist;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

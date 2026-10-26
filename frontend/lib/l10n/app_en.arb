@@ -577,5 +577,14 @@
   },
   "outdoorAlertsHint": "Frost, heat and rain alerts are shown for plants whose location is Outdoor.",
   "currentSeason": "now",
-  "forecast": "Forecast"
+  "forecast": "Forecast",
+  "changePlantImage": "Change image",
+  "phoneGallery": "Phone gallery",
+  "speciesPhotosOnline": "Photos of the species on the Internet",
+  "fromLink": "From a link",
+  "imageLink": "Image link (https://…)",
+  "useSpeciesImage": "Use the species image",
+  "imageUpdated": "Image updated",
+  "noPhotosFound": "No photos found for this species",
+  "photosFromINaturalist": "Photos shared on iNaturalist. The one you choose is saved with the plant photos."
 }

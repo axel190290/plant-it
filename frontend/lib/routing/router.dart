@@ -142,6 +142,7 @@ GoRouter router() => GoRouter(
                     speciesCareValueRepository: context.read(),
                     speciesDescriptionService: context.read(),
                     weatherService: context.read(),
+                    gbifSearcher: context.read(),
                   );
                   viewModel.load.execute(id);
                   return PlantScreen(

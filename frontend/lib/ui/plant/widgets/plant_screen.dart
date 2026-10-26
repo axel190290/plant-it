@@ -195,6 +195,184 @@ class _PlantScreenState extends State<PlantScreen> {
     setState(() {});
   }
 
+  /// Runs [action], then reports whether the plant image changed.
+  Future<void> _updateImage(Future<void> Function() action) async {
+    String message;
+    try {
+      await action();
+      if (!mounted) return;
+      message = L.of(context).imageUpdated;
+      // The home page shows the plant image too
+      widget.streamController.add(StreamCode.editPlant);
+    } catch (e) {
+      if (!mounted) return;
+      message = L.of(context).errorWithMessage(e.toString());
+    }
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+    setState(() {});
+  }
+
+  Future<void> _changeImage() async {
+    L l = L.of(context);
+    String? choice = await showModalBottomSheet<String>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              title: Text(l.changePlantImage,
+                  style: Theme.of(ctx).textTheme.titleMedium),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.images),
+              title: Text(l.phoneGallery),
+              onTap: () => Navigator.of(ctx).pop('gallery'),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.camera),
+              title: Text(l.camera),
+              onTap: () => Navigator.of(ctx).pop('camera'),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.globe),
+              title: Text(l.speciesPhotosOnline),
+              onTap: () => Navigator.of(ctx).pop('internet'),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.link),
+              title: Text(l.fromLink),
+              onTap: () => Navigator.of(ctx).pop('link'),
+            ),
+            ListTile(
+              leading: const Icon(LucideIcons.rotate_ccw),
+              title: Text(l.useSpeciesImage),
+              onTap: () => Navigator.of(ctx).pop('species'),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (choice == null || !mounted) return;
+
+    switch (choice) {
+      case 'gallery':
+      case 'camera':
+        XFile? picked = await _picker.pickImage(
+            source:
+                choice == 'camera' ? ImageSource.camera : ImageSource.gallery,
+            maxWidth: 2000,
+            imageQuality: 90);
+        if (picked == null) return;
+        await _updateImage(
+            () => widget.viewModel.setAvatarFromFile.executeWithFuture(picked));
+      case 'internet':
+        String? url = await _pickSpeciesPhoto();
+        if (url == null) return;
+        await _updateImage(
+            () => widget.viewModel.setAvatarFromUrl.executeWithFuture(url));
+      case 'link':
+        String? url = await _askImageLink();
+        if (url == null) return;
+        await _updateImage(
+            () => widget.viewModel.setAvatarFromUrl.executeWithFuture(url));
+      case 'species':
+        await _updateImage(
+            () => widget.viewModel.toggleAvatar.executeWithFuture(null));
+    }
+  }
+
+  Future<String?> _askImageLink() {
+    L l = L.of(context);
+    TextEditingController controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.fromLink),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          keyboardType: TextInputType.url,
+          decoration: InputDecoration(labelText: l.imageLink),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: Text(l.save),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Shows photos of the species from the Internet and returns the chosen.
+  Future<String?> _pickSpeciesPhoto() {
+    L l = L.of(context);
+    Future<List<String>> photos = widget.viewModel.speciesPhotoUrls();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l.speciesPhotosOnline),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: FutureBuilder<List<String>>(
+            future: photos,
+            builder: (ctx, snapshot) {
+              if (!snapshot.hasData) {
+                return const SizedBox(
+                  height: 120,
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (snapshot.data!.isEmpty) {
+                return Text(l.noPhotosFound);
+              }
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(l.photosFromINaturalist,
+                      style: Theme.of(ctx).textTheme.bodySmall),
+                  const SizedBox(height: 8),
+                  Flexible(
+                    child: GridView.count(
+                      crossAxisCount: 3,
+                      shrinkWrap: true,
+                      mainAxisSpacing: 6,
+                      crossAxisSpacing: 6,
+                      children: snapshot.data!
+                          .map((url) => InkWell(
+                                onTap: () => Navigator.of(ctx).pop(url),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(url,
+                                      fit: BoxFit.cover,
+                                      errorBuilder: (_, __, ___) =>
+                                          const Icon(LucideIcons.image_off)),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ),
+                ],
+              );
+            },
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l.cancel),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _editCare() {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(L.of(context).editCareSharedWarning)),
@@ -605,6 +783,18 @@ class _PlantScreenState extends State<PlantScreen> {
                             ),
                           ),
                           PopupMenuItem(
+                            value: 'changeImage',
+                            textStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                            child: ListTile(
+                              leading: Icon(
+                                LucideIcons.image,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              title: Text(appLocalizations.changePlantImage),
+                            ),
+                          ),
+                          PopupMenuItem(
                             value: 'editCare',
                             textStyle: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface),
@@ -645,6 +835,8 @@ class _PlantScreenState extends State<PlantScreen> {
                         if (value == 'edit') {
                           context.push(
                               Routes.editPlantWithId(widget.viewModel.id));
+                        } else if (value == 'changeImage') {
+                          _changeImage();
                         } else if (value == 'editCare') {
                           _editCare();
                         } else if (value == 'duplicate') {

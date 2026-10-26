@@ -1335,4 +1335,32 @@ class LFr extends L {
 
   @override
   String get forecast => 'Prévisions';
+
+  @override
+  String get changePlantImage => 'Changer l\'image';
+
+  @override
+  String get phoneGallery => 'Galerie du téléphone';
+
+  @override
+  String get speciesPhotosOnline => 'Photos de l\'espèce sur internet';
+
+  @override
+  String get fromLink => 'Depuis un lien';
+
+  @override
+  String get imageLink => 'Lien de l\'image (https://…)';
+
+  @override
+  String get useSpeciesImage => 'Utiliser l\'image de l\'espèce';
+
+  @override
+  String get imageUpdated => 'Image mise à jour';
+
+  @override
+  String get noPhotosFound => 'Aucune photo trouvée pour cette espèce';
+
+  @override
+  String get photosFromINaturalist =>
+      'Photos partagées sur iNaturalist. Celle choisie est enregistrée avec les photos de la plante.';
 }

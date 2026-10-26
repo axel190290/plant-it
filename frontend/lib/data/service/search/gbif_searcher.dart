@@ -245,6 +245,45 @@ class GbifSearcher extends SpeciesSearcher {
     }
   }
 
+  /// Photos of the species from iNaturalist, to pick one as plant image.
+  Future<List<String>> getPhotoUrls(String scientificName) async {
+    try {
+      http.Response search = await http
+          .get(Uri.parse("$iNaturalistUrl/taxa").replace(queryParameters: {
+        'q': scientificName,
+        'rank': 'species',
+        'per_page': '1',
+      }));
+      if (search.statusCode != 200) {
+        return [];
+      }
+      List<dynamic> results =
+          json.decode(utf8.decode(search.bodyBytes))['results'] ?? [];
+      if (results.isEmpty) {
+        return [];
+      }
+      http.Response taxon = await http
+          .get(Uri.parse("$iNaturalistUrl/taxa/${results.first['id']}"));
+      if (taxon.statusCode != 200) {
+        return [];
+      }
+      List<dynamic> details =
+          json.decode(utf8.decode(taxon.bodyBytes))['results'] ?? [];
+      if (details.isEmpty) {
+        return [];
+      }
+      List<dynamic> photos = details.first['taxon_photos'] ?? [];
+      return photos
+          .map((p) => p['photo']?['medium_url'] as String?)
+          .whereType<String>()
+          .take(12)
+          .toList();
+    } catch (e) {
+      _log.warning("Error while loading photos from iNaturalist: $e");
+      return [];
+    }
+  }
+
   /// Removes the HTML of a Wikipedia summary and keeps its first sentences.
   static String? cleanSummary(String? html) {
     if (html == null) {

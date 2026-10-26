@@ -1340,4 +1340,32 @@ class LEs extends L {
 
   @override
   String get forecast => 'Pronóstico';
+
+  @override
+  String get changePlantImage => 'Cambiar imagen';
+
+  @override
+  String get phoneGallery => 'Galería del móvil';
+
+  @override
+  String get speciesPhotosOnline => 'Fotos de la especie en internet';
+
+  @override
+  String get fromLink => 'Desde un enlace';
+
+  @override
+  String get imageLink => 'Enlace de la imagen (https://…)';
+
+  @override
+  String get useSpeciesImage => 'Usar la imagen de la especie';
+
+  @override
+  String get imageUpdated => 'Imagen actualizada';
+
+  @override
+  String get noPhotosFound => 'No se han encontrado fotos de esta especie';
+
+  @override
+  String get photosFromINaturalist =>
+      'Fotos compartidas en iNaturalist. La que elijas se guarda con las fotos de la planta.';
 }

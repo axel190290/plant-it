@@ -5,9 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 
-/// The plants of the collection as full-width cards, one below the other,
-/// scrolling with the rest of the home page.
+/// The plants of the collection as a grid of cards: two columns on a phone
+/// in portrait, and as many columns of about the same size as fit in
+/// landscape or on bigger screens.
 class PlantCardList extends StatelessWidget {
+  // Wide enough for two columns on any phone in portrait
+  static const double maxCardWidth = 220;
+
   final HomeViewModel viewModel;
   final String filter;
 
@@ -25,27 +29,32 @@ class PlantCardList extends StatelessWidget {
           .contains(filter.toLowerCase());
     }).toList();
 
-    return Padding(
+    return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: Column(
-        children: plantIds.map((int plantId) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(28),
-              child: Material(
-                child: InkWell(
-                  onTap: () => context.push(Routes.plantWithId(plantId)),
-                  child: HeroLayoutCard(
-                    plantId: plantId,
-                    viewModel: viewModel,
-                  ),
-                ),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+        maxCrossAxisExtent: maxCardWidth,
+        mainAxisSpacing: 12,
+        crossAxisSpacing: 12,
+        childAspectRatio: 0.8,
+      ),
+      itemCount: plantIds.length,
+      itemBuilder: (context, index) {
+        int plantId = plantIds[index];
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: Material(
+            child: InkWell(
+              onTap: () => context.push(Routes.plantWithId(plantId)),
+              child: HeroLayoutCard(
+                plantId: plantId,
+                viewModel: viewModel,
               ),
             ),
-          );
-        }).toList(),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -63,45 +72,38 @@ class HeroLayoutCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Stack(
-      alignment: AlignmentDirectional.bottomStart,
+      fit: StackFit.expand,
       children: <Widget>[
-        SizedBox(
-          width: double.infinity,
-          height: 200,
-          child: Image(
-            fit: BoxFit.cover,
-            image: viewModel.imagesBase64[plantId] == null
-                ? const AssetImage("assets/images/generic-plant.jpg")
-                : MemoryImage(base64Decode(viewModel.imagesBase64[plantId]!))
-                    as ImageProvider,
+        Image(
+          fit: BoxFit.cover,
+          image: viewModel.imagesBase64[plantId] == null
+              ? const AssetImage("assets/images/generic-plant.jpg")
+              : MemoryImage(base64Decode(viewModel.imagesBase64[plantId]!))
+                  as ImageProvider,
+        ),
+        // Keeps the name readable on light photos
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.center,
+              end: Alignment.bottomCenter,
+              colors: [Colors.transparent, Colors.black54],
+            ),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(18.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              Text(
-                viewModel.plantMap[plantId]!.name,
-                overflow: TextOverflow.ellipsis,
-                softWrap: false,
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(color: Colors.white),
-              ),
-              // const SizedBox(height: 10),
-              // Text(
-              //   viewModel.plantMap[plantId]!.species.toString(),
-              //   overflow: TextOverflow.clip,
-              //   softWrap: false,
-              //   style: Theme.of(context)
-              //       .textTheme
-              //       .bodyMedium
-              //       ?.copyWith(color: Colors.white),
-              // ),
-            ],
+        Align(
+          alignment: AlignmentDirectional.bottomStart,
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Text(
+              viewModel.plantMap[plantId]!.name,
+              overflow: TextOverflow.ellipsis,
+              maxLines: 2,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(color: Colors.white, fontWeight: FontWeight.w600),
+            ),
           ),
         ),
       ],

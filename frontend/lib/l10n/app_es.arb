@@ -486,5 +486,14 @@
   "rainAlert": "Hoy llueve: puedes saltarte el riego de {plants}",
   "outdoorAlertsHint": "Los avisos de helada, calor y lluvia se muestran para las plantas con ubicación Exterior.",
   "currentSeason": "ahora",
-  "forecast": "Pronóstico"
+  "forecast": "Pronóstico",
+  "changePlantImage": "Cambiar imagen",
+  "phoneGallery": "Galería del móvil",
+  "speciesPhotosOnline": "Fotos de la especie en internet",
+  "fromLink": "Desde un enlace",
+  "imageLink": "Enlace de la imagen (https://…)",
+  "useSpeciesImage": "Usar la imagen de la especie",
+  "imageUpdated": "Imagen actualizada",
+  "noPhotosFound": "No se han encontrado fotos de esta especie",
+  "photosFromINaturalist": "Fotos compartidas en iNaturalist. La que elijas se guarda con las fotos de la planta."
 }

@@ -1435,4 +1435,32 @@ class LIt extends L {
 
   @override
   String get forecast => 'Previsioni';
+
+  @override
+  String get changePlantImage => 'Cambia immagine';
+
+  @override
+  String get phoneGallery => 'Galleria del telefono';
+
+  @override
+  String get speciesPhotosOnline => 'Foto della specie su internet';
+
+  @override
+  String get fromLink => 'Da un link';
+
+  @override
+  String get imageLink => 'Link dell\'immagine (https://…)';
+
+  @override
+  String get useSpeciesImage => 'Usa l\'immagine della specie';
+
+  @override
+  String get imageUpdated => 'Immagine aggiornata';
+
+  @override
+  String get noPhotosFound => 'Nessuna foto trovata per questa specie';
+
+  @override
+  String get photosFromINaturalist =>
+      'Foto condivise su iNaturalist. Quella scelta viene salvata con le foto della pianta.';
 }

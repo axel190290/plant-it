@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:command_it/command_it.dart';
 import 'package:drift/drift.dart' as drift;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 //import 'package:logging/logging.dart';
 import 'package:path/path.dart' as path;
@@ -19,6 +20,7 @@ import 'package:plant_it/data/repository/species_care_repository.dart';
 import 'package:plant_it/data/repository/species_care_value_repository.dart';
 import 'package:plant_it/data/repository/species_repository.dart';
 import 'package:plant_it/data/service/care/species_description_service.dart';
+import 'package:plant_it/data/service/search/gbif_searcher.dart';
 import 'package:plant_it/data/service/weather/weather_service.dart';
 import 'package:plant_it/domain/models/weather.dart';
 import 'package:plant_it/database/database.dart' as db;
@@ -40,7 +42,9 @@ class PlantViewModel extends ChangeNotifier {
     required SpeciesCareValueRepository speciesCareValueRepository,
     required SpeciesDescriptionService speciesDescriptionService,
     required WeatherService weatherService,
+    required GbifSearcher gbifSearcher,
   })  : _weatherService = weatherService,
+        _gbifSearcher = gbifSearcher,
         _speciesDescriptionService = speciesDescriptionService,
         _careFieldRepository = careFieldRepository,
         _speciesCareValueRepository = speciesCareValueRepository,
@@ -79,6 +83,16 @@ class PlantViewModel extends ChangeNotifier {
       if (result.isError()) throw result.exceptionOrNull()!;
       return;
     }, initialValue: null);
+    setAvatarFromFile = Command.createAsync((XFile file) async {
+      Result<int> uploaded = await _uploadNewPhoto(file);
+      if (uploaded.isError()) throw uploaded.exceptionOrNull()!;
+      Result<void> avatar = await _toggleAvatar(uploaded.getOrThrow());
+      if (avatar.isError()) throw avatar.exceptionOrNull()!;
+    }, initialValue: null);
+    setAvatarFromUrl = Command.createAsync((String url) async {
+      Result<void> result = await _setAvatarFromUrl(url);
+      if (result.isError()) throw result.exceptionOrNull()!;
+    }, initialValue: null);
     updateNote = Command.createAsync((String? note) async {
       Result<void> result = await _updateNote(note);
       if (result.isError()) throw result.exceptionOrNull()!;
@@ -105,6 +119,7 @@ class PlantViewModel extends ChangeNotifier {
   //final Logger _log = Logger('PlantViewModel');
   final SpeciesDescriptionService _speciesDescriptionService;
   final WeatherService _weatherService;
+  final GbifSearcher _gbifSearcher;
   Season? _season;
   final CareFieldRepository _careFieldRepository;
   final SpeciesCareValueRepository _speciesCareValueRepository;
@@ -158,6 +173,8 @@ class PlantViewModel extends ChangeNotifier {
   late final Command<int?, void> toggleAvatar;
   late final Command<int, void> downloadPhoto;
   late final Command<String?, void> updateNote;
+  late final Command<XFile, void> setAvatarFromFile;
+  late final Command<String, void> setAvatarFromUrl;
   late final Command<String?, void> updateDescription;
   late final Command<db.Event, void> deleteEvent;
 
@@ -535,6 +552,50 @@ class PlantViewModel extends ChangeNotifier {
       return gallery;
     }
     return _loadBase64(_plant.id);
+  }
+
+  /// Photos of the species found on the Internet, to use as plant image.
+  Future<List<String>> speciesPhotoUrls() =>
+      _gbifSearcher.getPhotoUrls(_species.scientificName);
+
+  /// Downloads the image, keeps it as a photo of the plant (so it works
+  /// offline) and uses it as plant image.
+  Future<Result<void>> _setAvatarFromUrl(String url) async {
+    Uri? uri = Uri.tryParse(url.trim());
+    if (uri == null || !uri.hasScheme || !uri.scheme.startsWith('http')) {
+      return Failure(Exception("Invalid link"));
+    }
+    http.Response response;
+    try {
+      response = await http.get(uri);
+    } catch (e) {
+      return Failure(Exception("Error while downloading the image: $e"));
+    }
+    String contentType = response.headers['content-type'] ?? '';
+    if (response.statusCode != 200 || !contentType.startsWith('image/')) {
+      return Failure(Exception("The link is not an image"));
+    }
+    String extension = switch (contentType.split(';').first) {
+      'image/png' => '.png',
+      'image/webp' => '.webp',
+      'image/gif' => '.gif',
+      _ => '.jpg',
+    };
+    Directory temp = await getTemporaryDirectory();
+    File file = File(path.join(temp.path,
+        'plant_image_${DateTime.now().millisecondsSinceEpoch}$extension'));
+    await file.writeAsBytes(response.bodyBytes);
+    try {
+      Result<int> uploaded = await _uploadNewPhoto(XFile(file.path));
+      if (uploaded.isError()) {
+        return uploaded;
+      }
+      return _toggleAvatar(uploaded.getOrThrow());
+    } finally {
+      if (await file.exists()) {
+        await file.delete();
+      }
+    }
   }
 
   Future<Result<void>> _downloadPhoto(int id) async {

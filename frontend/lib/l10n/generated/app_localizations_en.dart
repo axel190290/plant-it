@@ -1328,4 +1328,32 @@ class LEn extends L {
 
   @override
   String get forecast => 'Forecast';
+
+  @override
+  String get changePlantImage => 'Change image';
+
+  @override
+  String get phoneGallery => 'Phone gallery';
+
+  @override
+  String get speciesPhotosOnline => 'Photos of the species on the Internet';
+
+  @override
+  String get fromLink => 'From a link';
+
+  @override
+  String get imageLink => 'Image link (https://…)';
+
+  @override
+  String get useSpeciesImage => 'Use the species image';
+
+  @override
+  String get imageUpdated => 'Image updated';
+
+  @override
+  String get noPhotosFound => 'No photos found for this species';
+
+  @override
+  String get photosFromINaturalist =>
+      'Photos shared on iNaturalist. The one you choose is saved with the plant photos.';
 }

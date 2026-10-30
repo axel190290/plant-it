@@ -60,6 +60,7 @@ GoRouter router() => GoRouter(
                 reminderOccurrenceRepository: context.read(),
                 imageRepository: context.read(),
                 eventRepository: context.read(),
+                collectionRepository: context.read(),
                 streamController: context.read(),
               );
               homeViewModel.load.execute();
@@ -89,6 +90,7 @@ GoRouter router() => GoRouter(
                 plantRepository: context.read(),
                 speciesCareRepository: context.read(),
                 speciesCareValueRepository: context.read(),
+                userSettingRepository: context.read(),
               );
               weatherViewModel.load.execute();
 
@@ -144,6 +146,7 @@ GoRouter router() => GoRouter(
                     speciesDescriptionService: context.read(),
                     weatherService: context.read(),
                     gbifSearcher: context.read(),
+                    collectionRepository: context.read(),
                   );
                   viewModel.load.execute(id);
                   return PlantScreen(

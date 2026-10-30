@@ -34,7 +34,8 @@ enum UserSettingsKeys {
 
   weatherPlace('weather_place'),
   weatherLatitude('weather_latitude'),
-  weatherLongitude('weather_longitude');
+  weatherLongitude('weather_longitude'),
+  dismissedWeatherAlerts('dismissed_weather_alerts');
 
   final String key;
 

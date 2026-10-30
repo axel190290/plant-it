@@ -1641,4 +1641,41 @@ class LEs extends L {
 
   @override
   String get createReminderHint => 'Recibe un aviso para un cuidado';
+
+  @override
+  String get plantCollections => 'Grupos';
+
+  @override
+  String get allPlants => 'Todas';
+
+  @override
+  String get newCollection => 'Nuevo grupo';
+
+  @override
+  String get collectionName => 'Nombre del grupo';
+
+  @override
+  String get renameCollection => 'Renombrar';
+
+  @override
+  String get choosePlants => 'Elegir plantas';
+
+  @override
+  String get deleteCollection => 'Eliminar grupo';
+
+  @override
+  String deleteCollectionConfirm(String name) {
+    return '¿Eliminar el grupo $name? Sus plantas no se eliminan.';
+  }
+
+  @override
+  String get emptyCollection =>
+      'Aún no hay plantas en este grupo. Mantenlo pulsado para elegirlas.';
+
+  @override
+  String get noCollectionsYet =>
+      'Aún no hay grupos: crea uno para ordenar tus plantas.';
+
+  @override
+  String get swipeToDismiss => 'Desliza una alerta para descartarla';
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:plant_it/data/repository/care_field_repository.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
@@ -75,6 +76,9 @@ List<SingleChildWidget> get providersLocal {
     ),
     Provider(
       create: (context) => SpeciesCareValueRepository(db: context.read()),
+    ),
+    Provider(
+      create: (context) => CollectionRepository(db: context.read()),
     ),
     Provider(
       create: (context) => SpeciesSynonymsRepository(db: context.read()),

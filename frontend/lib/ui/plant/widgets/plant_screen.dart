@@ -11,6 +11,8 @@ import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/domain/models/plant_location.dart';
 import 'package:plant_it/ui/core/ui/care_value_dialog.dart';
+import 'package:plant_it/ui/core/ui/collection_dialogs.dart';
+import 'package:result_dart/result_dart.dart';
 import 'package:plant_it/ui/core/ui/weather_format.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/core/ui/event_card.dart';
@@ -371,6 +373,36 @@ class _PlantScreenState extends State<PlantScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _editCollections() async {
+    L l = L.of(context);
+    (List<db.Collection>, Set<int>) current =
+        await widget.viewModel.collections();
+    if (!mounted) return;
+    Set<int>? chosen = await showMultiPickDialog(
+      context,
+      title: l.plantCollections,
+      options: collectionNames(current.$1),
+      selected: current.$2,
+      emptyText: l.noCollectionsYet,
+      onCreate: () async {
+        String? name = await showCollectionNameDialog(context);
+        if (name == null) return null;
+        Result<int> id = await widget.viewModel.createCollection(name);
+        return id.isSuccess() ? MapEntry(id.getOrThrow(), name) : null;
+      },
+    );
+    if (chosen == null || !mounted) return;
+    Result<void> saved = await widget.viewModel.setCollections(chosen);
+    if (!mounted) return;
+    if (saved.isError()) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content:
+              Text(l.errorWithMessage(saved.exceptionOrNull().toString()))));
+      return;
+    }
+    widget.streamController.add(StreamCode.editPlant);
   }
 
   void _editCare() {
@@ -808,6 +840,18 @@ class _PlantScreenState extends State<PlantScreen> {
                             ),
                           ),
                           PopupMenuItem(
+                            value: 'collections',
+                            textStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface),
+                            child: ListTile(
+                              leading: Icon(
+                                LucideIcons.folder,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
+                              title: Text(appLocalizations.plantCollections),
+                            ),
+                          ),
+                          PopupMenuItem(
                             value: 'duplicate',
                             textStyle: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface),
@@ -840,6 +884,8 @@ class _PlantScreenState extends State<PlantScreen> {
                           _changeImage();
                         } else if (value == 'editCare') {
                           _editCare();
+                        } else if (value == 'collections') {
+                          _editCollections();
                         } else if (value == 'duplicate') {
                           Command<void, void> command =
                               widget.viewModel.duplicatePlant;

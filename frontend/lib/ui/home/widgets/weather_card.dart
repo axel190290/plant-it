@@ -187,20 +187,32 @@ class _WeatherCardState extends State<WeatherCard> {
                   ),
                 ),
               ),
-              ...widget.viewModel.alerts.map((alert) => Card(
-                    color: Theme.of(context).colorScheme.errorContainer,
-                    child: ListTile(
-                      leading: Icon(_alertIcon(alert.type),
-                          color:
-                              Theme.of(context).colorScheme.onErrorContainer),
-                      title: Text(
-                        _alertText(l, alert),
-                        style: TextStyle(
+              // Swiped to either side, an alert is dismissed
+              ...widget.viewModel.alerts.map((alert) => Dismissible(
+                    key: ValueKey(alert.key(DateTime.now())),
+                    onDismissed: (_) => widget.viewModel.dismiss(alert),
+                    child: Card(
+                      color: Theme.of(context).colorScheme.errorContainer,
+                      child: ListTile(
+                        leading: Icon(_alertIcon(alert.type),
                             color:
                                 Theme.of(context).colorScheme.onErrorContainer),
+                        title: Text(
+                          _alertText(l, alert),
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onErrorContainer),
+                        ),
                       ),
                     ),
                   )),
+              if (widget.viewModel.alerts.isNotEmpty)
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(l.swipeToDismiss,
+                      style: Theme.of(context).textTheme.bodySmall),
+                ),
             ],
           ),
         );

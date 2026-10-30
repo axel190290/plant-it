@@ -1737,4 +1737,41 @@ class LIt extends L {
 
   @override
   String get createReminderHint => 'Ricevi un promemoria per una cura';
+
+  @override
+  String get plantCollections => 'Gruppi';
+
+  @override
+  String get allPlants => 'Tutte';
+
+  @override
+  String get newCollection => 'Nuovo gruppo';
+
+  @override
+  String get collectionName => 'Nome del gruppo';
+
+  @override
+  String get renameCollection => 'Rinomina';
+
+  @override
+  String get choosePlants => 'Scegli piante';
+
+  @override
+  String get deleteCollection => 'Elimina gruppo';
+
+  @override
+  String deleteCollectionConfirm(String name) {
+    return 'Eliminare il gruppo $name? Le sue piante restano.';
+  }
+
+  @override
+  String get emptyCollection =>
+      'Ancora nessuna pianta in questo gruppo. Tienilo premuto per sceglierle.';
+
+  @override
+  String get noCollectionsYet =>
+      'Ancora nessun gruppo: creane uno per ordinare le piante.';
+
+  @override
+  String get swipeToDismiss => 'Scorri un avviso per ignorarlo';
 }

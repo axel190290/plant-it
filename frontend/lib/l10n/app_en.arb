@@ -760,5 +760,23 @@
         "type": "int"
       }
     }
+  },
+  "plantCollections": "Groups",
+  "allPlants": "All",
+  "newCollection": "New group",
+  "collectionName": "Group name",
+  "renameCollection": "Rename",
+  "choosePlants": "Choose plants",
+  "deleteCollection": "Delete group",
+  "deleteCollectionConfirm": "Delete the group {name}? Its plants are kept.",
+  "emptyCollection": "No plants in this group yet. Long press it to choose them.",
+  "noCollectionsYet": "No groups yet: create one to sort your plants.",
+  "swipeToDismiss": "Swipe an alert to dismiss it",
+  "@deleteCollectionConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

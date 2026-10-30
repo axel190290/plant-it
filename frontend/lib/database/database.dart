@@ -171,6 +171,24 @@ class Images extends Table {
       ];
 }
 
+/// A group of plants made by the user, such as "Balcony" or "Living room".
+class Collections extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  TextColumn get name => text().withLength(min: 1, max: 50)();
+  IntColumn get position => integer().withDefault(const Constant(0))();
+}
+
+/// The groups each plant is in; a plant can be in several.
+class PlantCollections extends Table {
+  IntColumn get plant =>
+      integer().references(Plants, #id, onDelete: KeyAction.cascade)();
+  IntColumn get collection =>
+      integer().references(Collections, #id, onDelete: KeyAction.cascade)();
+
+  @override
+  Set<Column<Object>> get primaryKey => {plant, collection};
+}
+
 class UserSettings extends Table {
   TextColumn get key => text().withLength(max: 50)();
   TextColumn get value => text()();
@@ -198,6 +216,8 @@ class NotificationTranslations extends Table {
   Events,
   Reminders,
   Images,
+  Collections,
+  PlantCollections,
   UserSettings,
   NotificationTranslations,
 ])
@@ -207,7 +227,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -257,6 +277,10 @@ class AppDatabase extends _$AppDatabase {
         if (from >= 2 && from < 8) {
           await m.addColumn(speciesCareValues, speciesCareValues.source);
           await initMissingCareFields();
+        }
+        if (from < 9) {
+          await m.createTable(collections);
+          await m.createTable(plantCollections);
         }
       },
       beforeOpen: (details) async {

@@ -7,6 +7,7 @@ import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 import 'package:plant_it/ui/home/view_models/weather_viewmodel.dart';
+import 'package:plant_it/ui/home/widgets/collection_chips.dart';
 import 'package:plant_it/ui/home/widgets/weather_card.dart';
 import 'package:plant_it/ui/home/widgets/plant_card_list.dart';
 import 'package:plant_it/ui/home/widgets/homescreen_empty_data.dart';
@@ -100,9 +101,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   viewModel: widget.weatherViewModel,
                   streamController: widget.streamController,
                 ),
-                PlantCardList(
-                  viewModel: widget.viewModel,
-                  filter: _filter,
+                ListenableBuilder(
+                  listenable: widget.viewModel,
+                  builder: (context, _) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      CollectionChips(viewModel: widget.viewModel),
+                      const SizedBox(height: 8),
+                      PlantCardList(
+                        viewModel: widget.viewModel,
+                        filter: _filter,
+                      ),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 20),
               ],

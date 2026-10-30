@@ -4,6 +4,7 @@ import 'package:command_it/command_it.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
@@ -19,8 +20,10 @@ class HomeViewModel extends ChangeNotifier {
     required ReminderOccurrenceRepository reminderOccurrenceRepository,
     required ImageRepository imageRepository,
     required EventRepository eventRepository,
+    required CollectionRepository collectionRepository,
     required StreamController<StreamCode> streamController,
   })  : _plantRepository = plantRepository,
+        _collectionRepository = collectionRepository,
         _reminderOccurrenceRepository = reminderOccurrenceRepository,
         _imageRepository = imageRepository,
         _eventRepository = eventRepository,
@@ -42,12 +45,17 @@ class HomeViewModel extends ChangeNotifier {
   final ReminderOccurrenceRepository _reminderOccurrenceRepository;
   final ImageRepository _imageRepository;
   final EventRepository _eventRepository;
+  final CollectionRepository _collectionRepository;
   final StreamController<StreamCode> _streamController;
   final _log = Logger('HomeViewModel');
   List<db.Plant> _plants = [];
   final Map<int, db.Plant> _plantMap = {};
   final Map<int, String?> _imagesBase64 = {};
   List<ReminderOccurrence> _reminderOccurences = [];
+  List<db.Collection> _collections = [];
+  Map<int, Set<int>> _plantsByCollection = {};
+  // The group whose plants are shown, or null for all of them
+  int? _selectedCollection;
 
   late final Command<void, void> load;
   late final Command<ReminderOccurrence, void> createEventFromReminder;
@@ -56,6 +64,65 @@ class HomeViewModel extends ChangeNotifier {
   Map<int, db.Plant> get plantMap => _plantMap;
   Map<int, String?> get imagesBase64 => _imagesBase64;
   List<ReminderOccurrence> get reminderOccurrences => _reminderOccurences;
+  List<db.Collection> get collections => _collections;
+  int? get selectedCollection => _selectedCollection;
+
+  /// The ids of the plants of the group [collectionId].
+  Set<int> plantsOf(int collectionId) =>
+      _plantsByCollection[collectionId] ?? const {};
+
+  /// Whether [plantId] is shown with the chosen group.
+  bool isShown(int plantId) =>
+      _selectedCollection == null ||
+      plantsOf(_selectedCollection!).contains(plantId);
+
+  void selectCollection(int? collectionId) {
+    _selectedCollection = collectionId;
+    notifyListeners();
+  }
+
+  Future<void> _loadCollections() async {
+    _collections = (await _collectionRepository.getAll()).getOrDefault([]);
+    _plantsByCollection =
+        (await _collectionRepository.getPlantsByCollection()).getOrDefault({});
+    if (_selectedCollection != null &&
+        !_collections.any((c) => c.id == _selectedCollection)) {
+      _selectedCollection = null;
+    }
+  }
+
+  /// Creates a group and shows it. Returns its id.
+  Future<Result<int>> createCollection(String name) async {
+    Result<int> id = await _collectionRepository.insert(name);
+    if (id.isSuccess()) {
+      await _loadCollections();
+      _selectedCollection = id.getOrThrow();
+      notifyListeners();
+    }
+    return id;
+  }
+
+  Future<Result<void>> renameCollection(int id, String name) async {
+    Result<void> result = await _collectionRepository.rename(id, name);
+    await _loadCollections();
+    notifyListeners();
+    return result;
+  }
+
+  Future<Result<void>> deleteCollection(int id) async {
+    Result<void> result = await _collectionRepository.delete(id);
+    await _loadCollections();
+    notifyListeners();
+    return result;
+  }
+
+  Future<Result<void>> setPlantsOfCollection(int id, Set<int> plantIds) async {
+    Result<void> result =
+        await _collectionRepository.setPlantsOfCollection(id, plantIds);
+    await _loadCollections();
+    notifyListeners();
+    return result;
+  }
 
   Future<Result<void>> _load() async {
     final loadPlants = await _loadPlants();
@@ -66,6 +133,7 @@ class HomeViewModel extends ChangeNotifier {
     if (loadAvatarBase64.isError()) {
       return loadAvatarBase64.exceptionOrNull()!.toFailure();
     }
+    await _loadCollections();
     final loadReminderOccurrences = await _loadReminderOccurrences();
     if (loadReminderOccurrences.isError()) {
       return loadReminderOccurrences.exceptionOrNull()!.toFailure();

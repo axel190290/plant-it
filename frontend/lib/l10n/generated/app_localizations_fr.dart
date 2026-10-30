@@ -1637,4 +1637,41 @@ class LFr extends L {
 
   @override
   String get createReminderHint => 'Recevez un rappel pour un soin';
+
+  @override
+  String get plantCollections => 'Groupes';
+
+  @override
+  String get allPlants => 'Toutes';
+
+  @override
+  String get newCollection => 'Nouveau groupe';
+
+  @override
+  String get collectionName => 'Nom du groupe';
+
+  @override
+  String get renameCollection => 'Renommer';
+
+  @override
+  String get choosePlants => 'Choisir des plantes';
+
+  @override
+  String get deleteCollection => 'Supprimer le groupe';
+
+  @override
+  String deleteCollectionConfirm(String name) {
+    return 'Supprimer le groupe $name ? Ses plantes sont conservées.';
+  }
+
+  @override
+  String get emptyCollection =>
+      'Pas encore de plantes dans ce groupe. Appuyez longuement pour les choisir.';
+
+  @override
+  String get noCollectionsYet =>
+      'Pas encore de groupes : créez-en un pour classer vos plantes.';
+
+  @override
+  String get swipeToDismiss => 'Balayez une alerte pour l\'ignorer';
 }

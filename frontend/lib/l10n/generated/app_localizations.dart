@@ -2605,6 +2605,72 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Get reminded of a care'**
   String get createReminderHint;
+
+  /// No description provided for @plantCollections.
+  ///
+  /// In en, this message translates to:
+  /// **'Groups'**
+  String get plantCollections;
+
+  /// No description provided for @allPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allPlants;
+
+  /// No description provided for @newCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'New group'**
+  String get newCollection;
+
+  /// No description provided for @collectionName.
+  ///
+  /// In en, this message translates to:
+  /// **'Group name'**
+  String get collectionName;
+
+  /// No description provided for @renameCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get renameCollection;
+
+  /// No description provided for @choosePlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose plants'**
+  String get choosePlants;
+
+  /// No description provided for @deleteCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete group'**
+  String get deleteCollection;
+
+  /// No description provided for @deleteCollectionConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the group {name}? Its plants are kept.'**
+  String deleteCollectionConfirm(String name);
+
+  /// No description provided for @emptyCollection.
+  ///
+  /// In en, this message translates to:
+  /// **'No plants in this group yet. Long press it to choose them.'**
+  String get emptyCollection;
+
+  /// No description provided for @noCollectionsYet.
+  ///
+  /// In en, this message translates to:
+  /// **'No groups yet: create one to sort your plants.'**
+  String get noCollectionsYet;
+
+  /// No description provided for @swipeToDismiss.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe an alert to dismiss it'**
+  String get swipeToDismiss;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

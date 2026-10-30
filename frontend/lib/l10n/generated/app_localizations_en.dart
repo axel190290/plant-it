@@ -1629,4 +1629,41 @@ class LEn extends L {
 
   @override
   String get createReminderHint => 'Get reminded of a care';
+
+  @override
+  String get plantCollections => 'Groups';
+
+  @override
+  String get allPlants => 'All';
+
+  @override
+  String get newCollection => 'New group';
+
+  @override
+  String get collectionName => 'Group name';
+
+  @override
+  String get renameCollection => 'Rename';
+
+  @override
+  String get choosePlants => 'Choose plants';
+
+  @override
+  String get deleteCollection => 'Delete group';
+
+  @override
+  String deleteCollectionConfirm(String name) {
+    return 'Delete the group $name? Its plants are kept.';
+  }
+
+  @override
+  String get emptyCollection =>
+      'No plants in this group yet. Long press it to choose them.';
+
+  @override
+  String get noCollectionsYet =>
+      'No groups yet: create one to sort your plants.';
+
+  @override
+  String get swipeToDismiss => 'Swipe an alert to dismiss it';
 }

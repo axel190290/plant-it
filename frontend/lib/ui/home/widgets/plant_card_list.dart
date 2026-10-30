@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 
@@ -24,10 +25,19 @@ class PlantCardList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<int> plantIds = viewModel.plantMap.keys.where((id) {
-      return viewModel.plantMap[id]!.name
-          .toLowerCase()
-          .contains(filter.toLowerCase());
+      return viewModel.isShown(id) &&
+          viewModel.plantMap[id]!.name
+              .toLowerCase()
+              .contains(filter.toLowerCase());
     }).toList();
+    if (plantIds.isEmpty && viewModel.selectedCollection != null) {
+      return Padding(
+        padding: const EdgeInsets.all(24),
+        child: Text(L.of(context).emptyCollection,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium),
+      );
+    }
 
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 15),

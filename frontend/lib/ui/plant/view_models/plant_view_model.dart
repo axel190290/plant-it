@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:plant_it/data/repository/care_field_repository.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
@@ -43,7 +44,9 @@ class PlantViewModel extends ChangeNotifier {
     required SpeciesDescriptionService speciesDescriptionService,
     required WeatherService weatherService,
     required GbifSearcher gbifSearcher,
+    required CollectionRepository collectionRepository,
   })  : _weatherService = weatherService,
+        _collectionRepository = collectionRepository,
         _gbifSearcher = gbifSearcher,
         _speciesDescriptionService = speciesDescriptionService,
         _careFieldRepository = careFieldRepository,
@@ -126,6 +129,7 @@ class PlantViewModel extends ChangeNotifier {
   List<db.CareField> _careFields = [];
   Map<int, CareValue> _careValues = {};
   final PlantRepository _plantRepository;
+  final CollectionRepository _collectionRepository;
   final SpeciesRepository _speciesRepository;
   final SpeciesCareRepository _speciesCareRepository;
   final ImageRepository _imageRepository;
@@ -612,4 +616,19 @@ class PlantViewModel extends ChangeNotifier {
 
     return Success("Image downloaded successfully to $filePath");
   }
+
+  /// The groups of plants and the ids of the ones this plant is in.
+  Future<(List<db.Collection>, Set<int>)> collections() async => (
+        (await _collectionRepository.getAll()).getOrDefault([]),
+        (await _collectionRepository.getCollectionsOfPlant(id))
+            .getOrDefault({}),
+      );
+
+  /// Puts this plant in exactly the groups [collectionIds].
+  Future<Result<void>> setCollections(Set<int> collectionIds) =>
+      _collectionRepository.setCollectionsOfPlant(id, collectionIds);
+
+  /// Creates a group and returns its id.
+  Future<Result<int>> createCollection(String name) =>
+      _collectionRepository.insert(name);
 }

@@ -4254,6 +4254,423 @@ class ImagesCompanion extends UpdateCompanion<Image> {
   }
 }
 
+class $CollectionsTable extends Collections
+    with TableInfo<$CollectionsTable, Collection> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $CollectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+      'name', aliasedName, false,
+      additionalChecks:
+          GeneratedColumn.checkTextLength(minTextLength: 1, maxTextLength: 50),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _positionMeta =
+      const VerificationMeta('position');
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+      'position', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  @override
+  List<GeneratedColumn> get $columns => [id, name, position];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'collections';
+  @override
+  VerificationContext validateIntegrity(Insertable<Collection> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+          _nameMeta, name.isAcceptableOrUnknown(data['name']!, _nameMeta));
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(_positionMeta,
+          position.isAcceptableOrUnknown(data['position']!, _positionMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  Collection map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return Collection(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      name: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
+      position: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}position'])!,
+    );
+  }
+
+  @override
+  $CollectionsTable createAlias(String alias) {
+    return $CollectionsTable(attachedDatabase, alias);
+  }
+}
+
+class Collection extends DataClass implements Insertable<Collection> {
+  final int id;
+  final String name;
+  final int position;
+  const Collection(
+      {required this.id, required this.name, required this.position});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['position'] = Variable<int>(position);
+    return map;
+  }
+
+  CollectionsCompanion toCompanion(bool nullToAbsent) {
+    return CollectionsCompanion(
+      id: Value(id),
+      name: Value(name),
+      position: Value(position),
+    );
+  }
+
+  factory Collection.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return Collection(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      position: serializer.fromJson<int>(json['position']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'position': serializer.toJson<int>(position),
+    };
+  }
+
+  Collection copyWith({int? id, String? name, int? position}) => Collection(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        position: position ?? this.position,
+      );
+  Collection copyWithCompanion(CollectionsCompanion data) {
+    return Collection(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      position: data.position.present ? data.position.value : this.position,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('Collection(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, position);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is Collection &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.position == this.position);
+}
+
+class CollectionsCompanion extends UpdateCompanion<Collection> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<int> position;
+  const CollectionsCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.position = const Value.absent(),
+  });
+  CollectionsCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    this.position = const Value.absent(),
+  }) : name = Value(name);
+  static Insertable<Collection> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<int>? position,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (position != null) 'position': position,
+    });
+  }
+
+  CollectionsCompanion copyWith(
+      {Value<int>? id, Value<String>? name, Value<int>? position}) {
+    return CollectionsCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      position: position ?? this.position,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('CollectionsCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('position: $position')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $PlantCollectionsTable extends PlantCollections
+    with TableInfo<$PlantCollectionsTable, PlantCollection> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $PlantCollectionsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _plantMeta = const VerificationMeta('plant');
+  @override
+  late final GeneratedColumn<int> plant = GeneratedColumn<int>(
+      'plant', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES plants (id) ON DELETE CASCADE'));
+  static const VerificationMeta _collectionMeta =
+      const VerificationMeta('collection');
+  @override
+  late final GeneratedColumn<int> collection = GeneratedColumn<int>(
+      'collection', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'REFERENCES collections (id) ON DELETE CASCADE'));
+  @override
+  List<GeneratedColumn> get $columns => [plant, collection];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'plant_collections';
+  @override
+  VerificationContext validateIntegrity(Insertable<PlantCollection> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('plant')) {
+      context.handle(
+          _plantMeta, plant.isAcceptableOrUnknown(data['plant']!, _plantMeta));
+    } else if (isInserting) {
+      context.missing(_plantMeta);
+    }
+    if (data.containsKey('collection')) {
+      context.handle(
+          _collectionMeta,
+          collection.isAcceptableOrUnknown(
+              data['collection']!, _collectionMeta));
+    } else if (isInserting) {
+      context.missing(_collectionMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {plant, collection};
+  @override
+  PlantCollection map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return PlantCollection(
+      plant: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}plant'])!,
+      collection: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}collection'])!,
+    );
+  }
+
+  @override
+  $PlantCollectionsTable createAlias(String alias) {
+    return $PlantCollectionsTable(attachedDatabase, alias);
+  }
+}
+
+class PlantCollection extends DataClass implements Insertable<PlantCollection> {
+  final int plant;
+  final int collection;
+  const PlantCollection({required this.plant, required this.collection});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['plant'] = Variable<int>(plant);
+    map['collection'] = Variable<int>(collection);
+    return map;
+  }
+
+  PlantCollectionsCompanion toCompanion(bool nullToAbsent) {
+    return PlantCollectionsCompanion(
+      plant: Value(plant),
+      collection: Value(collection),
+    );
+  }
+
+  factory PlantCollection.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return PlantCollection(
+      plant: serializer.fromJson<int>(json['plant']),
+      collection: serializer.fromJson<int>(json['collection']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'plant': serializer.toJson<int>(plant),
+      'collection': serializer.toJson<int>(collection),
+    };
+  }
+
+  PlantCollection copyWith({int? plant, int? collection}) => PlantCollection(
+        plant: plant ?? this.plant,
+        collection: collection ?? this.collection,
+      );
+  PlantCollection copyWithCompanion(PlantCollectionsCompanion data) {
+    return PlantCollection(
+      plant: data.plant.present ? data.plant.value : this.plant,
+      collection:
+          data.collection.present ? data.collection.value : this.collection,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlantCollection(')
+          ..write('plant: $plant, ')
+          ..write('collection: $collection')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(plant, collection);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is PlantCollection &&
+          other.plant == this.plant &&
+          other.collection == this.collection);
+}
+
+class PlantCollectionsCompanion extends UpdateCompanion<PlantCollection> {
+  final Value<int> plant;
+  final Value<int> collection;
+  final Value<int> rowid;
+  const PlantCollectionsCompanion({
+    this.plant = const Value.absent(),
+    this.collection = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  PlantCollectionsCompanion.insert({
+    required int plant,
+    required int collection,
+    this.rowid = const Value.absent(),
+  })  : plant = Value(plant),
+        collection = Value(collection);
+  static Insertable<PlantCollection> custom({
+    Expression<int>? plant,
+    Expression<int>? collection,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (plant != null) 'plant': plant,
+      if (collection != null) 'collection': collection,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  PlantCollectionsCompanion copyWith(
+      {Value<int>? plant, Value<int>? collection, Value<int>? rowid}) {
+    return PlantCollectionsCompanion(
+      plant: plant ?? this.plant,
+      collection: collection ?? this.collection,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (plant.present) {
+      map['plant'] = Variable<int>(plant.value);
+    }
+    if (collection.present) {
+      map['collection'] = Variable<int>(collection.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('PlantCollectionsCompanion(')
+          ..write('plant: $plant, ')
+          ..write('collection: $collection, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $UserSettingsTable extends UserSettings
     with TableInfo<$UserSettingsTable, UserSetting> {
   @override
@@ -4658,6 +5075,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $EventsTable events = $EventsTable(this);
   late final $RemindersTable reminders = $RemindersTable(this);
   late final $ImagesTable images = $ImagesTable(this);
+  late final $CollectionsTable collections = $CollectionsTable(this);
+  late final $PlantCollectionsTable plantCollections =
+      $PlantCollectionsTable(this);
   late final $UserSettingsTable userSettings = $UserSettingsTable(this);
   late final $NotificationTranslationsTable notificationTranslations =
       $NotificationTranslationsTable(this);
@@ -4676,6 +5096,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         events,
         reminders,
         images,
+        collections,
+        plantCollections,
         userSettings,
         notificationTranslations
       ];
@@ -4757,6 +5179,20 @@ abstract class _$AppDatabase extends GeneratedDatabase {
                 limitUpdateKind: UpdateKind.delete),
             result: [
               TableUpdate('images', kind: UpdateKind.delete),
+            ],
+          ),
+          WritePropagation(
+            on: TableUpdateQuery.onTableName('plants',
+                limitUpdateKind: UpdateKind.delete),
+            result: [
+              TableUpdate('plant_collections', kind: UpdateKind.delete),
+            ],
+          ),
+          WritePropagation(
+            on: TableUpdateQuery.onTableName('collections',
+                limitUpdateKind: UpdateKind.delete),
+            result: [
+              TableUpdate('plant_collections', kind: UpdateKind.delete),
             ],
           ),
         ],
@@ -5838,6 +6274,23 @@ final class $$PlantsTableReferences
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
+
+  static MultiTypedResultKey<$PlantCollectionsTable, List<PlantCollection>>
+      _plantCollectionsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.plantCollections,
+              aliasName: $_aliasNameGenerator(
+                  db.plants.id, db.plantCollections.plant));
+
+  $$PlantCollectionsTableProcessedTableManager get plantCollectionsRefs {
+    final manager =
+        $$PlantCollectionsTableTableManager($_db, $_db.plantCollections)
+            .filter((f) => f.plant.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_plantCollectionsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
 }
 
 class $$PlantsTableFilterComposer
@@ -5953,6 +6406,27 @@ class $$PlantsTableFilterComposer
             $$ImagesTableFilterComposer(
               $db: $db,
               $table: $db.images,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> plantCollectionsRefs(
+      Expression<bool> Function($$PlantCollectionsTableFilterComposer f) f) {
+    final $$PlantCollectionsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.plantCollections,
+        getReferencedColumn: (t) => t.plant,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PlantCollectionsTableFilterComposer(
+              $db: $db,
+              $table: $db.plantCollections,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -6138,6 +6612,27 @@ class $$PlantsTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> plantCollectionsRefs<T extends Object>(
+      Expression<T> Function($$PlantCollectionsTableAnnotationComposer a) f) {
+    final $$PlantCollectionsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.plantCollections,
+        getReferencedColumn: (t) => t.plant,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PlantCollectionsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.plantCollections,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $$PlantsTableTableManager extends RootTableManager<
@@ -6152,7 +6647,11 @@ class $$PlantsTableTableManager extends RootTableManager<
     (Plant, $$PlantsTableReferences),
     Plant,
     PrefetchHooks Function(
-        {bool species, bool eventsRefs, bool remindersRefs, bool imagesRefs})> {
+        {bool species,
+        bool eventsRefs,
+        bool remindersRefs,
+        bool imagesRefs,
+        bool plantCollectionsRefs})> {
   $$PlantsTableTableManager(_$AppDatabase db, $PlantsTable table)
       : super(TableManagerState(
           db: db,
@@ -6219,13 +6718,15 @@ class $$PlantsTableTableManager extends RootTableManager<
               {species = false,
               eventsRefs = false,
               remindersRefs = false,
-              imagesRefs = false}) {
+              imagesRefs = false,
+              plantCollectionsRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
                 if (eventsRefs) db.events,
                 if (remindersRefs) db.reminders,
-                if (imagesRefs) db.images
+                if (imagesRefs) db.images,
+                if (plantCollectionsRefs) db.plantCollections
               ],
               addJoins: <
                   T extends TableManagerState<
@@ -6287,6 +6788,19 @@ class $$PlantsTableTableManager extends RootTableManager<
                         referencedItemsForCurrentItem: (item,
                                 referencedItems) =>
                             referencedItems.where((e) => e.plantId == item.id),
+                        typedResults: items),
+                  if (plantCollectionsRefs)
+                    await $_getPrefetchedData<Plant, $PlantsTable,
+                            PlantCollection>(
+                        currentTable: table,
+                        referencedTable: $$PlantsTableReferences
+                            ._plantCollectionsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$PlantsTableReferences(db, table, p0)
+                                .plantCollectionsRefs,
+                        referencedItemsForCurrentItem: (item,
+                                referencedItems) =>
+                            referencedItems.where((e) => e.plant == item.id),
                         typedResults: items)
                 ];
               },
@@ -6307,7 +6821,11 @@ typedef $$PlantsTableProcessedTableManager = ProcessedTableManager<
     (Plant, $$PlantsTableReferences),
     Plant,
     PrefetchHooks Function(
-        {bool species, bool eventsRefs, bool remindersRefs, bool imagesRefs})>;
+        {bool species,
+        bool eventsRefs,
+        bool remindersRefs,
+        bool imagesRefs,
+        bool plantCollectionsRefs})>;
 typedef $$SpeciesSynonymsTableCreateCompanionBuilder = SpeciesSynonymsCompanion
     Function({
   Value<int> id,
@@ -8706,6 +9224,537 @@ typedef $$ImagesTableProcessedTableManager = ProcessedTableManager<
     (Image, $$ImagesTableReferences),
     Image,
     PrefetchHooks Function({bool plantId, bool speciesId})>;
+typedef $$CollectionsTableCreateCompanionBuilder = CollectionsCompanion
+    Function({
+  Value<int> id,
+  required String name,
+  Value<int> position,
+});
+typedef $$CollectionsTableUpdateCompanionBuilder = CollectionsCompanion
+    Function({
+  Value<int> id,
+  Value<String> name,
+  Value<int> position,
+});
+
+final class $$CollectionsTableReferences
+    extends BaseReferences<_$AppDatabase, $CollectionsTable, Collection> {
+  $$CollectionsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<$PlantCollectionsTable, List<PlantCollection>>
+      _plantCollectionsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.plantCollections,
+              aliasName: $_aliasNameGenerator(
+                  db.collections.id, db.plantCollections.collection));
+
+  $$PlantCollectionsTableProcessedTableManager get plantCollectionsRefs {
+    final manager =
+        $$PlantCollectionsTableTableManager($_db, $_db.plantCollections)
+            .filter((f) => f.collection.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_plantCollectionsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+}
+
+class $$CollectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnFilters(column));
+
+  Expression<bool> plantCollectionsRefs(
+      Expression<bool> Function($$PlantCollectionsTableFilterComposer f) f) {
+    final $$PlantCollectionsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.plantCollections,
+        getReferencedColumn: (t) => t.collection,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PlantCollectionsTableFilterComposer(
+              $db: $db,
+              $table: $db.plantCollections,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$CollectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get position => $composableBuilder(
+      column: $table.position, builder: (column) => ColumnOrderings(column));
+}
+
+class $$CollectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $CollectionsTable> {
+  $$CollectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  Expression<T> plantCollectionsRefs<T extends Object>(
+      Expression<T> Function($$PlantCollectionsTableAnnotationComposer a) f) {
+    final $$PlantCollectionsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.plantCollections,
+        getReferencedColumn: (t) => t.collection,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PlantCollectionsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.plantCollections,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+}
+
+class $$CollectionsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $CollectionsTable,
+    Collection,
+    $$CollectionsTableFilterComposer,
+    $$CollectionsTableOrderingComposer,
+    $$CollectionsTableAnnotationComposer,
+    $$CollectionsTableCreateCompanionBuilder,
+    $$CollectionsTableUpdateCompanionBuilder,
+    (Collection, $$CollectionsTableReferences),
+    Collection,
+    PrefetchHooks Function({bool plantCollectionsRefs})> {
+  $$CollectionsTableTableManager(_$AppDatabase db, $CollectionsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$CollectionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$CollectionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$CollectionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> name = const Value.absent(),
+            Value<int> position = const Value.absent(),
+          }) =>
+              CollectionsCompanion(
+            id: id,
+            name: name,
+            position: position,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String name,
+            Value<int> position = const Value.absent(),
+          }) =>
+              CollectionsCompanion.insert(
+            id: id,
+            name: name,
+            position: position,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$CollectionsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({plantCollectionsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (plantCollectionsRefs) db.plantCollections
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (plantCollectionsRefs)
+                    await $_getPrefetchedData<Collection, $CollectionsTable,
+                            PlantCollection>(
+                        currentTable: table,
+                        referencedTable: $$CollectionsTableReferences
+                            ._plantCollectionsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$CollectionsTableReferences(db, table, p0)
+                                .plantCollectionsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.collection == item.id),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$CollectionsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $CollectionsTable,
+    Collection,
+    $$CollectionsTableFilterComposer,
+    $$CollectionsTableOrderingComposer,
+    $$CollectionsTableAnnotationComposer,
+    $$CollectionsTableCreateCompanionBuilder,
+    $$CollectionsTableUpdateCompanionBuilder,
+    (Collection, $$CollectionsTableReferences),
+    Collection,
+    PrefetchHooks Function({bool plantCollectionsRefs})>;
+typedef $$PlantCollectionsTableCreateCompanionBuilder
+    = PlantCollectionsCompanion Function({
+  required int plant,
+  required int collection,
+  Value<int> rowid,
+});
+typedef $$PlantCollectionsTableUpdateCompanionBuilder
+    = PlantCollectionsCompanion Function({
+  Value<int> plant,
+  Value<int> collection,
+  Value<int> rowid,
+});
+
+final class $$PlantCollectionsTableReferences extends BaseReferences<
+    _$AppDatabase, $PlantCollectionsTable, PlantCollection> {
+  $$PlantCollectionsTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $PlantsTable _plantTable(_$AppDatabase db) => db.plants.createAlias(
+      $_aliasNameGenerator(db.plantCollections.plant, db.plants.id));
+
+  $$PlantsTableProcessedTableManager get plant {
+    final $_column = $_itemColumn<int>('plant')!;
+
+    final manager = $$PlantsTableTableManager($_db, $_db.plants)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_plantTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+
+  static $CollectionsTable _collectionTable(_$AppDatabase db) =>
+      db.collections.createAlias($_aliasNameGenerator(
+          db.plantCollections.collection, db.collections.id));
+
+  $$CollectionsTableProcessedTableManager get collection {
+    final $_column = $_itemColumn<int>('collection')!;
+
+    final manager = $$CollectionsTableTableManager($_db, $_db.collections)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_collectionTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$PlantCollectionsTableFilterComposer
+    extends Composer<_$AppDatabase, $PlantCollectionsTable> {
+  $$PlantCollectionsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$PlantsTableFilterComposer get plant {
+    final $$PlantsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.plant,
+        referencedTable: $db.plants,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PlantsTableFilterComposer(
+              $db: $db,
+              $table: $db.plants,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$CollectionsTableFilterComposer get collection {
+    final $$CollectionsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.collection,
+        referencedTable: $db.collections,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CollectionsTableFilterComposer(
+              $db: $db,
+              $table: $db.collections,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$PlantCollectionsTableOrderingComposer
+    extends Composer<_$AppDatabase, $PlantCollectionsTable> {
+  $$PlantCollectionsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$PlantsTableOrderingComposer get plant {
+    final $$PlantsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.plant,
+        referencedTable: $db.plants,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PlantsTableOrderingComposer(
+              $db: $db,
+              $table: $db.plants,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$CollectionsTableOrderingComposer get collection {
+    final $$CollectionsTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.collection,
+        referencedTable: $db.collections,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CollectionsTableOrderingComposer(
+              $db: $db,
+              $table: $db.collections,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$PlantCollectionsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $PlantCollectionsTable> {
+  $$PlantCollectionsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  $$PlantsTableAnnotationComposer get plant {
+    final $$PlantsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.plant,
+        referencedTable: $db.plants,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$PlantsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.plants,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+
+  $$CollectionsTableAnnotationComposer get collection {
+    final $$CollectionsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.collection,
+        referencedTable: $db.collections,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$CollectionsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.collections,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$PlantCollectionsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $PlantCollectionsTable,
+    PlantCollection,
+    $$PlantCollectionsTableFilterComposer,
+    $$PlantCollectionsTableOrderingComposer,
+    $$PlantCollectionsTableAnnotationComposer,
+    $$PlantCollectionsTableCreateCompanionBuilder,
+    $$PlantCollectionsTableUpdateCompanionBuilder,
+    (PlantCollection, $$PlantCollectionsTableReferences),
+    PlantCollection,
+    PrefetchHooks Function({bool plant, bool collection})> {
+  $$PlantCollectionsTableTableManager(
+      _$AppDatabase db, $PlantCollectionsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$PlantCollectionsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$PlantCollectionsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$PlantCollectionsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> plant = const Value.absent(),
+            Value<int> collection = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PlantCollectionsCompanion(
+            plant: plant,
+            collection: collection,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required int plant,
+            required int collection,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              PlantCollectionsCompanion.insert(
+            plant: plant,
+            collection: collection,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$PlantCollectionsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({plant = false, collection = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (plant) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.plant,
+                    referencedTable:
+                        $$PlantCollectionsTableReferences._plantTable(db),
+                    referencedColumn:
+                        $$PlantCollectionsTableReferences._plantTable(db).id,
+                  ) as T;
+                }
+                if (collection) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.collection,
+                    referencedTable:
+                        $$PlantCollectionsTableReferences._collectionTable(db),
+                    referencedColumn: $$PlantCollectionsTableReferences
+                        ._collectionTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$PlantCollectionsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $PlantCollectionsTable,
+    PlantCollection,
+    $$PlantCollectionsTableFilterComposer,
+    $$PlantCollectionsTableOrderingComposer,
+    $$PlantCollectionsTableAnnotationComposer,
+    $$PlantCollectionsTableCreateCompanionBuilder,
+    $$PlantCollectionsTableUpdateCompanionBuilder,
+    (PlantCollection, $$PlantCollectionsTableReferences),
+    PlantCollection,
+    PrefetchHooks Function({bool plant, bool collection})>;
 typedef $$UserSettingsTableCreateCompanionBuilder = UserSettingsCompanion
     Function({
   required String key,
@@ -8993,6 +10042,10 @@ class $AppDatabaseManager {
       $$RemindersTableTableManager(_db, _db.reminders);
   $$ImagesTableTableManager get images =>
       $$ImagesTableTableManager(_db, _db.images);
+  $$CollectionsTableTableManager get collections =>
+      $$CollectionsTableTableManager(_db, _db.collections);
+  $$PlantCollectionsTableTableManager get plantCollections =>
+      $$PlantCollectionsTableTableManager(_db, _db.plantCollections);
   $$UserSettingsTableTableManager get userSettings =>
       $$UserSettingsTableTableManager(_db, _db.userSettings);
   $$NotificationTranslationsTableTableManager get notificationTranslations =>

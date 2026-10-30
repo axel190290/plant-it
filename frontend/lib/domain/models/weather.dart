@@ -105,6 +105,17 @@ class WeatherAlert {
     this.rainyDays,
     this.forecastDays,
   });
+
+  /// Identifies the alert, to remember that it was dismissed: the same
+  /// alert for the same plants and day. Starts with the day it is about,
+  /// as yyyy-mm-dd, or [today] for alerts without a day.
+  String key(DateTime today) {
+    DateTime date = day?.date ?? today;
+    String ymd = "${date.year.toString().padLeft(4, '0')}-"
+        "${date.month.toString().padLeft(2, '0')}-"
+        "${date.day.toString().padLeft(2, '0')}";
+    return "$ymd|${type.name}|${plants.join(',')}";
+  }
 }
 
 /// An outdoor plant and the temperatures its species withstands.

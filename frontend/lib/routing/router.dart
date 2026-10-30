@@ -1,6 +1,8 @@
 import 'package:go_router/go_router.dart';
 import 'package:plant_it/routing/routes.dart';
+import 'package:plant_it/ui/home/view_models/sensor_viewmodel.dart';
 import 'package:plant_it/ui/home/view_models/weather_viewmodel.dart';
+import 'package:plant_it/ui/settings/widgets/rainpoint_settings_screen.dart';
 import 'package:plant_it/ui/settings/widgets/weather_settings_screen.dart';
 import 'package:plant_it/ui/settings/view_models/care_fields_viewmodel.dart';
 import 'package:plant_it/ui/settings/widgets/care_fields_screen.dart';
@@ -94,6 +96,13 @@ GoRouter router() => GoRouter(
               );
               weatherViewModel.load.execute();
 
+              SensorViewModel sensorViewModel = SensorViewModel(
+                rainPointService: context.read(),
+                plantRepository: context.read(),
+                speciesCareValueRepository: context.read(),
+                streamController: context.read(),
+              );
+
               SearchViewModel searchViewModel = SearchViewModel(
                 speciesSearcherFacade: context.read(),
                 imageRepository: context.read(),
@@ -118,6 +127,7 @@ GoRouter router() => GoRouter(
               return AppMainView(
                 homeViewModel: homeViewModel,
                 weatherViewModel: weatherViewModel,
+                sensorViewModel: sensorViewModel,
                 calendarViewModel: calendarViewModel,
                 searchViewModel: searchViewModel,
                 settingsViewModel: settingsViewModel,
@@ -147,6 +157,7 @@ GoRouter router() => GoRouter(
                     weatherService: context.read(),
                     gbifSearcher: context.read(),
                     collectionRepository: context.read(),
+                    rainPointService: context.read(),
                   );
                   viewModel.load.execute(id);
                   return PlantScreen(
@@ -282,6 +293,14 @@ GoRouter router() => GoRouter(
                 path: Routes.settingsWeather,
                 builder: (context, state) => WeatherSettingsScreen(
                   weatherService: context.read(),
+                  streamController: context.read(),
+                ),
+              ),
+              GoRoute(
+                path: Routes.settingsRainPoint,
+                builder: (context, state) => RainPointSettingsScreen(
+                  rainPointService: context.read(),
+                  plantRepository: context.read(),
                   streamController: context.read(),
                 ),
               ),

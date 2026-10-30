@@ -35,7 +35,16 @@ enum UserSettingsKeys {
   weatherPlace('weather_place'),
   weatherLatitude('weather_latitude'),
   weatherLongitude('weather_longitude'),
-  dismissedWeatherAlerts('dismissed_weather_alerts');
+  dismissedWeatherAlerts('dismissed_weather_alerts'),
+
+  rainPointEmail('rainpoint_email'),
+  rainPointPassword('rainpoint_password'),
+  rainPointAreaCode('rainpoint_area_code'),
+  rainPointApp('rainpoint_app'),
+  rainPointToken('rainpoint_token'),
+  rainPointTokenExpires('rainpoint_token_expires'),
+  rainPointLinks('rainpoint_links'),
+  rainPointWaterings('rainpoint_waterings');
 
   final String key;
 

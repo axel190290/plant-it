@@ -25,6 +25,8 @@ import 'package:plant_it/data/service/care/species_care_enricher.dart';
 import 'package:plant_it/data/service/care/suggestion_care_filler.dart';
 import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
+import 'package:plant_it/data/service/sensors/rainpoint_client.dart';
+import 'package:plant_it/data/service/sensors/rainpoint_service.dart';
 import 'package:plant_it/data/service/search/flora_codex_searcher.dart';
 import 'package:plant_it/data/service/search/gbif_searcher.dart';
 import 'package:plant_it/data/service/weather/weather_service.dart';
@@ -126,6 +128,14 @@ List<SingleChildWidget> get providersLocal {
     Provider(
       create: (context) => FloraCodexSearcher(
         userSettingRepository: context.read(),
+      ),
+    ),
+    Provider(
+      create: (context) => RainPointService(
+        client: RainPointClient(),
+        userSettingRepository: context.read(),
+        eventRepository: context.read(),
+        eventTypeRepository: context.read(),
       ),
     ),
     Provider(

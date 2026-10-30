@@ -74,6 +74,14 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
+                      onTap: () => context.push(Routes.settingsRainPoint),
+                      child: ListTile(
+                        title: Text(L.of(context).rainPoint),
+                        subtitle: Text(L.of(context).rainPointSubtitle),
+                        leading: Icon(LucideIcons.shower_head),
+                      ),
+                    ),
+                    GestureDetector(
                       onTap: () => context.push(Routes.settingsDataSources,
                           extra: viewModel),
                       child: ListTile(
@@ -98,9 +106,7 @@ class SettingsScreen extends StatelessWidget {
                           extra: viewModel),
                       child: ListTile(
                         title: Text(L.of(context).databaseAndCache),
-                        subtitle: Text(L
-                            .of(context)
-                            .manageDatabaseAndCache),
+                        subtitle: Text(L.of(context).manageDatabaseAndCache),
                         leading: Icon(LucideIcons.database),
                       ),
                     ),

@@ -2701,6 +2701,150 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Suggested for {count} of {total}'**
   String suggestedForPlants(int count, int total);
+
+  /// No description provided for @rainPoint.
+  ///
+  /// In en, this message translates to:
+  /// **'RainPoint sensors'**
+  String get rainPoint;
+
+  /// No description provided for @rainPointSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil moisture and waterings of your devices'**
+  String get rainPointSubtitle;
+
+  /// No description provided for @rainPointHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Reads the soil moisture of your RainPoint sensors and records the waterings of your water timers. It uses the RainPoint cloud through an unofficial API, which may stop working if RainPoint changes it.'**
+  String get rainPointHint;
+
+  /// No description provided for @rainPointSessionWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting closes the session of the RainPoint app on your other devices. To avoid it, create a second account and invite it to your home from the app.'**
+  String get rainPointSessionWarning;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @passwordKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty to keep the saved one'**
+  String get passwordKeep;
+
+  /// No description provided for @countryCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone country code (e.g. 1, 34, 52)'**
+  String get countryCode;
+
+  /// No description provided for @rainPointAppLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account of the app'**
+  String get rainPointAppLabel;
+
+  /// No description provided for @connect.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get connect;
+
+  /// No description provided for @disconnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect'**
+  String get disconnect;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// No description provided for @devices.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get devices;
+
+  /// No description provided for @noRainPointDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'No sensors or water timers found'**
+  String get noRainPointDevices;
+
+  /// No description provided for @linkedPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Plants: {plants}'**
+  String linkedPlants(String plants);
+
+  /// No description provided for @linkPlantsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to link plants'**
+  String get linkPlantsHint;
+
+  /// No description provided for @soilMoistureValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Soil moisture {value}%'**
+  String soilMoistureValue(String value);
+
+  /// No description provided for @wateringNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Watering now'**
+  String get wateringNow;
+
+  /// No description provided for @lastWatering.
+  ///
+  /// In en, this message translates to:
+  /// **'Last watering: {date} · {liters} l'**
+  String lastWatering(String date, String liters);
+
+  /// No description provided for @lowBattery.
+  ///
+  /// In en, this message translates to:
+  /// **'low battery'**
+  String get lowBattery;
+
+  /// No description provided for @noReading.
+  ///
+  /// In en, this message translates to:
+  /// **'No reading yet'**
+  String get noReading;
+
+  /// No description provided for @sensors.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensors'**
+  String get sensors;
+
+  /// No description provided for @drySoilAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'{plant}: soil moisture {value}% (min. {min}%). Time to water.'**
+  String drySoilAlert(String plant, String value, String min);
+
+  /// No description provided for @rainPointWateringsRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 watering recorded from RainPoint} other{{count} waterings recorded from RainPoint}}'**
+  String rainPointWateringsRecorded(int count);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

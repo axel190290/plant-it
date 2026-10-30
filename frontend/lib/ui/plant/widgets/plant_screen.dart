@@ -12,6 +12,8 @@ import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/domain/models/plant_location.dart';
 import 'package:plant_it/ui/core/ui/care_value_dialog.dart';
 import 'package:plant_it/ui/core/ui/collection_dialogs.dart';
+import 'package:plant_it/ui/core/ui/rainpoint_format.dart';
+import 'package:plant_it/domain/models/rainpoint.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:plant_it/ui/core/ui/weather_format.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
@@ -449,6 +451,34 @@ class _PlantScreenState extends State<PlantScreen> {
     setState(() {});
   }
 
+  Widget _sensors(L l) {
+    List<RainPointDevice> sensors = widget.viewModel.sensors;
+    if (sensors.isEmpty) return const SizedBox();
+    double? min = widget.viewModel.soilMoistureMin ?? defaultSoilMoistureMin;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _sectionTitle(l.sensors,
+            onEdit: () => context.push(Routes.settingsRainPoint),
+            tooltip: l.rainPoint),
+        const SizedBox(height: 8),
+        ...sensors.map((device) {
+          double? moisture = device.reading?.soilMoisture;
+          bool dry = moisture != null && moisture < min;
+          return Card(
+            color: dry ? Theme.of(context).colorScheme.errorContainer : null,
+            child: ListTile(
+              leading: Icon(rainPointIcon(device)),
+              title: Text(device.name),
+              subtitle: Text(rainPointSummary(l, device)),
+            ),
+          );
+        }),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
   Widget _sectionTitle(String title, {VoidCallback? onEdit, String? tooltip}) {
     Text text = Text(title, style: Theme.of(context).textTheme.headlineSmall);
     if (onEdit == null) {
@@ -659,6 +689,12 @@ class _PlantScreenState extends State<PlantScreen> {
                                     note: note),
                           ),
                           const SizedBox(height: 16),
+
+                          // Readings of the linked RainPoint devices
+                          ListenableBuilder(
+                            listenable: widget.viewModel,
+                            builder: (context, _) => _sensors(appLocalizations),
+                          ),
 
                           // Reminder
                           Row(

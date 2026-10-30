@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,6 +13,7 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import 'package:plant_it/data/repository/care_field_repository.dart';
 import 'package:plant_it/data/repository/collection_repository.dart';
+import 'package:plant_it/data/service/sensors/rainpoint_service.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
@@ -25,6 +28,7 @@ import 'package:plant_it/data/service/search/gbif_searcher.dart';
 import 'package:plant_it/data/service/weather/weather_service.dart';
 import 'package:plant_it/domain/models/weather.dart';
 import 'package:plant_it/database/database.dart' as db;
+import 'package:plant_it/domain/models/rainpoint.dart';
 import 'package:plant_it/domain/models/care_value.dart';
 import 'package:plant_it/domain/models/reminder_occurrence.dart';
 import 'package:result_dart/result_dart.dart';
@@ -45,7 +49,9 @@ class PlantViewModel extends ChangeNotifier {
     required WeatherService weatherService,
     required GbifSearcher gbifSearcher,
     required CollectionRepository collectionRepository,
+    required RainPointService rainPointService,
   })  : _weatherService = weatherService,
+        _rainPointService = rainPointService,
         _collectionRepository = collectionRepository,
         _gbifSearcher = gbifSearcher,
         _speciesDescriptionService = speciesDescriptionService,
@@ -130,6 +136,8 @@ class PlantViewModel extends ChangeNotifier {
   Map<int, CareValue> _careValues = {};
   final PlantRepository _plantRepository;
   final CollectionRepository _collectionRepository;
+  final RainPointService _rainPointService;
+  List<RainPointDevice> _sensors = [];
   final SpeciesRepository _speciesRepository;
   final SpeciesCareRepository _speciesCareRepository;
   final ImageRepository _imageRepository;
@@ -154,6 +162,25 @@ class PlantViewModel extends ChangeNotifier {
   db.Specy get species => _species;
   db.SpeciesCareData get care => _care;
   List<db.CareField> get careFields => _careFields;
+
+  /// The RainPoint devices linked to the plant, with their readings.
+  List<RainPointDevice> get sensors => _sensors;
+
+  /// The lowest soil moisture the species wants, in %, if known.
+  double? get soilMoistureMin {
+    for (db.CareField field in careFields) {
+      if (field.key == 'soil_moisture') return careValues[field.id]?.value;
+    }
+    return null;
+  }
+
+  /// Loads the readings of the linked devices, without delaying the page.
+  Future<void> _loadSensors(int plantId) async {
+    List<RainPointDevice> sensors = await _rainPointService.devicesOf(plantId);
+    if (sensors.isEmpty && _sensors.isEmpty) return;
+    _sensors = sensors;
+    notifyListeners();
+  }
 
   /// The current season, if a weather place is set.
   Season? get season => _season;
@@ -235,6 +262,7 @@ class PlantViewModel extends ChangeNotifier {
       return loadThumbnails.exceptionOrNull()!.toFailure();
     }
     notifyListeners();
+    unawaited(_loadSensors(plantId));
     return Success("ok");
   }
 

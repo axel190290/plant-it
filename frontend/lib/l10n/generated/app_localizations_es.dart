@@ -1700,4 +1700,96 @@ class LEs extends L {
   String suggestedForPlants(int count, int total) {
     return 'Sugerido para $count de $total';
   }
+
+  @override
+  String get rainPoint => 'Sensores RainPoint';
+
+  @override
+  String get rainPointSubtitle =>
+      'Humedad del suelo y riegos de tus dispositivos';
+
+  @override
+  String get rainPointHint =>
+      'Lee la humedad del suelo de tus sensores RainPoint y registra los riegos de tus programadores. Usa la nube de RainPoint mediante una API no oficial, que puede dejar de funcionar si RainPoint la cambia.';
+
+  @override
+  String get rainPointSessionWarning =>
+      'Al conectar se cierra la sesión de la app RainPoint en tus otros dispositivos. Para evitarlo, crea una segunda cuenta e invítala a tu casa desde la app.';
+
+  @override
+  String get email => 'Correo';
+
+  @override
+  String get password => 'Contraseña';
+
+  @override
+  String get passwordKeep => 'Déjala vacía para mantener la guardada';
+
+  @override
+  String get countryCode => 'Código de país del teléfono (p. ej. 34, 52)';
+
+  @override
+  String get rainPointAppLabel => 'Cuenta de la app';
+
+  @override
+  String get connect => 'Conectar';
+
+  @override
+  String get disconnect => 'Desconectar';
+
+  @override
+  String get refresh => 'Actualizar';
+
+  @override
+  String get devices => 'Dispositivos';
+
+  @override
+  String get noRainPointDevices =>
+      'No se encontraron sensores ni programadores';
+
+  @override
+  String linkedPlants(String plants) {
+    return 'Plantas: $plants';
+  }
+
+  @override
+  String get linkPlantsHint => 'Toca para vincular plantas';
+
+  @override
+  String soilMoistureValue(String value) {
+    return 'Humedad del suelo $value%';
+  }
+
+  @override
+  String get wateringNow => 'Regando ahora';
+
+  @override
+  String lastWatering(String date, String liters) {
+    return 'Último riego: $date · $liters l';
+  }
+
+  @override
+  String get lowBattery => 'batería baja';
+
+  @override
+  String get noReading => 'Sin lecturas todavía';
+
+  @override
+  String get sensors => 'Sensores';
+
+  @override
+  String drySoilAlert(String plant, String value, String min) {
+    return '$plant: humedad del suelo $value% (mín. $min%). Toca regar.';
+  }
+
+  @override
+  String rainPointWateringsRecorded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count riegos registrados desde RainPoint',
+      one: '1 riego registrado desde RainPoint',
+    );
+    return '$_temp0';
+  }
 }

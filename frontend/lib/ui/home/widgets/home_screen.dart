@@ -6,7 +6,9 @@ import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/error_indicator.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
+import 'package:plant_it/ui/home/view_models/sensor_viewmodel.dart';
 import 'package:plant_it/ui/home/view_models/weather_viewmodel.dart';
+import 'package:plant_it/ui/home/widgets/sensor_alerts.dart';
 import 'package:plant_it/ui/home/widgets/collection_actions.dart';
 import 'package:plant_it/ui/home/widgets/weather_card.dart';
 import 'package:plant_it/ui/home/widgets/plant_card_list.dart';
@@ -16,12 +18,14 @@ import 'package:plant_it/utils/stream_code.dart';
 class HomeScreen extends StatefulWidget {
   final HomeViewModel viewModel;
   final WeatherViewModel weatherViewModel;
+  final SensorViewModel sensorViewModel;
   final StreamController<StreamCode> streamController;
 
   const HomeScreen({
     super.key,
     required this.viewModel,
     required this.weatherViewModel,
+    required this.sensorViewModel,
     required this.streamController,
   });
 
@@ -99,6 +103,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 WeatherCard(
                   viewModel: widget.weatherViewModel,
+                  streamController: widget.streamController,
+                ),
+                SensorAlerts(
+                  viewModel: widget.sensorViewModel,
                   streamController: widget.streamController,
                 ),
                 ListenableBuilder(

@@ -807,5 +807,73 @@
         "type": "int"
       }
     }
+  },
+  "rainPoint": "RainPoint sensors",
+  "rainPointSubtitle": "Soil moisture and waterings of your devices",
+  "rainPointHint": "Reads the soil moisture of your RainPoint sensors and records the waterings of your water timers. It uses the RainPoint cloud through an unofficial API, which may stop working if RainPoint changes it.",
+  "rainPointSessionWarning": "Connecting closes the session of the RainPoint app on your other devices. To avoid it, create a second account and invite it to your home from the app.",
+  "email": "Email",
+  "password": "Password",
+  "passwordKeep": "Leave empty to keep the saved one",
+  "countryCode": "Phone country code (e.g. 1, 34, 52)",
+  "rainPointAppLabel": "Account of the app",
+  "connect": "Connect",
+  "disconnect": "Disconnect",
+  "refresh": "Refresh",
+  "devices": "Devices",
+  "noRainPointDevices": "No sensors or water timers found",
+  "linkedPlants": "Plants: {plants}",
+  "linkPlantsHint": "Tap to link plants",
+  "soilMoistureValue": "Soil moisture {value}%",
+  "wateringNow": "Watering now",
+  "lastWatering": "Last watering: {date} · {liters} l",
+  "lowBattery": "low battery",
+  "noReading": "No reading yet",
+  "sensors": "Sensors",
+  "drySoilAlert": "{plant}: soil moisture {value}% (min. {min}%). Time to water.",
+  "rainPointWateringsRecorded": "{count, plural, =1{1 watering recorded from RainPoint} other{{count} waterings recorded from RainPoint}}",
+  "@linkedPlants": {
+    "placeholders": {
+      "plants": {
+        "type": "String"
+      }
+    }
+  },
+  "@soilMoistureValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@lastWatering": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "liters": {
+        "type": "String"
+      }
+    }
+  },
+  "@drySoilAlert": {
+    "placeholders": {
+      "plant": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      }
+    }
+  },
+  "@rainPointWateringsRecorded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

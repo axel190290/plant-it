@@ -1688,4 +1688,94 @@ class LEn extends L {
   String suggestedForPlants(int count, int total) {
     return 'Suggested for $count of $total';
   }
+
+  @override
+  String get rainPoint => 'RainPoint sensors';
+
+  @override
+  String get rainPointSubtitle => 'Soil moisture and waterings of your devices';
+
+  @override
+  String get rainPointHint =>
+      'Reads the soil moisture of your RainPoint sensors and records the waterings of your water timers. It uses the RainPoint cloud through an unofficial API, which may stop working if RainPoint changes it.';
+
+  @override
+  String get rainPointSessionWarning =>
+      'Connecting closes the session of the RainPoint app on your other devices. To avoid it, create a second account and invite it to your home from the app.';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get password => 'Password';
+
+  @override
+  String get passwordKeep => 'Leave empty to keep the saved one';
+
+  @override
+  String get countryCode => 'Phone country code (e.g. 1, 34, 52)';
+
+  @override
+  String get rainPointAppLabel => 'Account of the app';
+
+  @override
+  String get connect => 'Connect';
+
+  @override
+  String get disconnect => 'Disconnect';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get devices => 'Devices';
+
+  @override
+  String get noRainPointDevices => 'No sensors or water timers found';
+
+  @override
+  String linkedPlants(String plants) {
+    return 'Plants: $plants';
+  }
+
+  @override
+  String get linkPlantsHint => 'Tap to link plants';
+
+  @override
+  String soilMoistureValue(String value) {
+    return 'Soil moisture $value%';
+  }
+
+  @override
+  String get wateringNow => 'Watering now';
+
+  @override
+  String lastWatering(String date, String liters) {
+    return 'Last watering: $date · $liters l';
+  }
+
+  @override
+  String get lowBattery => 'low battery';
+
+  @override
+  String get noReading => 'No reading yet';
+
+  @override
+  String get sensors => 'Sensors';
+
+  @override
+  String drySoilAlert(String plant, String value, String min) {
+    return '$plant: soil moisture $value% (min. $min%). Time to water.';
+  }
+
+  @override
+  String rainPointWateringsRecorded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count waterings recorded from RainPoint',
+      one: '1 watering recorded from RainPoint',
+    );
+    return '$_temp0';
+  }
 }

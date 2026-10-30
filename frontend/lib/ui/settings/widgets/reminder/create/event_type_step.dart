@@ -62,6 +62,7 @@ class _EventTypeStepState extends State<EventTypeStep> {
                   [widget._ongoingSelection, widget.viewModel]),
               builder: (context, _) {
                 Plant? plant = widget.viewModel.plant;
+                Collection? collection = widget.viewModel.collection;
                 return ListView(
                   children: [
                     GridView.count(
@@ -81,6 +82,21 @@ class _EventTypeStepState extends State<EventTypeStep> {
                         viewModel: widget.viewModel,
                         plant: plant,
                       ),
+                    if (collection != null) ...[
+                      const SizedBox(height: 8),
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        value: widget.viewModel.perPlantSuggestions,
+                        onChanged: widget.viewModel.setPerPlantSuggestions,
+                        title: Text(l.perPlantSuggestions),
+                      ),
+                      Text(
+                        widget.viewModel.perPlantSuggestions
+                            ? l.perPlantSuggestionsHint(collection.name)
+                            : l.remindersForGroup(collection.name),
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
+                    ],
                   ],
                 );
               }),
@@ -94,6 +110,17 @@ class _EventTypeStepState extends State<EventTypeStep> {
     bool isSelected = widget._ongoingSelection.value == eventType;
     ReminderSuggestion? suggestion =
         widget.viewModel.suggestionForType(eventType);
+    // For a group, how many of its plants have a suggestion
+    Collection? collection = widget.viewModel.collection;
+    int? suggested = collection == null || !widget.viewModel.perPlantSuggestions
+        ? null
+        : widget.viewModel.plantsWithSuggestion(eventType);
+    String? hint = suggestion != null
+        ? suggestionEvery(l, suggestion)
+        : suggested != null && suggested > 0
+            ? l.suggestedForPlants(
+                suggested, widget.viewModel.plantsOf(collection!.id).length)
+            : null;
     Color primary = Theme.of(context).colorScheme.primary;
     return GestureDetector(
       onTap: () {
@@ -118,14 +145,14 @@ class _EventTypeStepState extends State<EventTypeStep> {
                 Text(eventType.name,
                     maxLines: 1, overflow: TextOverflow.ellipsis),
                 // What will be filled in when choosing it
-                if (suggestion != null)
+                if (hint != null)
                   Row(
                     children: [
                       Icon(LucideIcons.bell_ring, size: 12, color: primary),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          suggestionEvery(l, suggestion),
+                          hint,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: Theme.of(context)

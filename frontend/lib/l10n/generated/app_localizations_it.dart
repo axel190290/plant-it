@@ -1777,4 +1777,23 @@ class LIt extends L {
 
   @override
   String get ungroupedPlants => 'Senza gruppo';
+
+  @override
+  String get perPlantSuggestions =>
+      'Usa la frequenza suggerita per ogni pianta';
+
+  @override
+  String perPlantSuggestionsHint(String group) {
+    return 'Verrà creato un promemoria per ogni pianta di $group. Le piante senza suggerimento useranno i valori del riepilogo.';
+  }
+
+  @override
+  String remindersForGroup(String group) {
+    return 'Verrà creato un promemoria per ogni pianta di $group, con i valori del riepilogo.';
+  }
+
+  @override
+  String suggestedForPlants(int count, int total) {
+    return 'Suggerito per $count su $total';
+  }
 }

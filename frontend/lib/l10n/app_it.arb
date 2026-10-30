@@ -587,5 +587,9 @@
   "emptyCollection": "Ancora nessuna pianta in questo gruppo. Tienilo premuto per sceglierle.",
   "noCollectionsYet": "Ancora nessun gruppo: creane uno per ordinare le piante.",
   "swipeToDismiss": "Scorri un avviso per ignorarlo",
-  "ungroupedPlants": "Senza gruppo"
+  "ungroupedPlants": "Senza gruppo",
+  "perPlantSuggestions": "Usa la frequenza suggerita per ogni pianta",
+  "perPlantSuggestionsHint": "Verrà creato un promemoria per ogni pianta di {group}. Le piante senza suggerimento useranno i valori del riepilogo.",
+  "remindersForGroup": "Verrà creato un promemoria per ogni pianta di {group}, con i valori del riepilogo.",
+  "suggestedForPlants": "Suggerito per {count} su {total}"
 }

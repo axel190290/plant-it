@@ -6,12 +6,12 @@ import 'package:plant_it/ui/core/ui/collection_dialogs.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 import 'package:result_dart/result_dart.dart';
 
-/// The groups of plants, to show only the plants of one. A long press on a
-/// group chooses its plants, renames it or deletes it.
-class CollectionChips extends StatelessWidget {
+/// What can be done with the groups of plants: create one, and choose the
+/// plants of a group, rename it or delete it.
+class CollectionActions {
   final HomeViewModel viewModel;
 
-  const CollectionChips({super.key, required this.viewModel});
+  const CollectionActions(this.viewModel);
 
   void _showError(BuildContext context, Result<Object?> result) {
     if (result.isError() && context.mounted) {
@@ -22,7 +22,7 @@ class CollectionChips extends StatelessWidget {
     }
   }
 
-  Future<void> _create(BuildContext context) async {
+  Future<void> create(BuildContext context) async {
     String? name = await showCollectionNameDialog(context);
     if (name == null || !context.mounted) return;
     Result<int> id = await viewModel.createCollection(name);
@@ -46,7 +46,7 @@ class CollectionChips extends StatelessWidget {
         context, await viewModel.setPlantsOfCollection(collectionId, plants));
   }
 
-  Future<void> _showActions(BuildContext context, Collection collection) async {
+  Future<void> showActions(BuildContext context, Collection collection) async {
     L l = L.of(context);
     String? action = await showModalBottomSheet<String>(
       context: context,
@@ -112,43 +112,25 @@ class CollectionChips extends StatelessWidget {
         _showError(context, await viewModel.deleteCollection(collection.id));
     }
   }
+}
+
+/// Creates a group of plants.
+class NewCollectionButton extends StatelessWidget {
+  final HomeViewModel viewModel;
+
+  const NewCollectionButton({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
-    L l = L.of(context);
-    int? selected = viewModel.selectedCollection;
-    return SizedBox(
-      height: 48,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 15),
-        children: [
-          ChoiceChip(
-            label: Text("${l.allPlants} (${viewModel.plants.length})"),
-            selected: selected == null,
-            onSelected: (_) => viewModel.selectCollection(null),
-          ),
-          ...viewModel.collections.map((c) => Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: GestureDetector(
-                  onLongPress: () => _showActions(context, c),
-                  child: ChoiceChip(
-                    label:
-                        Text("${c.name} (${viewModel.plantsOf(c.id).length})"),
-                    selected: selected == c.id,
-                    onSelected: (_) => viewModel.selectCollection(c.id),
-                  ),
-                ),
-              )),
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: ActionChip(
-              avatar: const Icon(LucideIcons.plus, size: 16),
-              label: Text(l.newCollection),
-              onPressed: () => _create(context),
-            ),
-          ),
-        ],
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 7),
+        child: TextButton.icon(
+          onPressed: () => CollectionActions(viewModel).create(context),
+          icon: const Icon(LucideIcons.folder_plus),
+          label: Text(L.of(context).newCollection),
+        ),
       ),
     );
   }

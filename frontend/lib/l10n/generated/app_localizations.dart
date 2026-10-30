@@ -2677,6 +2677,30 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Without group'**
   String get ungroupedPlants;
+
+  /// No description provided for @perPlantSuggestions.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the frequency suggested for each plant'**
+  String get perPlantSuggestions;
+
+  /// No description provided for @perPlantSuggestionsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder is made for each plant of {group}. Plants without a suggestion take the values of the summary.'**
+  String perPlantSuggestionsHint(String group);
+
+  /// No description provided for @remindersForGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder is made for each plant of {group}, with the values of the summary.'**
+  String remindersForGroup(String group);
+
+  /// No description provided for @suggestedForPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested for {count} of {total}'**
+  String suggestedForPlants(int count, int total);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

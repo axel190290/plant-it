@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/step_section.dart';
@@ -90,6 +91,34 @@ class _PlantStepState extends State<PlantStep> {
           style: Theme.of(context).textTheme.headlineSmall,
         ),
         const SizedBox(height: 10),
+        // A group selects all of its plants at once
+        if (widget.viewModel.collections.isNotEmpty)
+          SizedBox(
+            height: 48,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              children: widget.viewModel.collections
+                  .where((c) => widget.viewModel.plantsOf(c.id).isNotEmpty)
+                  .map((c) => Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: ActionChip(
+                          avatar: const Icon(LucideIcons.folder, size: 16),
+                          label: Text(
+                              "${c.name} (${widget.viewModel.plantsOf(c.id).length})"),
+                          onPressed: () {
+                            for (Plant plant
+                                in widget.viewModel.plantsOf(c.id)) {
+                              if (!widget._ongoingSelection.value
+                                  .any((p) => p.id == plant.id)) {
+                                widget.addSelectedPlant(plant);
+                              }
+                            }
+                          },
+                        ),
+                      ))
+                  .toList(),
+            ),
+          ),
         Expanded(
             child: AnimatedBuilder(
                 animation: widget._ongoingSelection,

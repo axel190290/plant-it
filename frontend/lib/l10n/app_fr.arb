@@ -574,5 +574,9 @@
   "emptyCollection": "Pas encore de plantes dans ce groupe. Appuyez longuement pour les choisir.",
   "noCollectionsYet": "Pas encore de groupes : créez-en un pour classer vos plantes.",
   "swipeToDismiss": "Balayez une alerte pour l'ignorer",
-  "ungroupedPlants": "Sans groupe"
+  "ungroupedPlants": "Sans groupe",
+  "perPlantSuggestions": "Utiliser la fréquence suggérée pour chaque plante",
+  "perPlantSuggestionsHint": "Un rappel sera créé pour chaque plante de {group}. Les plantes sans suggestion utiliseront les valeurs du résumé.",
+  "remindersForGroup": "Un rappel sera créé pour chaque plante de {group}, avec les valeurs du résumé.",
+  "suggestedForPlants": "Suggéré pour {count} sur {total}"
 }

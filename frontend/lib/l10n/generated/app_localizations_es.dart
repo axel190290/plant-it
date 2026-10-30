@@ -1681,4 +1681,23 @@ class LEs extends L {
 
   @override
   String get ungroupedPlants => 'Sin grupo';
+
+  @override
+  String get perPlantSuggestions =>
+      'Usar la frecuencia sugerida de cada planta';
+
+  @override
+  String perPlantSuggestionsHint(String group) {
+    return 'Se creará un recordatorio para cada planta de $group. Las plantas sin sugerencia usarán los valores del resumen.';
+  }
+
+  @override
+  String remindersForGroup(String group) {
+    return 'Se creará un recordatorio para cada planta de $group, con los valores del resumen.';
+  }
+
+  @override
+  String suggestedForPlants(int count, int total) {
+    return 'Sugerido para $count de $total';
+  }
 }

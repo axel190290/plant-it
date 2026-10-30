@@ -1677,4 +1677,23 @@ class LFr extends L {
 
   @override
   String get ungroupedPlants => 'Sans groupe';
+
+  @override
+  String get perPlantSuggestions =>
+      'Utiliser la fréquence suggérée pour chaque plante';
+
+  @override
+  String perPlantSuggestionsHint(String group) {
+    return 'Un rappel sera créé pour chaque plante de $group. Les plantes sans suggestion utiliseront les valeurs du résumé.';
+  }
+
+  @override
+  String remindersForGroup(String group) {
+    return 'Un rappel sera créé pour chaque plante de $group, avec les valeurs du résumé.';
+  }
+
+  @override
+  String suggestedForPlants(int count, int total) {
+    return 'Suggéré pour $count sur $total';
+  }
 }

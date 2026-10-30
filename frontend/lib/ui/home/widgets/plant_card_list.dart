@@ -7,10 +7,10 @@ import 'package:plant_it/database/database.dart' show Collection;
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
+import 'package:plant_it/ui/home/widgets/collection_actions.dart';
 
 /// The plants of the collection: one section per group, then the plants
-/// in no group, when there are groups and all plants are shown; else only
-/// the plants of the chosen group, or all of them.
+/// in no group, when there are groups; else all of them.
 class PlantCardList extends StatelessWidget {
   final HomeViewModel viewModel;
   final String filter;
@@ -32,29 +32,17 @@ class PlantCardList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     L l = L.of(context);
-    int? selected = viewModel.selectedCollection;
-    if (selected != null) {
-      List<int> plantIds = _matching(viewModel.plantsOf(selected));
-      if (plantIds.isEmpty) {
-        return Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(l.emptyCollection,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium),
-        );
-      }
-      return PlantGrid(viewModel: viewModel, plantIds: plantIds);
-    }
     if (viewModel.collections.isEmpty) {
       return PlantGrid(
           viewModel: viewModel, plantIds: _matching(viewModel.plantMap.keys));
     }
 
     // One section per group, then the plants in no group
-    List<(int, String, List<int>)> sections = [
+    List<(Collection?, int, String, List<int>)> sections = [
       for (Collection c in viewModel.collections)
-        (c.id, c.name, _matching(viewModel.plantsOf(c.id))),
+        (c, c.id, c.name, _matching(viewModel.plantsOf(c.id))),
       (
+        null,
         HomeViewModel.ungroupedSection,
         l.ungroupedPlants,
         _matching(viewModel.ungroupedPlants)
@@ -63,16 +51,28 @@ class PlantCardList extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for ((int, String, List<int>) section in sections)
-          if (section.$3.isNotEmpty) ...[
+        for ((Collection?, int, String, List<int>) section in sections)
+          // An empty group shows, without search, to choose its plants
+          if (section.$4.isNotEmpty ||
+              (section.$1 != null && filter.isEmpty)) ...[
             _SectionHeader(
-              title: section.$2,
-              count: section.$3.length,
-              collapsed: viewModel.isCollapsed(section.$1),
-              onTap: () => viewModel.toggleCollapsed(section.$1),
+              title: section.$3,
+              count: section.$4.length,
+              collapsed: viewModel.isCollapsed(section.$2),
+              onTap: () => viewModel.toggleCollapsed(section.$2),
+              onLongPress: section.$1 == null
+                  ? null
+                  : () => CollectionActions(viewModel)
+                      .showActions(context, section.$1!),
             ),
-            if (!viewModel.isCollapsed(section.$1))
-              PlantGrid(viewModel: viewModel, plantIds: section.$3),
+            if (!viewModel.isCollapsed(section.$2))
+              section.$4.isEmpty
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 15),
+                      child: Text(l.emptyCollection,
+                          style: Theme.of(context).textTheme.bodySmall),
+                    )
+                  : PlantGrid(viewModel: viewModel, plantIds: section.$4),
             const SizedBox(height: 8),
           ],
       ],
@@ -80,24 +80,28 @@ class PlantCardList extends StatelessWidget {
   }
 }
 
-/// The title of a section of plants; tapping it folds or unfolds it.
+/// The title of a section of plants; tapping it folds or unfolds it, and
+/// a long press shows what can be done with its group.
 class _SectionHeader extends StatelessWidget {
   final String title;
   final int count;
   final bool collapsed;
   final VoidCallback onTap;
+  final VoidCallback? onLongPress;
 
   const _SectionHeader({
     required this.title,
     required this.count,
     required this.collapsed,
     required this.onTap,
+    this.onLongPress,
   });
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      onLongPress: onLongPress,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
         child: Row(

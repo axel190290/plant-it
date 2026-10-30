@@ -357,6 +357,7 @@ GoRouter router() => GoRouter(
                     speciesRepository: context.read(),
                     streamController: context.read(),
                     reminderSuggestionService: context.read(),
+                    collectionRepository: context.read(),
                   );
                   viewModel.load.execute();
                   return AddReminderScreen(viewModel: viewModel);
@@ -389,6 +390,7 @@ GoRouter router() => GoRouter(
               careFieldRepository: context.read(),
               speciesCareRepository: context.read(),
               speciesCareValueRepository: context.read(),
+              collectionRepository: context.read(),
               streamController: context.read(),
             );
             viewModel.load.execute();

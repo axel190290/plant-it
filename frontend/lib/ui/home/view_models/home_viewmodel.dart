@@ -54,8 +54,6 @@ class HomeViewModel extends ChangeNotifier {
   List<ReminderOccurrence> _reminderOccurences = [];
   List<db.Collection> _collections = [];
   Map<int, Set<int>> _plantsByCollection = {};
-  // The group whose plants are shown, or null for all of them
-  int? _selectedCollection;
   // Sections folded on home: group ids, or [ungroupedSection]
   final Set<int> _collapsed = {};
 
@@ -70,7 +68,6 @@ class HomeViewModel extends ChangeNotifier {
   Map<int, String?> get imagesBase64 => _imagesBase64;
   List<ReminderOccurrence> get reminderOccurrences => _reminderOccurences;
   List<db.Collection> get collections => _collections;
-  int? get selectedCollection => _selectedCollection;
 
   /// The ids of the plants of the group [collectionId].
   Set<int> plantsOf(int collectionId) =>
@@ -91,27 +88,17 @@ class HomeViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void selectCollection(int? collectionId) {
-    _selectedCollection = collectionId;
-    notifyListeners();
-  }
-
   Future<void> _loadCollections() async {
     _collections = (await _collectionRepository.getAll()).getOrDefault([]);
     _plantsByCollection =
         (await _collectionRepository.getPlantsByCollection()).getOrDefault({});
-    if (_selectedCollection != null &&
-        !_collections.any((c) => c.id == _selectedCollection)) {
-      _selectedCollection = null;
-    }
   }
 
-  /// Creates a group and shows it. Returns its id.
+  /// Creates a group. Returns its id.
   Future<Result<int>> createCollection(String name) async {
     Result<int> id = await _collectionRepository.insert(name);
     if (id.isSuccess()) {
       await _loadCollections();
-      _selectedCollection = id.getOrThrow();
       notifyListeners();
     }
     return id;

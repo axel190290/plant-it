@@ -4,6 +4,7 @@ import 'package:command_it/command_it.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/repository/reminder_repository.dart';
@@ -22,7 +23,9 @@ class AddReminderViewModel extends ChangeNotifier {
     required SpeciesRepository speciesRepository,
     required StreamController<StreamCode> streamController,
     required ReminderSuggestionService reminderSuggestionService,
+    required CollectionRepository collectionRepository,
   })  : _reminderSuggestionService = reminderSuggestionService,
+        _collectionRepository = collectionRepository,
         _streamController = streamController,
         _reminderRepository = reminderRepository,
         _eventTypeRepository = eventTypeRepository,
@@ -45,6 +48,7 @@ class AddReminderViewModel extends ChangeNotifier {
   final EventTypeRepository _eventTypeRepository;
   final PlantRepository _plantRepository;
   final SpeciesRepository _speciesRepository;
+  final CollectionRepository _collectionRepository;
   final _log = Logger('AddReminderViewModel');
 
   late final Command<void, void> load;
@@ -61,6 +65,13 @@ class AddReminderViewModel extends ChangeNotifier {
 
   RemindersCompanion _remindersCompanion = _defaults();
   Plant? _plant;
+  // A group chosen instead of a plant: a reminder is made for each plant
+  Collection? _collection;
+  List<Collection> _collections = [];
+  Map<int, Set<int>> _plantsByCollection = {};
+  // Suggestions of each plant of the chosen group, by plant id
+  Map<int, List<ReminderSuggestion>>? _groupSuggestions;
+  bool _perPlantSuggestions = true;
   List<ReminderSuggestion>? _suggestions;
   ReminderSuggestion? _applied;
   final Map<int, EventType> _eventTypes = {};
@@ -72,6 +83,30 @@ class AddReminderViewModel extends ChangeNotifier {
   Map<int, Specy> get species => _species;
 
   Plant? get plant => _plant;
+  Collection? get collection => _collection;
+  List<Collection> get collections => _collections;
+
+  /// The plants of the group [collectionId].
+  List<Plant> plantsOf(int collectionId) => [
+        for (int id in _plantsByCollection[collectionId] ?? const <int>{})
+          if (_plants[id] != null) _plants[id]!
+      ];
+
+  /// For a group: whether each plant takes the values suggested for it,
+  /// when it has them, instead of the same values for all.
+  bool get perPlantSuggestions => _perPlantSuggestions;
+
+  void setPerPlantSuggestions(bool value) {
+    _perPlantSuggestions = value;
+    notifyListeners();
+  }
+
+  /// For a group: how many of its plants have a suggestion for [type],
+  /// null while they load.
+  int? plantsWithSuggestion(EventType type) => _groupSuggestions?.values
+      .where(
+          (list) => list.any((s) => suggestionEventTypes[s.kind] == type.name))
+      .length;
 
   /// The suggestions for the chosen plant, null while they load.
   List<ReminderSuggestion>? get suggestions => _suggestions;
@@ -90,8 +125,12 @@ class AddReminderViewModel extends ChangeNotifier {
       : null;
 
   /// The suggestion for [type]: the one in force today, or the next one.
-  ReminderSuggestion? suggestionForType(EventType type) {
-    List<ReminderSuggestion> matching = (_suggestions ?? [])
+  ReminderSuggestion? suggestionForType(EventType type) =>
+      _currentSuggestion(_suggestions, type);
+
+  static ReminderSuggestion? _currentSuggestion(
+      List<ReminderSuggestion>? suggestions, EventType type) {
+    List<ReminderSuggestion> matching = (suggestions ?? [])
         .where((s) => suggestionEventTypes[s.kind] == type.name)
         .toList();
     if (matching.isEmpty) return null;
@@ -122,6 +161,10 @@ class AddReminderViewModel extends ChangeNotifier {
       _species.putIfAbsent(s.id, () => s);
     }
     _log.fine("Specy loaded");
+
+    _collections = (await _collectionRepository.getAll()).getOrDefault([]);
+    _plantsByCollection =
+        (await _collectionRepository.getPlantsByCollection()).getOrDefault({});
 
     notifyListeners();
     return Success("ok");
@@ -181,7 +224,62 @@ class AddReminderViewModel extends ChangeNotifier {
   }
 
   Future<Result<void>> _insert() async {
-    return _reminderRepository.insert(_remindersCompanion);
+    if (_collection == null) {
+      return _reminderRepository.insert(_remindersCompanion);
+    }
+    // One reminder per plant of the group
+    List<Plant> plants = plantsOf(_collection!.id);
+    if (plants.isEmpty) {
+      return Failure(Exception("The group has no plants"));
+    }
+    EventType? type = _eventTypes[_remindersCompanion.type.value];
+    for (Plant plant in plants) {
+      ReminderSuggestion? suggestion = _perPlantSuggestions && type != null
+          ? _currentSuggestion(_groupSuggestions?[plant.id], type)
+          : null;
+      RemindersCompanion reminder =
+          _remindersCompanion.copyWith(plant: Value(plant.id));
+      if (suggestion != null) {
+        reminder = _withSuggestion(reminder, suggestion);
+      }
+      Result<int> inserted = await _reminderRepository.insert(reminder);
+      if (inserted.isError()) return inserted;
+    }
+    return Success("ok");
+  }
+
+  static RemindersCompanion _withSuggestion(
+      RemindersCompanion reminder, ReminderSuggestion suggestion) {
+    (int, FrequencyUnit) repeatAfter = _repeatAfter(suggestion);
+    return reminder.copyWith(
+      startDate: Value(suggestion.start),
+      endDate: Value(suggestion.end),
+      frequencyQuantity: Value(suggestion.frequencyQuantity),
+      frequencyUnit: Value(suggestion.frequencyUnit),
+      repeatAfterQuantity: Value(repeatAfter.$1),
+      repeatAfterUnit: Value(repeatAfter.$2),
+    );
+  }
+
+  /// Chooses a group instead of a plant, and loads the suggestions of its
+  /// plants.
+  void setCollection(Collection collection) {
+    if (_collection?.id == collection.id) return;
+    _collection = collection;
+    _plant = null;
+    _suggestions = [];
+    _groupSuggestions = null;
+    notifyListeners();
+    List<Plant> plants = plantsOf(collection.id);
+    Future.wait(plants.map((p) => _reminderSuggestionService
+        .suggest(p)
+        .catchError((Object e) => <ReminderSuggestion>[]))).then((lists) {
+      if (_collection?.id != collection.id) return;
+      _groupSuggestions = {
+        for (int i = 0; i < plants.length; i++) plants[i].id: lists[i]
+      };
+      notifyListeners();
+    });
   }
 
   /// Chooses the type and fills in the values suggested for it, or the
@@ -193,15 +291,7 @@ class AddReminderViewModel extends ChangeNotifier {
       type: Value(eventType.id),
     );
     if (suggestion != null) {
-      (int, FrequencyUnit) repeatAfter = _repeatAfter(suggestion);
-      base = base.copyWith(
-        startDate: Value(suggestion.start),
-        endDate: Value(suggestion.end),
-        frequencyQuantity: Value(suggestion.frequencyQuantity),
-        frequencyUnit: Value(suggestion.frequencyUnit),
-        repeatAfterQuantity: Value(repeatAfter.$1),
-        repeatAfterUnit: Value(repeatAfter.$2),
-      );
+      base = _withSuggestion(base, suggestion);
     }
     _remindersCompanion = base;
     _applied = suggestion;
@@ -213,6 +303,8 @@ class AddReminderViewModel extends ChangeNotifier {
     _remindersCompanion = _remindersCompanion.copyWith(plant: Value(plant.id));
     if (_plant?.id == plant.id) return;
     _plant = plant;
+    _collection = null;
+    _groupSuggestions = null;
     _suggestions = null;
     notifyListeners();
     _reminderSuggestionService.suggest(plant).then((suggestions) {

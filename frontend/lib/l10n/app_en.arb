@@ -779,5 +779,33 @@
       }
     }
   },
-  "ungroupedPlants": "Without group"
+  "ungroupedPlants": "Without group",
+  "perPlantSuggestions": "Use the frequency suggested for each plant",
+  "perPlantSuggestionsHint": "A reminder is made for each plant of {group}. Plants without a suggestion take the values of the summary.",
+  "remindersForGroup": "A reminder is made for each plant of {group}, with the values of the summary.",
+  "suggestedForPlants": "Suggested for {count} of {total}",
+  "@perPlantSuggestionsHint": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "@remindersForGroup": {
+    "placeholders": {
+      "group": {
+        "type": "String"
+      }
+    }
+  },
+  "@suggestedForPlants": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  }
 }

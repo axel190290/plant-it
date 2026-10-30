@@ -5,6 +5,7 @@ import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
 import 'package:plant_it/data/repository/care_field_repository.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
@@ -27,8 +28,10 @@ class CreateEventFormViewModel extends ChangeNotifier {
     required CareFieldRepository careFieldRepository,
     required SpeciesCareRepository speciesCareRepository,
     required SpeciesCareValueRepository speciesCareValueRepository,
+    required CollectionRepository collectionRepository,
     required StreamController<StreamCode> streamController,
   })  : _eventRepository = eventRepository,
+        _collectionRepository = collectionRepository,
         _careFieldRepository = careFieldRepository,
         _speciesCareRepository = speciesCareRepository,
         _speciesCareValueRepository = speciesCareValueRepository,
@@ -56,6 +59,7 @@ class CreateEventFormViewModel extends ChangeNotifier {
   final CareFieldRepository _careFieldRepository;
   final SpeciesCareRepository _speciesCareRepository;
   final SpeciesCareValueRepository _speciesCareValueRepository;
+  final CollectionRepository _collectionRepository;
   final _log = Logger('EventFormViewModel');
   final StreamController<StreamCode> _streamController;
 
@@ -71,6 +75,8 @@ class CreateEventFormViewModel extends ChangeNotifier {
   // Whether the note was written by the user, and not filled in
   bool _noteWritten = false;
   List<CareField> _careFields = [];
+  List<Collection> _collections = [];
+  Map<int, Set<int>> _plantsByCollection = {};
   // Care of the species of the chosen plant, loaded when it is chosen
   final Map<int, (SpeciesCareData?, Map<String, CareValue>)> _care = {};
   DateTime? _date;
@@ -78,6 +84,14 @@ class CreateEventFormViewModel extends ChangeNotifier {
   String? errorMessage;
 
   List<Plant> get plants => _plants;
+  List<Collection> get collections => _collections;
+
+  /// The plants of the group [collectionId].
+  List<Plant> plantsOf(int collectionId) {
+    Set<int> ids = _plantsByCollection[collectionId] ?? const {};
+    return _plants.where((p) => ids.contains(p.id)).toList();
+  }
+
   List<EventType> get eventTypes => _eventTypes;
   bool get isSubmitting => _isSubmitting;
   List<EventType> get selectedEventTypes => _selectedEventTypes;
@@ -99,6 +113,9 @@ class CreateEventFormViewModel extends ChangeNotifier {
       return loadSpecies.exceptionOrNull()!.toFailure();
     }
     _careFields = (await _careFieldRepository.getAll()).getOrDefault([]);
+    _collections = (await _collectionRepository.getAll()).getOrDefault([]);
+    _plantsByCollection =
+        (await _collectionRepository.getPlantsByCollection()).getOrDefault({});
     notifyListeners();
     return Success("ok");
   }

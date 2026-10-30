@@ -56,6 +56,11 @@ class HomeViewModel extends ChangeNotifier {
   Map<int, Set<int>> _plantsByCollection = {};
   // The group whose plants are shown, or null for all of them
   int? _selectedCollection;
+  // Sections folded on home: group ids, or [ungroupedSection]
+  final Set<int> _collapsed = {};
+
+  /// The section of the plants that are in no group.
+  static const int ungroupedSection = -1;
 
   late final Command<void, void> load;
   late final Command<ReminderOccurrence, void> createEventFromReminder;
@@ -71,10 +76,20 @@ class HomeViewModel extends ChangeNotifier {
   Set<int> plantsOf(int collectionId) =>
       _plantsByCollection[collectionId] ?? const {};
 
-  /// Whether [plantId] is shown with the chosen group.
-  bool isShown(int plantId) =>
-      _selectedCollection == null ||
-      plantsOf(_selectedCollection!).contains(plantId);
+  /// The ids of the plants that are in no group.
+  Set<int> get ungroupedPlants {
+    Set<int> grouped = {
+      for (Set<int> ids in _plantsByCollection.values) ...ids
+    };
+    return _plantMap.keys.where((id) => !grouped.contains(id)).toSet();
+  }
+
+  bool isCollapsed(int section) => _collapsed.contains(section);
+
+  void toggleCollapsed(int section) {
+    if (!_collapsed.remove(section)) _collapsed.add(section);
+    notifyListeners();
+  }
 
   void selectCollection(int? collectionId) {
     _selectedCollection = collectionId;

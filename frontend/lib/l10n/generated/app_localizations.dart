@@ -2671,6 +2671,12 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Swipe an alert to dismiss it'**
   String get swipeToDismiss;
+
+  /// No description provided for @ungroupedPlants.
+  ///
+  /// In en, this message translates to:
+  /// **'Without group'**
+  String get ungroupedPlants;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

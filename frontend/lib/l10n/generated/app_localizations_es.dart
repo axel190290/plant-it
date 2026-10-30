@@ -1678,4 +1678,7 @@ class LEs extends L {
 
   @override
   String get swipeToDismiss => 'Desliza una alerta para descartarla';
+
+  @override
+  String get ungroupedPlants => 'Sin grupo';
 }

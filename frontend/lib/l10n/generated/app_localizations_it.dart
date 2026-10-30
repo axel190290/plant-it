@@ -1774,4 +1774,7 @@ class LIt extends L {
 
   @override
   String get swipeToDismiss => 'Scorri un avviso per ignorarlo';
+
+  @override
+  String get ungroupedPlants => 'Senza gruppo';
 }

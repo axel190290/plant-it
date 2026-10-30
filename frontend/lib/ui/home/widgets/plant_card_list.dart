@@ -1,18 +1,17 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:go_router/go_router.dart';
+import 'package:plant_it/database/database.dart' show Collection;
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 
-/// The plants of the collection as a grid of cards: two columns on a phone
-/// in portrait, and as many columns of about the same size as fit in
-/// landscape or on bigger screens.
+/// The plants of the collection: one section per group, then the plants
+/// in no group, when there are groups and all plants are shown; else only
+/// the plants of the chosen group, or all of them.
 class PlantCardList extends StatelessWidget {
-  // Wide enough for two columns on any phone in portrait
-  static const double maxCardWidth = 220;
-
   final HomeViewModel viewModel;
   final String filter;
 
@@ -22,23 +21,120 @@ class PlantCardList extends StatelessWidget {
     required this.filter,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final List<int> plantIds = viewModel.plantMap.keys.where((id) {
-      return viewModel.isShown(id) &&
+  List<int> _matching(Iterable<int> ids) => ids
+      .where((id) =>
+          viewModel.plantMap[id] != null &&
           viewModel.plantMap[id]!.name
               .toLowerCase()
-              .contains(filter.toLowerCase());
-    }).toList();
-    if (plantIds.isEmpty && viewModel.selectedCollection != null) {
-      return Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text(L.of(context).emptyCollection,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium),
-      );
+              .contains(filter.toLowerCase()))
+      .toList();
+
+  @override
+  Widget build(BuildContext context) {
+    L l = L.of(context);
+    int? selected = viewModel.selectedCollection;
+    if (selected != null) {
+      List<int> plantIds = _matching(viewModel.plantsOf(selected));
+      if (plantIds.isEmpty) {
+        return Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(l.emptyCollection,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyMedium),
+        );
+      }
+      return PlantGrid(viewModel: viewModel, plantIds: plantIds);
+    }
+    if (viewModel.collections.isEmpty) {
+      return PlantGrid(
+          viewModel: viewModel, plantIds: _matching(viewModel.plantMap.keys));
     }
 
+    // One section per group, then the plants in no group
+    List<(int, String, List<int>)> sections = [
+      for (Collection c in viewModel.collections)
+        (c.id, c.name, _matching(viewModel.plantsOf(c.id))),
+      (
+        HomeViewModel.ungroupedSection,
+        l.ungroupedPlants,
+        _matching(viewModel.ungroupedPlants)
+      ),
+    ];
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for ((int, String, List<int>) section in sections)
+          if (section.$3.isNotEmpty) ...[
+            _SectionHeader(
+              title: section.$2,
+              count: section.$3.length,
+              collapsed: viewModel.isCollapsed(section.$1),
+              onTap: () => viewModel.toggleCollapsed(section.$1),
+            ),
+            if (!viewModel.isCollapsed(section.$1))
+              PlantGrid(viewModel: viewModel, plantIds: section.$3),
+            const SizedBox(height: 8),
+          ],
+      ],
+    );
+  }
+}
+
+/// The title of a section of plants; tapping it folds or unfolds it.
+class _SectionHeader extends StatelessWidget {
+  final String title;
+  final int count;
+  final bool collapsed;
+  final VoidCallback onTap;
+
+  const _SectionHeader({
+    required this.title,
+    required this.count,
+    required this.collapsed,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(15, 10, 15, 10),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                "$title ($count)",
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+            ),
+            Icon(collapsed ? LucideIcons.chevron_down : LucideIcons.chevron_up),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Plants as a grid of cards: two columns on a phone in portrait, and as
+/// many columns of about the same size as fit in landscape or on bigger
+/// screens.
+class PlantGrid extends StatelessWidget {
+  // Wide enough for two columns on any phone in portrait
+  static const double maxCardWidth = 220;
+
+  final HomeViewModel viewModel;
+  final List<int> plantIds;
+
+  const PlantGrid({
+    super.key,
+    required this.viewModel,
+    required this.plantIds,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return GridView.builder(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       shrinkWrap: true,

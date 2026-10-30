@@ -573,5 +573,6 @@
   "deleteCollectionConfirm": "Supprimer le groupe {name} ? Ses plantes sont conservées.",
   "emptyCollection": "Pas encore de plantes dans ce groupe. Appuyez longuement pour les choisir.",
   "noCollectionsYet": "Pas encore de groupes : créez-en un pour classer vos plantes.",
-  "swipeToDismiss": "Balayez une alerte pour l'ignorer"
+  "swipeToDismiss": "Balayez une alerte pour l'ignorer",
+  "ungroupedPlants": "Sans groupe"
 }

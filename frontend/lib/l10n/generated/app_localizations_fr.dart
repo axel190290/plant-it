@@ -1674,4 +1674,7 @@ class LFr extends L {
 
   @override
   String get swipeToDismiss => 'Balayez une alerte pour l\'ignorer';
+
+  @override
+  String get ungroupedPlants => 'Sans groupe';
 }

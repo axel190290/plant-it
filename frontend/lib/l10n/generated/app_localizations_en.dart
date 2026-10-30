@@ -1666,4 +1666,7 @@ class LEn extends L {
 
   @override
   String get swipeToDismiss => 'Swipe an alert to dismiss it';
+
+  @override
+  String get ungroupedPlants => 'Without group';
 }

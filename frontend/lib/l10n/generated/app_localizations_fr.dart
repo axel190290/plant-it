@@ -1823,4 +1823,135 @@ class LFr extends L {
   String backupRestored(int plants, int images) {
     return 'Sauvegarde restaurée : $plants plantes et $images photos. Fermez et rouvrez l\'app pour voir tous les changements.';
   }
+
+  @override
+  String get sensorPhones => 'Téléphones capteurs';
+
+  @override
+  String get sensorPhonesSubtitle =>
+      'Utilisez un vieux téléphone pour mesurer la lumière de vos plantes';
+
+  @override
+  String get useAsSensor => 'Utiliser ce téléphone comme capteur';
+
+  @override
+  String get useAsSensorHint =>
+      'Mesure la lumière, la pression et une température approximative près de vos plantes';
+
+  @override
+  String get addSensorPhone => 'Ajouter un téléphone capteur';
+
+  @override
+  String get sensorAddress => 'Adresse affichée par le téléphone capteur';
+
+  @override
+  String get pairingCode => 'Code';
+
+  @override
+  String get noSensorPhones =>
+      'Aucun téléphone capteur. Activez le mode capteur sur un autre téléphone de votre Wi-Fi et ajoutez-le avec son adresse et son code.';
+
+  @override
+  String get sensorMode => 'Mode capteur';
+
+  @override
+  String get startSensor => 'Commencer à mesurer';
+
+  @override
+  String get stopSensor => 'Arrêter de mesurer';
+
+  @override
+  String get sensorModeHint =>
+      'Posez le téléphone face vers le haut, sans coque, près de la plante, le haut vers la fenêtre, et laissez-le branché. L\'écran reste allumé au minimum et l\'app doit rester ouverte.';
+
+  @override
+  String get sensorBatteryWarning =>
+      'Pixel 6a et vieux téléphones : vérifiez que la batterie n\'est pas gonflée, limitez la charge à 80 % dans Paramètres > Batterie et évitez le soleil direct.';
+
+  @override
+  String get sensorPairInfo =>
+      'Sur votre téléphone principal, allez dans Plus > Téléphones capteurs > Ajouter et saisissez :';
+
+  @override
+  String get sensorName => 'Nom de ce téléphone';
+
+  @override
+  String readingsSaved(int count) {
+    return '$count mesures enregistrées';
+  }
+
+  @override
+  String luxValue(String value) {
+    return 'Lumière : $value lx';
+  }
+
+  @override
+  String pressureValue(String value) {
+    return 'Pression : $value hPa';
+  }
+
+  @override
+  String approxTemperature(String value) {
+    return 'Température approx. : $value °C';
+  }
+
+  @override
+  String facing(String direction) {
+    return 'Le haut pointe vers le $direction';
+  }
+
+  @override
+  String get compassN => 'nord';
+
+  @override
+  String get compassNE => 'nord-est';
+
+  @override
+  String get compassE => 'est';
+
+  @override
+  String get compassSE => 'sud-est';
+
+  @override
+  String get compassS => 'sud';
+
+  @override
+  String get compassSW => 'sud-ouest';
+
+  @override
+  String get compassW => 'ouest';
+
+  @override
+  String get compassNW => 'nord-ouest';
+
+  @override
+  String dliToday(String value) {
+    return 'Lumière du jour : $value mol/m²·jour';
+  }
+
+  @override
+  String dliAverage(String value) {
+    return 'Moyenne des derniers jours : $value mol/m²·jour';
+  }
+
+  @override
+  String dliNeeded(String min, String max) {
+    return 'A besoin de $min–$max mol/m²·jour';
+  }
+
+  @override
+  String lowLightAlert(String plant, String value, String min, String max) {
+    return '$plant : peu de lumière. Elle reçoit $value mol/m²·jour en moyenne et a besoin de $min–$max. Rapprochez-la de la fenêtre.';
+  }
+
+  @override
+  String lastReading(String time) {
+    return 'Dernière mesure : $time';
+  }
+
+  @override
+  String get lightLast24h => 'Lumière des dernières 24 h';
+
+  @override
+  String get sensorPhone => 'Téléphone capteur';
 }

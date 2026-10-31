@@ -82,6 +82,14 @@ class SettingsScreen extends StatelessWidget {
                       ),
                     ),
                     GestureDetector(
+                      onTap: () => context.push(Routes.settingsSensorPhones),
+                      child: ListTile(
+                        title: Text(L.of(context).sensorPhones),
+                        subtitle: Text(L.of(context).sensorPhonesSubtitle),
+                        leading: Icon(LucideIcons.smartphone),
+                      ),
+                    ),
+                    GestureDetector(
                       onTap: () => context.push(Routes.settingsBackup),
                       child: ListTile(
                         title: Text(L.of(context).backup),

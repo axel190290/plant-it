@@ -129,6 +129,7 @@ void main() {
       await db.customStatement(
           "DELETE FROM event_types WHERE name IN ('pest', 'treatment')");
       await db.customStatement('ALTER TABLE species DROP COLUMN description');
+      await db.customStatement('DROP TABLE sensor_readings');
       await db.customStatement('DROP TABLE plant_collections');
       await db.customStatement('DROP TABLE collections');
       await db.customStatement('PRAGMA user_version = 1');
@@ -157,6 +158,7 @@ void main() {
       await db.customStatement('ALTER TABLE species DROP COLUMN description');
       await db.customStatement(
           'ALTER TABLE species_care_values DROP COLUMN source');
+      await db.customStatement('DROP TABLE sensor_readings');
       await db.customStatement('DROP TABLE plant_collections');
       await db.customStatement('DROP TABLE collections');
       await db.customStatement('PRAGMA user_version = 2');
@@ -189,6 +191,7 @@ void main() {
           .customStatement("DELETE FROM care_fields WHERE key LIKE 'basic_%'");
       await db.customStatement(
           'ALTER TABLE species_care_values DROP COLUMN source');
+      await db.customStatement('DROP TABLE sensor_readings');
       await db.customStatement('DROP TABLE plant_collections');
       await db.customStatement('DROP TABLE collections');
       await db.customStatement('PRAGMA user_version = 4');
@@ -222,6 +225,7 @@ void main() {
           "('repotting', 'inspection', 'misting', 'protect', 'move outdoors')");
       await db.customStatement(
           'ALTER TABLE species_care_values DROP COLUMN source');
+      await db.customStatement('DROP TABLE sensor_readings');
       await db.customStatement('DROP TABLE plant_collections');
       await db.customStatement('DROP TABLE collections');
       await db.customStatement('PRAGMA user_version = 5');
@@ -260,6 +264,7 @@ void main() {
           "'repotting_years', 'repotting_month')");
       await db.customStatement(
           'ALTER TABLE species_care_values DROP COLUMN source');
+      await db.customStatement('DROP TABLE sensor_readings');
       await db.customStatement('DROP TABLE plant_collections');
       await db.customStatement('DROP TABLE collections');
       await db.customStatement('PRAGMA user_version = 6');
@@ -290,6 +295,7 @@ void main() {
           'ALTER TABLE species_care_values DROP COLUMN source');
       await db.customStatement("DELETE FROM care_fields WHERE key IN "
           "('flowering_months', 'dormancy_months')");
+      await db.customStatement('DROP TABLE sensor_readings');
       await db.customStatement('DROP TABLE plant_collections');
       await db.customStatement('DROP TABLE collections');
       await db.customStatement('PRAGMA user_version = 7');

@@ -3,6 +3,8 @@ import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/home/view_models/sensor_viewmodel.dart';
 import 'package:plant_it/ui/home/view_models/weather_viewmodel.dart';
 import 'package:plant_it/ui/settings/widgets/backup_screen.dart';
+import 'package:plant_it/ui/settings/widgets/sensor_phones_screen.dart';
+import 'package:plant_it/ui/settings/widgets/sensor_station_screen.dart';
 import 'package:plant_it/ui/settings/widgets/rainpoint_settings_screen.dart';
 import 'package:plant_it/ui/settings/widgets/weather_settings_screen.dart';
 import 'package:plant_it/ui/settings/view_models/care_fields_viewmodel.dart';
@@ -101,6 +103,8 @@ GoRouter router() => GoRouter(
                 rainPointService: context.read(),
                 plantRepository: context.read(),
                 speciesCareValueRepository: context.read(),
+                speciesCareRepository: context.read(),
+                sensorPhoneService: context.read(),
                 streamController: context.read(),
               );
 
@@ -159,6 +163,7 @@ GoRouter router() => GoRouter(
                     gbifSearcher: context.read(),
                     collectionRepository: context.read(),
                     rainPointService: context.read(),
+                    sensorPhoneService: context.read(),
                   );
                   viewModel.load.execute(id);
                   return PlantScreen(
@@ -295,6 +300,21 @@ GoRouter router() => GoRouter(
                 builder: (context, state) => WeatherSettingsScreen(
                   weatherService: context.read(),
                   streamController: context.read(),
+                ),
+              ),
+              GoRoute(
+                path: Routes.settingsSensorPhones,
+                builder: (context, state) => SensorPhonesScreen(
+                  sensorPhoneService: context.read(),
+                  plantRepository: context.read(),
+                  collectionRepository: context.read(),
+                  streamController: context.read(),
+                ),
+              ),
+              GoRoute(
+                path: Routes.settingsSensorStation,
+                builder: (context, state) => SensorStationScreen(
+                  station: context.read(),
                 ),
               ),
               GoRoute(

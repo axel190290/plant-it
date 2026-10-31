@@ -67,24 +67,38 @@ class _SensorAlertsState extends State<SensorAlerts> {
     return ListenableBuilder(
       listenable: widget.viewModel,
       builder: (context, _) {
-        if (widget.viewModel.alerts.isEmpty) return const SizedBox();
+        if (widget.viewModel.alerts.isEmpty &&
+            widget.viewModel.lowLight.isEmpty) {
+          return const SizedBox();
+        }
         Color onError = Theme.of(context).colorScheme.onErrorContainer;
         return Padding(
           padding: const EdgeInsets.fromLTRB(15, 0, 15, 12),
           child: Column(
-            children: widget.viewModel.alerts
-                .map((alert) => Card(
-                      color: Theme.of(context).colorScheme.errorContainer,
-                      child: ListTile(
-                        leading: Icon(LucideIcons.droplet_off, color: onError),
-                        title: Text(
-                          l.drySoilAlert(alert.plant, _number(alert.moisture),
-                              _number(alert.min)),
-                          style: TextStyle(color: onError),
-                        ),
+            children: [
+              ...widget.viewModel.lowLight.map((alert) => Card(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    child: ListTile(
+                      leading: Icon(LucideIcons.sun_dim, color: onError),
+                      title: Text(
+                        l.lowLightAlert(alert.plant, _number(alert.dli),
+                            _number(alert.needed.$1), _number(alert.needed.$2)),
+                        style: TextStyle(color: onError),
                       ),
-                    ))
-                .toList(),
+                    ),
+                  )),
+              ...widget.viewModel.alerts.map((alert) => Card(
+                    color: Theme.of(context).colorScheme.errorContainer,
+                    child: ListTile(
+                      leading: Icon(LucideIcons.droplet_off, color: onError),
+                      title: Text(
+                        l.drySoilAlert(alert.plant, _number(alert.moisture),
+                            _number(alert.min)),
+                        style: TextStyle(color: onError),
+                      ),
+                    ),
+                  )),
+            ],
           ),
         );
       },

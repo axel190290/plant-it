@@ -2905,6 +2905,216 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Backup restored: {plants} plants and {images} photos. Close and open the app again to see every change.'**
   String backupRestored(int plants, int images);
+
+  /// No description provided for @sensorPhones.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor phones'**
+  String get sensorPhones;
+
+  /// No description provided for @sensorPhonesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Use an old phone to measure the light of your plants'**
+  String get sensorPhonesSubtitle;
+
+  /// No description provided for @useAsSensor.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this phone as a sensor'**
+  String get useAsSensor;
+
+  /// No description provided for @useAsSensorHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Measures light, pressure and an approximate temperature next to your plants'**
+  String get useAsSensorHint;
+
+  /// No description provided for @addSensorPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a sensor phone'**
+  String get addSensorPhone;
+
+  /// No description provided for @sensorAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Address shown by the sensor phone'**
+  String get sensorAddress;
+
+  /// No description provided for @pairingCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Code'**
+  String get pairingCode;
+
+  /// No description provided for @noSensorPhones.
+  ///
+  /// In en, this message translates to:
+  /// **'No sensor phones yet. Turn on the sensor mode in another phone on your Wi-Fi and add it with its address and code.'**
+  String get noSensorPhones;
+
+  /// No description provided for @sensorMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor mode'**
+  String get sensorMode;
+
+  /// No description provided for @startSensor.
+  ///
+  /// In en, this message translates to:
+  /// **'Start measuring'**
+  String get startSensor;
+
+  /// No description provided for @stopSensor.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop measuring'**
+  String get stopSensor;
+
+  /// No description provided for @sensorModeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Place the phone face up, without a case, next to the plant, with its top towards the window, and leave it plugged in. The screen stays on at its lowest brightness and the app must stay open.'**
+  String get sensorModeHint;
+
+  /// No description provided for @sensorBatteryWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Pixel 6a and older phones: check that the battery is not swollen, limit charging to 80% in Settings > Battery, and keep it out of direct sun.'**
+  String get sensorBatteryWarning;
+
+  /// No description provided for @sensorPairInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'On your main phone, go to More > Sensor phones > Add and type:'**
+  String get sensorPairInfo;
+
+  /// No description provided for @sensorName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name of this phone'**
+  String get sensorName;
+
+  /// No description provided for @readingsSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} readings saved'**
+  String readingsSaved(int count);
+
+  /// No description provided for @luxValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Light: {value} lx'**
+  String luxValue(String value);
+
+  /// No description provided for @pressureValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Pressure: {value} hPa'**
+  String pressureValue(String value);
+
+  /// No description provided for @approxTemperature.
+  ///
+  /// In en, this message translates to:
+  /// **'Approx. temperature: {value} °C'**
+  String approxTemperature(String value);
+
+  /// No description provided for @facing.
+  ///
+  /// In en, this message translates to:
+  /// **'The top points {direction}'**
+  String facing(String direction);
+
+  /// No description provided for @compassN.
+  ///
+  /// In en, this message translates to:
+  /// **'north'**
+  String get compassN;
+
+  /// No description provided for @compassNE.
+  ///
+  /// In en, this message translates to:
+  /// **'northeast'**
+  String get compassNE;
+
+  /// No description provided for @compassE.
+  ///
+  /// In en, this message translates to:
+  /// **'east'**
+  String get compassE;
+
+  /// No description provided for @compassSE.
+  ///
+  /// In en, this message translates to:
+  /// **'southeast'**
+  String get compassSE;
+
+  /// No description provided for @compassS.
+  ///
+  /// In en, this message translates to:
+  /// **'south'**
+  String get compassS;
+
+  /// No description provided for @compassSW.
+  ///
+  /// In en, this message translates to:
+  /// **'southwest'**
+  String get compassSW;
+
+  /// No description provided for @compassW.
+  ///
+  /// In en, this message translates to:
+  /// **'west'**
+  String get compassW;
+
+  /// No description provided for @compassNW.
+  ///
+  /// In en, this message translates to:
+  /// **'northwest'**
+  String get compassNW;
+
+  /// No description provided for @dliToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Light today: {value} mol/m²·day'**
+  String dliToday(String value);
+
+  /// No description provided for @dliAverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Average of the last days: {value} mol/m²·day'**
+  String dliAverage(String value);
+
+  /// No description provided for @dliNeeded.
+  ///
+  /// In en, this message translates to:
+  /// **'Needs {min}–{max} mol/m²·day'**
+  String dliNeeded(String min, String max);
+
+  /// No description provided for @lowLightAlert.
+  ///
+  /// In en, this message translates to:
+  /// **'{plant}: little light. It gets {value} mol/m²·day on average and needs {min}–{max}. Move it closer to the window.'**
+  String lowLightAlert(String plant, String value, String min, String max);
+
+  /// No description provided for @lastReading.
+  ///
+  /// In en, this message translates to:
+  /// **'Last reading: {time}'**
+  String lastReading(String time);
+
+  /// No description provided for @lightLast24h.
+  ///
+  /// In en, this message translates to:
+  /// **'Light in the last 24 h'**
+  String get lightLast24h;
+
+  /// No description provided for @sensorPhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Sensor phone'**
+  String get sensorPhone;
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

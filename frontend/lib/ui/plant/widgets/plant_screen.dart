@@ -13,6 +13,9 @@ import 'package:plant_it/domain/models/plant_location.dart';
 import 'package:plant_it/ui/core/ui/care_value_dialog.dart';
 import 'package:plant_it/ui/core/ui/collection_dialogs.dart';
 import 'package:plant_it/ui/core/ui/rainpoint_format.dart';
+import 'package:plant_it/ui/core/ui/light_format.dart';
+import 'package:plant_it/data/service/sensors/sensor_phone_service.dart';
+import 'package:plant_it/domain/models/light.dart';
 import 'package:plant_it/domain/models/rainpoint.dart';
 import 'package:result_dart/result_dart.dart';
 import 'package:plant_it/ui/core/ui/weather_format.dart';
@@ -451,17 +454,71 @@ class _PlantScreenState extends State<PlantScreen> {
     setState(() {});
   }
 
+  Widget _lightCard(L l, LightSummary light) {
+    (double, double)? needed = widget.viewModel.dliNeeded;
+    double? average = light.averageDli;
+    bool low = needed != null && average != null && average < needed.$1;
+    db.SensorReading? last = light.last;
+    return Card(
+      color: low ? Theme.of(context).colorScheme.errorContainer : null,
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const Icon(LucideIcons.sun),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(light.phone.name,
+                      style: Theme.of(context).textTheme.titleMedium),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text([
+              if (last?.lux != null) l.luxValue(oneDecimal(last!.lux!)),
+              if (light.todayDli != null)
+                l.dliToday(oneDecimal(light.todayDli!)),
+              if (average != null) l.dliAverage(oneDecimal(average)),
+              if (needed != null)
+                l.dliNeeded(oneDecimal(needed.$1), oneDecimal(needed.$2)),
+              if (last?.temperature != null)
+                l.approxTemperature(oneDecimal(last!.temperature!)),
+              if (last?.pressure != null)
+                l.pressureValue(oneDecimal(last!.pressure!)),
+              if (light.phone.azimuth != null)
+                l.facing(compassName(l, compassPoint(light.phone.azimuth!))),
+            ].join('\n')),
+            if (light.lastDay.length > 1) ...[
+              const SizedBox(height: 12),
+              Text(l.lightLast24h,
+                  style: Theme.of(context).textTheme.bodySmall),
+              const SizedBox(height: 4),
+              LightChart(samples: light.lastDay),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _sensors(L l) {
     List<RainPointDevice> sensors = widget.viewModel.sensors;
-    if (sensors.isEmpty) return const SizedBox();
+    LightSummary? light = widget.viewModel.light;
+    if (sensors.isEmpty && light == null) return const SizedBox();
     double? min = widget.viewModel.soilMoistureMin ?? defaultSoilMoistureMin;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _sectionTitle(l.sensors,
-            onEdit: () => context.push(Routes.settingsRainPoint),
-            tooltip: l.rainPoint),
+            onEdit: () => context.push(sensors.isEmpty
+                ? Routes.settingsSensorPhones
+                : Routes.settingsRainPoint),
+            tooltip: sensors.isEmpty ? l.sensorPhones : l.rainPoint),
         const SizedBox(height: 8),
+        if (light != null) _lightCard(l, light),
         ...sensors.map((device) {
           double? moisture = device.reading?.soilMoisture;
           bool dry = moisture != null && moisture < min;

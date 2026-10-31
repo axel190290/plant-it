@@ -895,5 +895,122 @@
         "type": "int"
       }
     }
+  },
+  "sensorPhones": "Sensor phones",
+  "sensorPhonesSubtitle": "Use an old phone to measure the light of your plants",
+  "useAsSensor": "Use this phone as a sensor",
+  "useAsSensorHint": "Measures light, pressure and an approximate temperature next to your plants",
+  "addSensorPhone": "Add a sensor phone",
+  "sensorAddress": "Address shown by the sensor phone",
+  "pairingCode": "Code",
+  "noSensorPhones": "No sensor phones yet. Turn on the sensor mode in another phone on your Wi-Fi and add it with its address and code.",
+  "sensorMode": "Sensor mode",
+  "startSensor": "Start measuring",
+  "stopSensor": "Stop measuring",
+  "sensorModeHint": "Place the phone face up, without a case, next to the plant, with its top towards the window, and leave it plugged in. The screen stays on at its lowest brightness and the app must stay open.",
+  "sensorBatteryWarning": "Pixel 6a and older phones: check that the battery is not swollen, limit charging to 80% in Settings > Battery, and keep it out of direct sun.",
+  "sensorPairInfo": "On your main phone, go to More > Sensor phones > Add and type:",
+  "sensorName": "Name of this phone",
+  "readingsSaved": "{count} readings saved",
+  "luxValue": "Light: {value} lx",
+  "pressureValue": "Pressure: {value} hPa",
+  "approxTemperature": "Approx. temperature: {value} °C",
+  "facing": "The top points {direction}",
+  "compassN": "north",
+  "compassNE": "northeast",
+  "compassE": "east",
+  "compassSE": "southeast",
+  "compassS": "south",
+  "compassSW": "southwest",
+  "compassW": "west",
+  "compassNW": "northwest",
+  "dliToday": "Light today: {value} mol/m²·day",
+  "dliAverage": "Average of the last days: {value} mol/m²·day",
+  "dliNeeded": "Needs {min}–{max} mol/m²·day",
+  "lowLightAlert": "{plant}: little light. It gets {value} mol/m²·day on average and needs {min}–{max}. Move it closer to the window.",
+  "lastReading": "Last reading: {time}",
+  "lightLast24h": "Light in the last 24 h",
+  "sensorPhone": "Sensor phone",
+  "@readingsSaved": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@luxValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@pressureValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@approxTemperature": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@facing": {
+    "placeholders": {
+      "direction": {
+        "type": "String"
+      }
+    }
+  },
+  "@dliToday": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@dliAverage": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@dliNeeded": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "@lowLightAlert": {
+    "placeholders": {
+      "plant": {
+        "type": "String"
+      },
+      "value": {
+        "type": "String"
+      },
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "@lastReading": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
   }
 }

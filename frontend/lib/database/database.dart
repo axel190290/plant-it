@@ -189,6 +189,24 @@ class PlantCollections extends Table {
   Set<Column<Object>> get primaryKey => {plant, collection};
 }
 
+/// What a phone in sensor mode measured over a few minutes.
+class SensorReadings extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  // The id of the phone that measured it
+  TextColumn get device => text().withLength(max: 50)();
+  DateTimeColumn get time => dateTime()();
+  RealColumn get lux => real().nullable()();
+  // hPa
+  RealColumn get pressure => real().nullable()();
+  // °C, approximate: the battery of the phone
+  RealColumn get temperature => real().nullable()();
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+        {device, time}
+      ];
+}
+
 class UserSettings extends Table {
   TextColumn get key => text().withLength(max: 50)();
   TextColumn get value => text()();
@@ -218,6 +236,7 @@ class NotificationTranslations extends Table {
   Images,
   Collections,
   PlantCollections,
+  SensorReadings,
   UserSettings,
   NotificationTranslations,
 ])
@@ -227,7 +246,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   static QueryExecutor _openConnection() {
     driftRuntimeOptions.dontWarnAboutMultipleDatabases =
@@ -281,6 +300,9 @@ class AppDatabase extends _$AppDatabase {
         if (from < 9) {
           await m.createTable(collections);
           await m.createTable(plantCollections);
+        }
+        if (from < 10) {
+          await m.createTable(sensorReadings);
         }
       },
       beforeOpen: (details) async {

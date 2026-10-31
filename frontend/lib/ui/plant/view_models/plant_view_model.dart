@@ -14,6 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:plant_it/data/repository/care_field_repository.dart';
 import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/service/sensors/rainpoint_service.dart';
+import 'package:plant_it/data/service/sensors/sensor_phone_service.dart';
+import 'package:plant_it/domain/models/light.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/image_repository.dart';
@@ -50,7 +52,9 @@ class PlantViewModel extends ChangeNotifier {
     required GbifSearcher gbifSearcher,
     required CollectionRepository collectionRepository,
     required RainPointService rainPointService,
+    required SensorPhoneService sensorPhoneService,
   })  : _weatherService = weatherService,
+        _sensorPhoneService = sensorPhoneService,
         _rainPointService = rainPointService,
         _collectionRepository = collectionRepository,
         _gbifSearcher = gbifSearcher,
@@ -137,7 +141,9 @@ class PlantViewModel extends ChangeNotifier {
   final PlantRepository _plantRepository;
   final CollectionRepository _collectionRepository;
   final RainPointService _rainPointService;
+  final SensorPhoneService _sensorPhoneService;
   List<RainPointDevice> _sensors = [];
+  LightSummary? _light;
   final SpeciesRepository _speciesRepository;
   final SpeciesCareRepository _speciesCareRepository;
   final ImageRepository _imageRepository;
@@ -174,11 +180,34 @@ class PlantViewModel extends ChangeNotifier {
     return null;
   }
 
+  /// What the sensor phone linked to the plant measured, if any.
+  LightSummary? get light => _light;
+
+  /// The daily light integral the species wants, if known.
+  (double, double)? get dliNeeded {
+    double? luxMin;
+    double? luxMax;
+    for (db.CareField field in careFields) {
+      if (field.key == 'light_lux') {
+        luxMin = careValues[field.id]?.value;
+        luxMax = careValues[field.id]?.maxValue;
+      }
+    }
+    return dliRange(light: _care.light, luxMin: luxMin, luxMax: luxMax);
+  }
+
   /// Loads the readings of the linked devices, without delaying the page.
   Future<void> _loadSensors(int plantId) async {
     List<RainPointDevice> sensors = await _rainPointService.devicesOf(plantId);
-    if (sensors.isEmpty && _sensors.isEmpty) return;
+    LightSummary? light = await _sensorPhoneService.summaryOf(plantId);
+    if (sensors.isEmpty &&
+        _sensors.isEmpty &&
+        light == null &&
+        _light == null) {
+      return;
+    }
     _sensors = sensors;
+    _light = light;
     notifyListeners();
   }
 

@@ -4671,6 +4671,349 @@ class PlantCollectionsCompanion extends UpdateCompanion<PlantCollection> {
   }
 }
 
+class $SensorReadingsTable extends SensorReadings
+    with TableInfo<$SensorReadingsTable, SensorReading> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SensorReadingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _deviceMeta = const VerificationMeta('device');
+  @override
+  late final GeneratedColumn<String> device = GeneratedColumn<String>(
+      'device', aliasedName, false,
+      additionalChecks: GeneratedColumn.checkTextLength(maxTextLength: 50),
+      type: DriftSqlType.string,
+      requiredDuringInsert: true);
+  static const VerificationMeta _timeMeta = const VerificationMeta('time');
+  @override
+  late final GeneratedColumn<DateTime> time = GeneratedColumn<DateTime>(
+      'time', aliasedName, false,
+      type: DriftSqlType.dateTime, requiredDuringInsert: true);
+  static const VerificationMeta _luxMeta = const VerificationMeta('lux');
+  @override
+  late final GeneratedColumn<double> lux = GeneratedColumn<double>(
+      'lux', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _pressureMeta =
+      const VerificationMeta('pressure');
+  @override
+  late final GeneratedColumn<double> pressure = GeneratedColumn<double>(
+      'pressure', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  static const VerificationMeta _temperatureMeta =
+      const VerificationMeta('temperature');
+  @override
+  late final GeneratedColumn<double> temperature = GeneratedColumn<double>(
+      'temperature', aliasedName, true,
+      type: DriftSqlType.double, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, device, time, lux, pressure, temperature];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'sensor_readings';
+  @override
+  VerificationContext validateIntegrity(Insertable<SensorReading> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('device')) {
+      context.handle(_deviceMeta,
+          device.isAcceptableOrUnknown(data['device']!, _deviceMeta));
+    } else if (isInserting) {
+      context.missing(_deviceMeta);
+    }
+    if (data.containsKey('time')) {
+      context.handle(
+          _timeMeta, time.isAcceptableOrUnknown(data['time']!, _timeMeta));
+    } else if (isInserting) {
+      context.missing(_timeMeta);
+    }
+    if (data.containsKey('lux')) {
+      context.handle(
+          _luxMeta, lux.isAcceptableOrUnknown(data['lux']!, _luxMeta));
+    }
+    if (data.containsKey('pressure')) {
+      context.handle(_pressureMeta,
+          pressure.isAcceptableOrUnknown(data['pressure']!, _pressureMeta));
+    }
+    if (data.containsKey('temperature')) {
+      context.handle(
+          _temperatureMeta,
+          temperature.isAcceptableOrUnknown(
+              data['temperature']!, _temperatureMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {device, time},
+      ];
+  @override
+  SensorReading map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SensorReading(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      device: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}device'])!,
+      time: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}time'])!,
+      lux: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}lux']),
+      pressure: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}pressure']),
+      temperature: attachedDatabase.typeMapping
+          .read(DriftSqlType.double, data['${effectivePrefix}temperature']),
+    );
+  }
+
+  @override
+  $SensorReadingsTable createAlias(String alias) {
+    return $SensorReadingsTable(attachedDatabase, alias);
+  }
+}
+
+class SensorReading extends DataClass implements Insertable<SensorReading> {
+  final int id;
+  final String device;
+  final DateTime time;
+  final double? lux;
+  final double? pressure;
+  final double? temperature;
+  const SensorReading(
+      {required this.id,
+      required this.device,
+      required this.time,
+      this.lux,
+      this.pressure,
+      this.temperature});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['device'] = Variable<String>(device);
+    map['time'] = Variable<DateTime>(time);
+    if (!nullToAbsent || lux != null) {
+      map['lux'] = Variable<double>(lux);
+    }
+    if (!nullToAbsent || pressure != null) {
+      map['pressure'] = Variable<double>(pressure);
+    }
+    if (!nullToAbsent || temperature != null) {
+      map['temperature'] = Variable<double>(temperature);
+    }
+    return map;
+  }
+
+  SensorReadingsCompanion toCompanion(bool nullToAbsent) {
+    return SensorReadingsCompanion(
+      id: Value(id),
+      device: Value(device),
+      time: Value(time),
+      lux: lux == null && nullToAbsent ? const Value.absent() : Value(lux),
+      pressure: pressure == null && nullToAbsent
+          ? const Value.absent()
+          : Value(pressure),
+      temperature: temperature == null && nullToAbsent
+          ? const Value.absent()
+          : Value(temperature),
+    );
+  }
+
+  factory SensorReading.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SensorReading(
+      id: serializer.fromJson<int>(json['id']),
+      device: serializer.fromJson<String>(json['device']),
+      time: serializer.fromJson<DateTime>(json['time']),
+      lux: serializer.fromJson<double?>(json['lux']),
+      pressure: serializer.fromJson<double?>(json['pressure']),
+      temperature: serializer.fromJson<double?>(json['temperature']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'device': serializer.toJson<String>(device),
+      'time': serializer.toJson<DateTime>(time),
+      'lux': serializer.toJson<double?>(lux),
+      'pressure': serializer.toJson<double?>(pressure),
+      'temperature': serializer.toJson<double?>(temperature),
+    };
+  }
+
+  SensorReading copyWith(
+          {int? id,
+          String? device,
+          DateTime? time,
+          Value<double?> lux = const Value.absent(),
+          Value<double?> pressure = const Value.absent(),
+          Value<double?> temperature = const Value.absent()}) =>
+      SensorReading(
+        id: id ?? this.id,
+        device: device ?? this.device,
+        time: time ?? this.time,
+        lux: lux.present ? lux.value : this.lux,
+        pressure: pressure.present ? pressure.value : this.pressure,
+        temperature: temperature.present ? temperature.value : this.temperature,
+      );
+  SensorReading copyWithCompanion(SensorReadingsCompanion data) {
+    return SensorReading(
+      id: data.id.present ? data.id.value : this.id,
+      device: data.device.present ? data.device.value : this.device,
+      time: data.time.present ? data.time.value : this.time,
+      lux: data.lux.present ? data.lux.value : this.lux,
+      pressure: data.pressure.present ? data.pressure.value : this.pressure,
+      temperature:
+          data.temperature.present ? data.temperature.value : this.temperature,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SensorReading(')
+          ..write('id: $id, ')
+          ..write('device: $device, ')
+          ..write('time: $time, ')
+          ..write('lux: $lux, ')
+          ..write('pressure: $pressure, ')
+          ..write('temperature: $temperature')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, device, time, lux, pressure, temperature);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SensorReading &&
+          other.id == this.id &&
+          other.device == this.device &&
+          other.time == this.time &&
+          other.lux == this.lux &&
+          other.pressure == this.pressure &&
+          other.temperature == this.temperature);
+}
+
+class SensorReadingsCompanion extends UpdateCompanion<SensorReading> {
+  final Value<int> id;
+  final Value<String> device;
+  final Value<DateTime> time;
+  final Value<double?> lux;
+  final Value<double?> pressure;
+  final Value<double?> temperature;
+  const SensorReadingsCompanion({
+    this.id = const Value.absent(),
+    this.device = const Value.absent(),
+    this.time = const Value.absent(),
+    this.lux = const Value.absent(),
+    this.pressure = const Value.absent(),
+    this.temperature = const Value.absent(),
+  });
+  SensorReadingsCompanion.insert({
+    this.id = const Value.absent(),
+    required String device,
+    required DateTime time,
+    this.lux = const Value.absent(),
+    this.pressure = const Value.absent(),
+    this.temperature = const Value.absent(),
+  })  : device = Value(device),
+        time = Value(time);
+  static Insertable<SensorReading> custom({
+    Expression<int>? id,
+    Expression<String>? device,
+    Expression<DateTime>? time,
+    Expression<double>? lux,
+    Expression<double>? pressure,
+    Expression<double>? temperature,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (device != null) 'device': device,
+      if (time != null) 'time': time,
+      if (lux != null) 'lux': lux,
+      if (pressure != null) 'pressure': pressure,
+      if (temperature != null) 'temperature': temperature,
+    });
+  }
+
+  SensorReadingsCompanion copyWith(
+      {Value<int>? id,
+      Value<String>? device,
+      Value<DateTime>? time,
+      Value<double?>? lux,
+      Value<double?>? pressure,
+      Value<double?>? temperature}) {
+    return SensorReadingsCompanion(
+      id: id ?? this.id,
+      device: device ?? this.device,
+      time: time ?? this.time,
+      lux: lux ?? this.lux,
+      pressure: pressure ?? this.pressure,
+      temperature: temperature ?? this.temperature,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (device.present) {
+      map['device'] = Variable<String>(device.value);
+    }
+    if (time.present) {
+      map['time'] = Variable<DateTime>(time.value);
+    }
+    if (lux.present) {
+      map['lux'] = Variable<double>(lux.value);
+    }
+    if (pressure.present) {
+      map['pressure'] = Variable<double>(pressure.value);
+    }
+    if (temperature.present) {
+      map['temperature'] = Variable<double>(temperature.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SensorReadingsCompanion(')
+          ..write('id: $id, ')
+          ..write('device: $device, ')
+          ..write('time: $time, ')
+          ..write('lux: $lux, ')
+          ..write('pressure: $pressure, ')
+          ..write('temperature: $temperature')
+          ..write(')'))
+        .toString();
+  }
+}
+
 class $UserSettingsTable extends UserSettings
     with TableInfo<$UserSettingsTable, UserSetting> {
   @override
@@ -5078,6 +5421,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $CollectionsTable collections = $CollectionsTable(this);
   late final $PlantCollectionsTable plantCollections =
       $PlantCollectionsTable(this);
+  late final $SensorReadingsTable sensorReadings = $SensorReadingsTable(this);
   late final $UserSettingsTable userSettings = $UserSettingsTable(this);
   late final $NotificationTranslationsTable notificationTranslations =
       $NotificationTranslationsTable(this);
@@ -5098,6 +5442,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         images,
         collections,
         plantCollections,
+        sensorReadings,
         userSettings,
         notificationTranslations
       ];
@@ -9755,6 +10100,189 @@ typedef $$PlantCollectionsTableProcessedTableManager = ProcessedTableManager<
     (PlantCollection, $$PlantCollectionsTableReferences),
     PlantCollection,
     PrefetchHooks Function({bool plant, bool collection})>;
+typedef $$SensorReadingsTableCreateCompanionBuilder = SensorReadingsCompanion
+    Function({
+  Value<int> id,
+  required String device,
+  required DateTime time,
+  Value<double?> lux,
+  Value<double?> pressure,
+  Value<double?> temperature,
+});
+typedef $$SensorReadingsTableUpdateCompanionBuilder = SensorReadingsCompanion
+    Function({
+  Value<int> id,
+  Value<String> device,
+  Value<DateTime> time,
+  Value<double?> lux,
+  Value<double?> pressure,
+  Value<double?> temperature,
+});
+
+class $$SensorReadingsTableFilterComposer
+    extends Composer<_$AppDatabase, $SensorReadingsTable> {
+  $$SensorReadingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get device => $composableBuilder(
+      column: $table.device, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get time => $composableBuilder(
+      column: $table.time, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get lux => $composableBuilder(
+      column: $table.lux, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get pressure => $composableBuilder(
+      column: $table.pressure, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<double> get temperature => $composableBuilder(
+      column: $table.temperature, builder: (column) => ColumnFilters(column));
+}
+
+class $$SensorReadingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $SensorReadingsTable> {
+  $$SensorReadingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get device => $composableBuilder(
+      column: $table.device, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get time => $composableBuilder(
+      column: $table.time, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get lux => $composableBuilder(
+      column: $table.lux, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get pressure => $composableBuilder(
+      column: $table.pressure, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<double> get temperature => $composableBuilder(
+      column: $table.temperature, builder: (column) => ColumnOrderings(column));
+}
+
+class $$SensorReadingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SensorReadingsTable> {
+  $$SensorReadingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get device =>
+      $composableBuilder(column: $table.device, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get time =>
+      $composableBuilder(column: $table.time, builder: (column) => column);
+
+  GeneratedColumn<double> get lux =>
+      $composableBuilder(column: $table.lux, builder: (column) => column);
+
+  GeneratedColumn<double> get pressure =>
+      $composableBuilder(column: $table.pressure, builder: (column) => column);
+
+  GeneratedColumn<double> get temperature => $composableBuilder(
+      column: $table.temperature, builder: (column) => column);
+}
+
+class $$SensorReadingsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $SensorReadingsTable,
+    SensorReading,
+    $$SensorReadingsTableFilterComposer,
+    $$SensorReadingsTableOrderingComposer,
+    $$SensorReadingsTableAnnotationComposer,
+    $$SensorReadingsTableCreateCompanionBuilder,
+    $$SensorReadingsTableUpdateCompanionBuilder,
+    (
+      SensorReading,
+      BaseReferences<_$AppDatabase, $SensorReadingsTable, SensorReading>
+    ),
+    SensorReading,
+    PrefetchHooks Function()> {
+  $$SensorReadingsTableTableManager(
+      _$AppDatabase db, $SensorReadingsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SensorReadingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SensorReadingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SensorReadingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<String> device = const Value.absent(),
+            Value<DateTime> time = const Value.absent(),
+            Value<double?> lux = const Value.absent(),
+            Value<double?> pressure = const Value.absent(),
+            Value<double?> temperature = const Value.absent(),
+          }) =>
+              SensorReadingsCompanion(
+            id: id,
+            device: device,
+            time: time,
+            lux: lux,
+            pressure: pressure,
+            temperature: temperature,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required String device,
+            required DateTime time,
+            Value<double?> lux = const Value.absent(),
+            Value<double?> pressure = const Value.absent(),
+            Value<double?> temperature = const Value.absent(),
+          }) =>
+              SensorReadingsCompanion.insert(
+            id: id,
+            device: device,
+            time: time,
+            lux: lux,
+            pressure: pressure,
+            temperature: temperature,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $$SensorReadingsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $SensorReadingsTable,
+    SensorReading,
+    $$SensorReadingsTableFilterComposer,
+    $$SensorReadingsTableOrderingComposer,
+    $$SensorReadingsTableAnnotationComposer,
+    $$SensorReadingsTableCreateCompanionBuilder,
+    $$SensorReadingsTableUpdateCompanionBuilder,
+    (
+      SensorReading,
+      BaseReferences<_$AppDatabase, $SensorReadingsTable, SensorReading>
+    ),
+    SensorReading,
+    PrefetchHooks Function()>;
 typedef $$UserSettingsTableCreateCompanionBuilder = UserSettingsCompanion
     Function({
   required String key,
@@ -10046,6 +10574,8 @@ class $AppDatabaseManager {
       $$CollectionsTableTableManager(_db, _db.collections);
   $$PlantCollectionsTableTableManager get plantCollections =>
       $$PlantCollectionsTableTableManager(_db, _db.plantCollections);
+  $$SensorReadingsTableTableManager get sensorReadings =>
+      $$SensorReadingsTableTableManager(_db, _db.sensorReadings);
   $$UserSettingsTableTableManager get userSettings =>
       $$UserSettingsTableTableManager(_db, _db.userSettings);
   $$NotificationTranslationsTableTableManager get notificationTranslations =>

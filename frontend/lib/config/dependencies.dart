@@ -27,6 +27,8 @@ import 'package:plant_it/data/service/care/suggestion_care_filler.dart';
 import 'package:plant_it/data/service/care/species_description_service.dart';
 import 'package:plant_it/data/service/identify/plantnet_identifier.dart';
 import 'package:plant_it/data/service/sensors/rainpoint_client.dart';
+import 'package:plant_it/data/service/sensors/sensor_phone_service.dart';
+import 'package:plant_it/data/service/sensors/sensor_station.dart';
 import 'package:plant_it/data/service/sensors/rainpoint_service.dart';
 import 'package:plant_it/data/service/search/flora_codex_searcher.dart';
 import 'package:plant_it/data/service/search/gbif_searcher.dart';
@@ -85,6 +87,19 @@ List<SingleChildWidget> get providersLocal {
     ),
     Provider(
       create: (context) => BackupService(db: context.read()),
+    ),
+    ChangeNotifierProvider(
+      create: (context) => SensorStation(
+        db: context.read(),
+        userSettingRepository: context.read(),
+      ),
+    ),
+    Provider(
+      create: (context) => SensorPhoneService(
+        db: context.read(),
+        userSettingRepository: context.read(),
+        collectionRepository: context.read(),
+      ),
     ),
     Provider(
       create: (context) => SpeciesSynonymsRepository(db: context.read()),

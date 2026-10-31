@@ -88,6 +88,16 @@ List<SingleChildWidget> get providersLocal {
     Provider(
       create: (context) => BackupService(db: context.read()),
     ),
+    Provider(
+      create: (context) => SpeciesSynonymsRepository(db: context.read()),
+    ),
+    Provider(
+      create: (context) => UserSettingRepository(db: context.read()),
+    ),
+    Provider(
+      create: (context) => NotificationsLangRepository(db: context.read()),
+    ),
+    // After UserSettingRepository, which they read
     ChangeNotifierProvider(
       create: (context) => SensorStation(
         db: context.read(),
@@ -100,15 +110,6 @@ List<SingleChildWidget> get providersLocal {
         userSettingRepository: context.read(),
         collectionRepository: context.read(),
       ),
-    ),
-    Provider(
-      create: (context) => SpeciesSynonymsRepository(db: context.read()),
-    ),
-    Provider(
-      create: (context) => UserSettingRepository(db: context.read()),
-    ),
-    Provider(
-      create: (context) => NotificationsLangRepository(db: context.read()),
     ),
     Provider(
       create: (context) => ReminderOccurrenceService(

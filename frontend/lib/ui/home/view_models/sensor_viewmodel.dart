@@ -63,7 +63,7 @@ class SensorViewModel extends ChangeNotifier {
     _recorded = await _rainPointService.recordWaterings();
     if (_recorded > 0) _streamController.add(StreamCode.insertEvent);
 
-    Map<String, Set<int>> links = await _rainPointService.links();
+    Map<String, Set<int>> links = await _rainPointService.linkedPlants();
     Result<List<RainPointDevice>> devices = await _rainPointService.devices();
     Map<int, Plant> plants = {
       for (Plant p in (await _plantRepository.getAll()).getOrDefault([]))

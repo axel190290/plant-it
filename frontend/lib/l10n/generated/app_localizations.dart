@@ -2795,7 +2795,7 @@ abstract class L {
   /// No description provided for @linkPlantsHint.
   ///
   /// In en, this message translates to:
-  /// **'Tap to link plants'**
+  /// **'Tap to link plants or groups'**
   String get linkPlantsHint;
 
   /// No description provided for @soilMoistureValue.

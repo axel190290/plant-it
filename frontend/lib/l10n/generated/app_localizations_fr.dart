@@ -1748,7 +1748,7 @@ class LFr extends L {
   }
 
   @override
-  String get linkPlantsHint => 'Touchez pour lier des plantes';
+  String get linkPlantsHint => 'Touchez pour lier des plantes ou des groupes';
 
   @override
   String soilMoistureValue(String value) {

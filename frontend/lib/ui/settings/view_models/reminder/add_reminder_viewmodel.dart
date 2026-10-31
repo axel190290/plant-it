@@ -101,11 +101,15 @@ class AddReminderViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// For a group: the suggestions of each of its plants, by plant id, null
+  /// while they load.
+  Map<int, List<ReminderSuggestion>>? get groupSuggestions => _groupSuggestions;
+
   /// For a group: how many of its plants have a suggestion for [type],
   /// null while they load.
   int? plantsWithSuggestion(EventType type) => _groupSuggestions?.values
       .where(
-          (list) => list.any((s) => suggestionEventTypes[s.kind] == type.name))
+          (list) => list.any((s) => isSuggestionEventType(type.name, s.kind)))
       .length;
 
   /// The suggestions for the chosen plant, null while they load.
@@ -131,7 +135,7 @@ class AddReminderViewModel extends ChangeNotifier {
   static ReminderSuggestion? _currentSuggestion(
       List<ReminderSuggestion>? suggestions, EventType type) {
     List<ReminderSuggestion> matching = (suggestions ?? [])
-        .where((s) => suggestionEventTypes[s.kind] == type.name)
+        .where((s) => isSuggestionEventType(type.name, s.kind))
         .toList();
     if (matching.isEmpty) return null;
     DateTime now = DateTime.now();
@@ -173,8 +177,12 @@ class AddReminderViewModel extends ChangeNotifier {
   /// The event type of a suggestion, created if it was deleted or renamed.
   Future<Result<EventType>> _eventTypeFor(SuggestionKind kind) async {
     String name = suggestionEventTypes[kind]!;
+    // The built-in type, or one the user made or renamed for it
     for (EventType type in _eventTypes.values) {
       if (type.name == name) return Success(type);
+    }
+    for (EventType type in _eventTypes.values) {
+      if (isSuggestionEventType(type.name, kind)) return Success(type);
     }
     Result<int> id = await _eventTypeRepository.insert(EventTypesCompanion(
       name: Value(name),

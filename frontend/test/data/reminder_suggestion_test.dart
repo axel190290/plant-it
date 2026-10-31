@@ -229,4 +229,15 @@ void main() {
     expect(hints.repottingYears, 3);
     expect(hints.repottingMonth, isNull);
   });
+
+  test('isSuggestionEventType knows the usual names of each care', () {
+    expect(isSuggestionEventType('watering', SuggestionKind.watering), isTrue);
+    expect(isSuggestionEventType(' Riego ', SuggestionKind.watering), isTrue);
+    expect(isSuggestionEventType('Abonado', SuggestionKind.fertilizing),
+        isTrue);
+    expect(isSuggestionEventType('Fertilización', SuggestionKind.fertilizing),
+        isTrue);
+    expect(isSuggestionEventType('Poda', SuggestionKind.watering), isFalse);
+    expect(isSuggestionEventType('Siembra', SuggestionKind.pruning), isFalse);
+  });
 }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/database/database.dart';
-import 'package:plant_it/domain/models/reminder_suggestion.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
 import 'package:plant_it/ui/core/ui/step_section.dart';
 import 'package:plant_it/ui/settings/view_models/reminder/add_reminder_viewmodel.dart';
+import 'package:plant_it/ui/settings/widgets/reminder/create/group_suggestions_panel.dart';
 import 'package:plant_it/ui/settings/widgets/reminder/create/reminder_suggestions_panel.dart';
 import 'package:plant_it/utils/icons.dart';
 
@@ -83,6 +82,10 @@ class _EventTypeStepState extends State<EventTypeStep> {
                         plant: plant,
                       ),
                     if (collection != null) ...[
+                      GroupSuggestionsPanel(
+                        viewModel: widget.viewModel,
+                        collection: collection,
+                      ),
                       const SizedBox(height: 8),
                       SwitchListTile(
                         contentPadding: EdgeInsets.zero,
@@ -106,21 +109,7 @@ class _EventTypeStepState extends State<EventTypeStep> {
   }
 
   Widget _typeCard(BuildContext context, EventType eventType) {
-    L l = L.of(context);
     bool isSelected = widget._ongoingSelection.value == eventType;
-    ReminderSuggestion? suggestion =
-        widget.viewModel.suggestionForType(eventType);
-    // For a group, how many of its plants have a suggestion
-    Collection? collection = widget.viewModel.collection;
-    int? suggested = collection == null || !widget.viewModel.perPlantSuggestions
-        ? null
-        : widget.viewModel.plantsWithSuggestion(eventType);
-    String? hint = suggestion != null
-        ? suggestionEvery(l, suggestion)
-        : suggested != null && suggested > 0
-            ? l.suggestedForPlants(
-                suggested, widget.viewModel.plantsOf(collection!.id).length)
-            : null;
     Color primary = Theme.of(context).colorScheme.primary;
     return GestureDetector(
       onTap: () {
@@ -144,25 +133,6 @@ class _EventTypeStepState extends State<EventTypeStep> {
                 const SizedBox(height: 6),
                 Text(eventType.name,
                     maxLines: 1, overflow: TextOverflow.ellipsis),
-                // What will be filled in when choosing it
-                if (hint != null)
-                  Row(
-                    children: [
-                      Icon(LucideIcons.bell_ring, size: 12, color: primary),
-                      const SizedBox(width: 4),
-                      Expanded(
-                        child: Text(
-                          hint,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodySmall!
-                              .copyWith(color: primary),
-                        ),
-                      ),
-                    ],
-                  ),
               ],
             ),
           )),

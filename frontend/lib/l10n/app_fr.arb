@@ -594,7 +594,7 @@
   "devices": "Appareils",
   "noRainPointDevices": "Aucun capteur ni programmateur trouvé",
   "linkedPlants": "Plantes : {plants}",
-  "linkPlantsHint": "Touchez pour lier des plantes",
+  "linkPlantsHint": "Touchez pour lier des plantes ou des groupes",
   "soilMoistureValue": "Humidité du sol {value} %",
   "wateringNow": "Arrosage en cours",
   "lastWatering": "Dernier arrosage : {date} · {liters} l",

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/plant_repository.dart';
 import 'package:plant_it/data/service/sensors/rainpoint_client.dart';
 import 'package:plant_it/data/service/sensors/rainpoint_service.dart';
@@ -17,12 +18,14 @@ import 'package:result_dart/result_dart.dart';
 class RainPointSettingsScreen extends StatefulWidget {
   final RainPointService rainPointService;
   final PlantRepository plantRepository;
+  final CollectionRepository collectionRepository;
   final StreamController<StreamCode> streamController;
 
   const RainPointSettingsScreen({
     super.key,
     required this.rainPointService,
     required this.plantRepository,
+    required this.collectionRepository,
     required this.streamController,
   });
 
@@ -40,6 +43,7 @@ class _RainPointSettingsScreenState extends State<RainPointSettingsScreen> {
   bool _busy = false;
   List<RainPointDevice> _devices = [];
   Map<String, Set<int>> _links = {};
+  // Plants by id, and groups of plants by their negated id
   Map<int, String> _plants = {};
 
   @override
@@ -61,6 +65,8 @@ class _RainPointSettingsScreenState extends State<RainPointSettingsScreen> {
     (String, String, String) account = await service.account();
     List<Plant> plants =
         (await widget.plantRepository.getAll()).getOrDefault([]);
+    List<Collection> groups =
+        (await widget.collectionRepository.getAll()).getOrDefault([]);
     Map<String, Set<int>> links = await service.links();
     bool configured = await service.isConfigured();
     if (!mounted) return;
@@ -69,7 +75,11 @@ class _RainPointSettingsScreenState extends State<RainPointSettingsScreen> {
       _areaCode.text = account.$2;
       _app = account.$3;
       _configured = configured;
-      _plants = {for (Plant p in plants) p.id: p.name};
+      // Groups first: a water timer usually waters a group of plants
+      _plants = {
+        for (Collection g in groups) -g.id: "📁 ${g.name}",
+        for (Plant p in plants) p.id: p.name,
+      };
       _links = links;
     });
     if (configured) await _refresh();

@@ -4,6 +4,7 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/user_setting_repository.dart';
@@ -61,6 +62,7 @@ void main() {
       userSettingRepository: UserSettingRepository(db: db),
       eventRepository: EventRepository(db: db),
       eventTypeRepository: EventTypeRepository(db: db),
+      collectionRepository: CollectionRepository(db: db),
     );
   }
 
@@ -102,8 +104,12 @@ void main() {
     int plant = await db
         .into(db.plants)
         .insert(PlantsCompanion.insert(name: 'Rosal', species: species));
-    await rainPoint.setLinks('42_3', {plant});
-    expect(await rainPoint.links(), {
+    // Linked through a group of plants
+    CollectionRepository groups = CollectionRepository(db: db);
+    int balcony = (await groups.insert('Balcón')).getOrThrow();
+    await groups.setPlantsOfCollection(balcony, {plant});
+    await rainPoint.setLinks('42_3', {-balcony});
+    expect(await rainPoint.linkedPlants(), {
       '42_3': {plant}
     });
     expect((await rainPoint.devicesOf(plant)).single.name, 'Grifo');

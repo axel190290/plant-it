@@ -1753,7 +1753,7 @@ class LEs extends L {
   }
 
   @override
-  String get linkPlantsHint => 'Toca para vincular plantas';
+  String get linkPlantsHint => 'Toca para vincular plantas o grupos';
 
   @override
   String soilMoistureValue(String value) {

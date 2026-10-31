@@ -26,6 +26,94 @@ const Map<SuggestionKind, String> suggestionEventTypes = {
   SuggestionKind.moveOutdoors: 'move outdoors',
 };
 
+/// Names, without accents and in lower case, by which an event type the
+/// user made or renamed is taken for the event type of a suggestion.
+const Map<SuggestionKind, List<String>> _eventTypeNames = {
+  SuggestionKind.watering: [
+    'riego',
+    'regar',
+    'regado',
+    'irrigazione',
+    'annaffiatura',
+    'arrosage',
+    'arroser',
+    'water'
+  ],
+  SuggestionKind.fertilizing: [
+    'fertilizer',
+    'abono',
+    'abonado',
+    'abonar',
+    'fertilizado',
+    'fertilizar',
+    'fertilizante',
+    'fertilizacion',
+    'concimazione',
+    'concime',
+    'fertilisation',
+    'engrais'
+  ],
+  SuggestionKind.pruning: ['poda', 'podar', 'potatura', 'taille'],
+  SuggestionKind.repotting: [
+    'trasplante',
+    'trasplantar',
+    'rinvaso',
+    'rempotage'
+  ],
+  SuggestionKind.pestCheck: [
+    'revision',
+    'revisar',
+    'inspeccion',
+    'plagas',
+    'ispezione',
+    'controllo'
+  ],
+  SuggestionKind.misting: [
+    'pulverizar',
+    'pulverizacion',
+    'nebulizzazione',
+    'brumisation'
+  ],
+  SuggestionKind.protectFromCold: [
+    'proteger',
+    'proteccion',
+    'proteggere',
+    'proteger del frio',
+    'proteger'
+  ],
+  SuggestionKind.moveOutdoors: ['sacar al exterior', 'exterior', 'sortir'],
+};
+
+String _plain(String s) {
+  const Map<String, String> accents = {
+    'á': 'a',
+    'é': 'e',
+    'í': 'i',
+    'ó': 'o',
+    'ú': 'u',
+    'ü': 'u',
+    'à': 'a',
+    'è': 'e',
+    'ì': 'i',
+    'ò': 'o',
+    'ù': 'u',
+    'â': 'a',
+    'ê': 'e',
+    'ô': 'o',
+    'ç': 'c',
+    'ñ': 'n',
+  };
+  return s.trim().toLowerCase().split('').map((c) => accents[c] ?? c).join();
+}
+
+/// Whether the event type named [name] is the one of the suggestions of
+/// [kind]: its built-in name or a usual name in the languages of the app.
+bool isSuggestionEventType(String name, SuggestionKind kind) {
+  String plain = _plain(name);
+  return plain == suggestionEventTypes[kind] ||
+      _eventTypeNames[kind]!.contains(plain);
+}
+
 class ReminderSuggestion {
   final SuggestionKind kind;
   final int frequencyQuantity;

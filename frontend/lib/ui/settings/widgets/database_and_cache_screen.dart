@@ -36,7 +36,9 @@ class DatabaseAndCacheScreen extends StatelessWidget {
               onTap: () async {
                 await viewModel.clearNotificationMessages();
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(appLocalizations.notificationMessagesReloaded)),
+                  SnackBar(
+                      content:
+                          Text(appLocalizations.notificationMessagesReloaded)),
                 );
               },
             ),

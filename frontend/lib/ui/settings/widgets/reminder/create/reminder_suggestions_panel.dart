@@ -20,7 +20,7 @@ String suggestionTitle(L l, SuggestionKind kind) => switch (kind) {
       SuggestionKind.moveOutdoors => l.suggestionMoveOutdoors,
     };
 
-String _reason(L l, SuggestionKind kind) => switch (kind) {
+String suggestionReason(L l, SuggestionKind kind) => switch (kind) {
       SuggestionKind.watering => l.reasonWatering,
       SuggestionKind.fertilizing => l.reasonFertilizing,
       SuggestionKind.pruning => l.reasonPruning,
@@ -31,7 +31,7 @@ String _reason(L l, SuggestionKind kind) => switch (kind) {
       SuggestionKind.moveOutdoors => l.reasonMoveOutdoors,
     };
 
-IconData _icon(SuggestionKind kind) => switch (kind) {
+IconData suggestionIcon(SuggestionKind kind) => switch (kind) {
       SuggestionKind.watering => LucideIcons.droplet,
       SuggestionKind.fertilizing => LucideIcons.flask_conical,
       SuggestionKind.pruning => LucideIcons.scissors,
@@ -142,11 +142,11 @@ class ReminderSuggestionsPanel extends StatelessWidget {
         const SizedBox(height: 8),
         ...groups.values.map((group) => Card.filled(
               child: ListTile(
-                leading: Icon(_icon(group.first.kind)),
+                leading: Icon(suggestionIcon(group.first.kind)),
                 title: Text(suggestionTitle(l, group.first.kind)),
                 subtitle: Text([
                   ...group.map((s) => suggestionSchedule(l, s)),
-                  _reason(l, group.first.kind),
+                  suggestionReason(l, group.first.kind),
                 ].join('\n')),
                 isThreeLine: true,
                 trailing: const Icon(LucideIcons.plus),

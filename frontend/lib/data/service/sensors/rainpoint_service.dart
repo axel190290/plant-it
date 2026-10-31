@@ -2,12 +2,14 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart' show Value;
 import 'package:logging/logging.dart';
+import 'package:plant_it/data/repository/collection_repository.dart';
 import 'package:plant_it/data/repository/event_repository.dart';
 import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/user_setting_repository.dart';
 import 'package:plant_it/data/service/sensors/rainpoint_client.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/domain/models/rainpoint.dart';
+import 'package:plant_it/domain/models/reminder_suggestion.dart';
 import 'package:plant_it/domain/models/user_settings_keys.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -21,6 +23,7 @@ class RainPointService {
   final UserSettingRepository _settings;
   final EventRepository _eventRepository;
   final EventTypeRepository _eventTypeRepository;
+  final CollectionRepository _collectionRepository;
   final Logger _log = Logger('RainPointService');
 
   List<RainPointDevice>? _devices;
@@ -31,7 +34,9 @@ class RainPointService {
     required UserSettingRepository userSettingRepository,
     required EventRepository eventRepository,
     required EventTypeRepository eventTypeRepository,
+    required CollectionRepository collectionRepository,
   })  : _client = client,
+        _collectionRepository = collectionRepository,
         _settings = userSettingRepository,
         _eventRepository = eventRepository,
         _eventTypeRepository = eventTypeRepository;
@@ -148,7 +153,8 @@ class RainPointService {
     return result;
   }
 
-  /// The plants each device is linked to, by device key.
+  /// What each device is linked to, by device key: plant ids, and groups
+  /// of plants as their negated ids.
   Future<Map<String, Set<int>>> links() async {
     String saved = await _get(UserSettingsKeys.rainPointLinks);
     if (saved.isEmpty) return {};
@@ -163,12 +169,14 @@ class RainPointService {
     }
   }
 
-  Future<void> setLinks(String deviceKey, Set<int> plantIds) async {
+  /// Links a device to plants and to groups of plants, given as their
+  /// negated ids.
+  Future<void> setLinks(String deviceKey, Set<int> linked) async {
     Map<String, Set<int>> all = await links();
-    if (plantIds.isEmpty) {
+    if (linked.isEmpty) {
       all.remove(deviceKey);
     } else {
-      all[deviceKey] = plantIds;
+      all[deviceKey] = linked;
     }
     await _settings.put(
         UserSettingsKeys.rainPointLinks.key,
@@ -178,10 +186,25 @@ class RainPointService {
         }));
   }
 
+  /// The plants each device is linked to, directly or through a group.
+  Future<Map<String, Set<int>>> linkedPlants() async {
+    Map<String, Set<int>> all = await links();
+    if (all.isEmpty) return {};
+    Map<int, Set<int>> groups =
+        (await _collectionRepository.getPlantsByCollection()).getOrDefault({});
+    return {
+      for (MapEntry<String, Set<int>> e in all.entries)
+        e.key: {
+          for (int id in e.value)
+            if (id > 0) id else ...?groups[-id]
+        }
+    };
+  }
+
   /// The devices linked to [plantId], with their readings. Empty when no
   /// account is set or the cloud cannot be reached.
   Future<List<RainPointDevice>> devicesOf(int plantId) async {
-    Map<String, Set<int>> linked = await links();
+    Map<String, Set<int>> linked = await linkedPlants();
     if (!linked.values.any((ids) => ids.contains(plantId))) return const [];
     Result<List<RainPointDevice>> all = await devices();
     if (all.isError()) {
@@ -197,7 +220,7 @@ class RainPointService {
   /// Records as watering events the waterings the linked water timers did
   /// since they were last checked. Returns how many events were made.
   Future<int> recordWaterings() async {
-    Map<String, Set<int>> linked = await links();
+    Map<String, Set<int>> linked = await linkedPlants();
     if (linked.isEmpty) return 0;
     Result<List<RainPointDevice>> all = await devices();
     if (all.isError()) return 0;
@@ -209,10 +232,15 @@ class RainPointService {
             .map((k, v) => MapEntry(k, (v as num).toInt()));
       }
     } catch (_) {}
-    EventType? watering = (await _eventTypeRepository.getAll())
-        .getOrDefault([])
-        .where((t) => t.name == 'watering')
-        .firstOrNull;
+    List<EventType> types =
+        (await _eventTypeRepository.getAll()).getOrDefault([]);
+    EventType? watering = types
+            .where((t) => t.name == 'watering')
+            .firstOrNull ??
+        types
+            .where(
+                (t) => isSuggestionEventType(t.name, SuggestionKind.watering))
+            .firstOrNull;
     if (watering == null) return 0;
 
     int made = 0;

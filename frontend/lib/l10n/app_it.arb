@@ -607,7 +607,7 @@
   "devices": "Dispositivi",
   "noRainPointDevices": "Nessun sensore o timer trovato",
   "linkedPlants": "Piante: {plants}",
-  "linkPlantsHint": "Tocca per collegare piante",
+  "linkPlantsHint": "Tocca per collegare piante o gruppi",
   "soilMoistureValue": "Umidità del terreno {value}%",
   "wateringNow": "Irrigazione in corso",
   "lastWatering": "Ultima irrigazione: {date} · {liters} l",

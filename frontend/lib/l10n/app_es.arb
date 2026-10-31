@@ -594,7 +594,7 @@
   "devices": "Dispositivos",
   "noRainPointDevices": "No se encontraron sensores ni programadores",
   "linkedPlants": "Plantas: {plants}",
-  "linkPlantsHint": "Toca para vincular plantas",
+  "linkPlantsHint": "Toca para vincular plantas o grupos",
   "soilMoistureValue": "Humedad del suelo {value}%",
   "wateringNow": "Regando ahora",
   "lastWatering": "Último riego: {date} · {liters} l",

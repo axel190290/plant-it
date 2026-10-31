@@ -1848,7 +1848,7 @@ class LIt extends L {
   }
 
   @override
-  String get linkPlantsHint => 'Tocca per collegare piante';
+  String get linkPlantsHint => 'Tocca per collegare piante o gruppi';
 
   @override
   String soilMoistureValue(String value) {

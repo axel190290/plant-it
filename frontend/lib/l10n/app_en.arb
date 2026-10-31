@@ -823,7 +823,7 @@
   "devices": "Devices",
   "noRainPointDevices": "No sensors or water timers found",
   "linkedPlants": "Plants: {plants}",
-  "linkPlantsHint": "Tap to link plants",
+  "linkPlantsHint": "Tap to link plants or groups",
   "soilMoistureValue": "Soil moisture {value}%",
   "wateringNow": "Watering now",
   "lastWatering": "Last watering: {date} · {liters} l",

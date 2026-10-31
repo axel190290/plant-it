@@ -1739,7 +1739,7 @@ class LEn extends L {
   }
 
   @override
-  String get linkPlantsHint => 'Tap to link plants';
+  String get linkPlantsHint => 'Tap to link plants or groups';
 
   @override
   String soilMoistureValue(String value) {

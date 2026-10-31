@@ -301,6 +301,7 @@ GoRouter router() => GoRouter(
                 builder: (context, state) => RainPointSettingsScreen(
                   rainPointService: context.read(),
                   plantRepository: context.read(),
+                  collectionRepository: context.read(),
                   streamController: context.read(),
                 ),
               ),

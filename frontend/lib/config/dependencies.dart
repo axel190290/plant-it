@@ -109,6 +109,8 @@ List<SingleChildWidget> get providersLocal {
         db: context.read(),
         userSettingRepository: context.read(),
         collectionRepository: context.read(),
+        eventRepository: context.read(),
+        eventTypeRepository: context.read(),
       ),
     ),
     Provider(

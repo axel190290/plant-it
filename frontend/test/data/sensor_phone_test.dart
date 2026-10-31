@@ -5,6 +5,8 @@ import 'package:drift/drift.dart' hide isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plant_it/data/repository/collection_repository.dart';
+import 'package:plant_it/data/repository/event_repository.dart';
+import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/user_setting_repository.dart';
 import 'package:plant_it/data/service/sensors/sensor_phone_service.dart';
 import 'package:plant_it/data/service/sensors/sensor_station.dart';
@@ -33,6 +35,26 @@ void main() {
       LightSample(t.add(const Duration(minutes: 5)), 1000),
     ]);
     expect(daily.keys.single, DateTime(2026, 10, 31));
+  });
+
+  test('estimatedDli joins the hours measured on different days', () {
+    expect(estimatedDli([]), isNull);
+    // 10 000 lux measured at noon on one day and at 13:00 on another
+    double dli = estimatedDli([
+      LightSample(DateTime(2026, 10, 30, 12, 10), 10000),
+      LightSample(DateTime(2026, 10, 31, 13, 40), 10000),
+    ])!;
+    // A ramp from 5:00 to 12:00, two hours at 10 000, a ramp to 21:00:
+    // 7 hours x 5 000 avg-ish + 2 x 10 000 + 8 x 5 000, about 6.5 mol
+    expect(dli, greaterThan(5));
+    expect(dli, lessThan(8));
+    expect(
+        hoursCovered([
+          LightSample(DateTime(2026, 10, 30, 12, 10), 1),
+          LightSample(DateTime(2026, 10, 31, 12, 40), 1),
+          LightSample(DateTime(2026, 10, 31, 15), 1),
+        ]),
+        2);
   });
 
   test('dliRange comes from the lux of the care or the light level', () {
@@ -89,6 +111,8 @@ void main() {
       db: main,
       userSettingRepository: UserSettingRepository(db: main),
       collectionRepository: CollectionRepository(db: main),
+      eventRepository: EventRepository(db: main),
+      eventTypeRepository: EventTypeRepository(db: main),
     );
     expect((await service.add('127.0.0.1', '000000')).isError(), isTrue);
     SensorPhone phone =
@@ -123,6 +147,62 @@ void main() {
 
     await server.close();
     await sensor.close();
+    await main.close();
+  });
+
+  test('records a light event per complete day and keeps hand readings',
+      () async {
+    AppDatabase main = AppDatabase.forTesting(NativeDatabase.memory());
+    DateTime now = DateTime.now();
+    DateTime yesterday = DateTime(now.year, now.month, now.day - 1, 7);
+    // A day of readings every five minutes, from 7:00
+    List<List<Object?>> readings = [
+      for (int i = 0; i < 120; i++)
+        [
+          yesterday.add(Duration(minutes: 5 * i)).millisecondsSinceEpoch,
+          3000.0,
+          null,
+          null
+        ]
+    ];
+    SensorPhoneService service = SensorPhoneService(
+      db: main,
+      userSettingRepository: UserSettingRepository(db: main),
+      collectionRepository: CollectionRepository(db: main),
+      eventRepository: EventRepository(db: main),
+      eventTypeRepository: EventTypeRepository(db: main),
+      ask: (address, code, {since}) async => {
+        'ok': true,
+        'device': 'pixel',
+        'name': 'Pixel 6a',
+        'readings': readings,
+      },
+    );
+    int species = await main.into(main.species).insert(
+        SpeciesCompanion.insert(scientificName: 'Ficus', species: 'Ficus'));
+    int plant = await main
+        .into(main.plants)
+        .insert(PlantsCompanion.insert(name: 'Ficus', species: species));
+    SensorPhone phone = (await service.add('10.0.0.2', '1')).getOrThrow();
+    await service.setLinks(phone.id, {plant});
+
+    expect(await service.recordLightEvents('Luz'), 1);
+    expect(await service.recordLightEvents('Luz'), 0);
+    Event event = (await main.select(main.events).get()).single;
+    EventType type = (await main.select(main.eventTypes).get())
+        .firstWhere((t) => t.id == event.type);
+    expect(type.name, 'Luz');
+    // 3000 lux for ten hours: 3000 x 0.0185 x 36 000 / 1e6
+    expect(event.note, startsWith('2.0 mol'));
+
+    // Readings by hand next to its group count for the plant
+    CollectionRepository groups = CollectionRepository(db: main);
+    int shelf = (await groups.insert('Estante')).getOrThrow();
+    await groups.setPlantsOfCollection(shelf, {plant});
+    await service.saveSpot(1500, groupId: shelf);
+    await service.saveSpot(2500, plantId: plant);
+    expect((await service.spotSamplesOf(plant)).map((s) => s.lux).toSet(),
+        {1500.0, 2500.0});
     await main.close();
   });
 }

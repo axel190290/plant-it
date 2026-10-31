@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:plant_it/database/database.dart';
 import 'package:plant_it/l10n/generated/app_localizations.dart';
+import 'package:plant_it/data/service/sensors/sensor_phone_service.dart';
 import 'package:plant_it/ui/core/ui/collection_dialogs.dart';
+import 'package:plant_it/ui/core/ui/light_format.dart';
+import 'package:plant_it/ui/core/ui/light_measure_dialog.dart';
+import 'package:provider/provider.dart';
 import 'package:plant_it/ui/home/view_models/home_viewmodel.dart';
 import 'package:result_dart/result_dart.dart';
 
@@ -66,6 +70,11 @@ class CollectionActions {
               onTap: () => Navigator.of(sheet).pop('plants'),
             ),
             ListTile(
+              leading: const Icon(LucideIcons.sun_medium),
+              title: Text(l.measureLight),
+              onTap: () => Navigator.of(sheet).pop('light'),
+            ),
+            ListTile(
               leading: const Icon(LucideIcons.pencil),
               title: Text(l.renameCollection),
               onTap: () => Navigator.of(sheet).pop('rename'),
@@ -84,6 +93,15 @@ class CollectionActions {
     switch (action) {
       case 'plants':
         await _choosePlants(context, collection.id);
+      case 'light':
+        SensorPhoneService sensors = context.read<SensorPhoneService>();
+        double? lux = await showLightMeasureDialog(
+            context, "${l.measureLight} · ${collection.name}");
+        if (lux == null || !context.mounted) return;
+        await sensors.saveSpot(lux, groupId: collection.id);
+        if (!context.mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(l.lightMeasured(oneDecimal(lux)))));
       case 'rename':
         String? name =
             await showCollectionNameDialog(context, initial: collection.name);

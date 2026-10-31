@@ -93,6 +93,7 @@ class RainPointClient {
               model: model,
               name: '${sub['name'] ?? model}',
               reading: value == null ? null : decodeRainPoint(model, value),
+              status: value,
             ));
           }
         }

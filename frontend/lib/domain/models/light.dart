@@ -65,3 +65,44 @@ enum CompassPoint { n, ne, e, se, s, sw, w, nw }
 /// The compass point of [azimuth] degrees from the north.
 CompassPoint compassPoint(double azimuth) =>
     CompassPoint.values[(((azimuth % 360) + 22.5) ~/ 45) % 8];
+
+/// The daily light integral estimated from readings taken at different
+/// times of different days: the average lux of each hour measured, joined
+/// by straight lines, with darkness before 5:00 and after 21:00 unless
+/// measured. Null without readings.
+double? estimatedDli(List<LightSample> samples) {
+  if (samples.isEmpty) return null;
+  Map<int, List<double>> byHour = {};
+  for (LightSample s in samples) {
+    byHour.putIfAbsent(s.time.toLocal().hour, () => []).add(s.lux);
+  }
+  Map<int, double> points = {
+    for (MapEntry<int, List<double>> e in byHour.entries)
+      e.key: e.value.reduce((a, b) => a + b) / e.value.length
+  };
+  int first = points.keys.reduce((a, b) => a < b ? a : b);
+  int last = points.keys.reduce((a, b) => a > b ? a : b);
+  if (first > 5) points[5] = 0;
+  if (last < 21) points[21] = 0;
+  List<int> hours = points.keys.toList()..sort();
+  double total = 0;
+  for (int h = 0; h < 24; h++) {
+    int before = hours.lastWhere((x) => x <= h, orElse: () => -1);
+    int after = hours.firstWhere((x) => x >= h, orElse: () => -1);
+    double lux;
+    if (before == -1 || after == -1) {
+      lux = 0;
+    } else if (before == after) {
+      lux = points[before]!;
+    } else {
+      double t = (h - before) / (after - before);
+      lux = points[before]! + (points[after]! - points[before]!) * t;
+    }
+    total += lux * ppfdPerLux * 3600 / 1e6;
+  }
+  return total;
+}
+
+/// How many different hours of the day [samples] cover.
+int hoursCovered(List<LightSample> samples) =>
+    samples.map((s) => s.time.toLocal().hour).toSet().length;

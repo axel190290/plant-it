@@ -42,16 +42,31 @@ class _SensorAlertsState extends State<SensorAlerts> {
       }
     });
     widget.viewModel.load.results.addListener(_showRecorded);
+  }
+
+  bool _loaded = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_loaded) return;
+    _loaded = true;
+    // Light events are named in the language of the app
+    widget.viewModel.lightTypeName = L.of(context).lightEvent;
     widget.viewModel.load.execute();
   }
 
   void _showRecorded() {
     if (widget.viewModel.load.results.value.isExecuting) return;
     int recorded = widget.viewModel.recorded;
-    if (recorded > 0 && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(L.of(context).rainPointWateringsRecorded(recorded))));
-    }
+    int light = widget.viewModel.lightRecorded;
+    if (!mounted || (recorded == 0 && light == 0)) return;
+    L l = L.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text([
+      if (recorded > 0) l.rainPointWateringsRecorded(recorded),
+      if (light > 0) l.lightEventsRecorded(light),
+    ].join(' · '))));
   }
 
   @override

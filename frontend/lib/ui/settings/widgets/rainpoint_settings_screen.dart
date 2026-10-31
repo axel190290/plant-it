@@ -150,6 +150,23 @@ class _RainPointSettingsScreenState extends State<RainPointSettingsScreen> {
     if (chosen.isEmpty) _showMessage(l.linkPlantsHint);
   }
 
+  /// What the device reported, as received, to check its decoding.
+  void _showStatus(RainPointDevice device) {
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("${device.name} · ${device.model}"),
+        content: SelectableText(device.status ?? '—'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(MaterialLocalizations.of(ctx).closeButtonLabel),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     L l = L.of(context);
@@ -266,6 +283,7 @@ class _RainPointSettingsScreenState extends State<RainPointSettingsScreen> {
                     isThreeLine: true,
                     trailing: const Icon(LucideIcons.link),
                     onTap: () => _link(device),
+                    onLongPress: () => _showStatus(device),
                   ),
                 );
               }),

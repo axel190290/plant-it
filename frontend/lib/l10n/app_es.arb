@@ -647,5 +647,15 @@
   "lowLightAlert": "{plant}: poca luz. Recibe {value} mol/m²·día de media y necesita {min}–{max}. Acércala a la ventana.",
   "lastReading": "Última lectura: {time}",
   "lightLast24h": "Luz en las últimas 24 h",
-  "sensorPhone": "Teléfono sensor"
+  "sensorPhone": "Teléfono sensor",
+  "lightEvent": "Luz",
+  "measureLight": "Medir luz",
+  "measureLightHint": "Pon el teléfono junto a las hojas, boca arriba, sin tapar la parte superior de la pantalla, donde está el sensor de luz.",
+  "noLightSensor": "Este teléfono no tiene sensor de luz",
+  "lightMeasured": "Medición guardada: {value} lx",
+  "spotLight": "Mediciones puntuales",
+  "spotEstimate": "Luz diaria estimada: {value} mol/m²·día",
+  "spotCoverage": "{count} mediciones en {hours} horas distintas. Mide a otras horas del día para mejorarla.",
+  "noSpotReadings": "Mide la luz aquí con este teléfono a distintas horas para estimar cuánta recibe en el día.",
+  "lightEventsRecorded": "{count, plural, =1{1 evento de luz registrado} other{{count} eventos de luz registrados}}"
 }

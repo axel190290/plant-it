@@ -217,30 +217,37 @@ class RainPointService {
         .toList();
   }
 
-  /// Records as watering events the waterings the linked water timers did
-  /// since they were last checked. Returns how many events were made.
+  /// Work mode of a water timer that mists instead of watering.
+  static const int _mistMode = 2;
+
+  /// Records as events the sessions the linked water timers did since they
+  /// were last checked: waterings, and mistings as misting events. A
+  /// session is noticed when what the timer reports of its last one (end
+  /// time, liters, duration) changes; the mode is the one seen while it
+  /// ran, watering when not seen. Returns how many events were made.
   Future<int> recordWaterings() async {
     Map<String, Set<int>> linked = await linkedPlants();
     if (linked.isEmpty) return 0;
     Result<List<RainPointDevice>> all = await devices();
     if (all.isError()) return 0;
-    Map<String, int> seen = {};
+    // By device: the last session seen and the mode of the running one
+    Map<String, Map<String, dynamic>> state = {};
     try {
       String saved = await _get(UserSettingsKeys.rainPointWaterings);
       if (saved.isNotEmpty) {
-        seen = (json.decode(saved) as Map<String, dynamic>)
-            .map((k, v) => MapEntry(k, (v as num).toInt()));
+        (json.decode(saved) as Map<String, dynamic>).forEach((key, value) {
+          // Older versions kept only a time, which is read again
+          if (value is Map<String, dynamic>) state[key] = value;
+        });
       }
     } catch (_) {}
     List<EventType> types =
         (await _eventTypeRepository.getAll()).getOrDefault([]);
-    EventType? watering = types
-            .where((t) => t.name == 'watering')
-            .firstOrNull ??
-        types
-            .where(
-                (t) => isSuggestionEventType(t.name, SuggestionKind.watering))
-            .firstOrNull;
+    EventType? typeFor(String name, SuggestionKind kind) =>
+        types.where((t) => t.name == name).firstOrNull ??
+        types.where((t) => isSuggestionEventType(t.name, kind)).firstOrNull;
+    EventType? watering = typeFor('watering', SuggestionKind.watering);
+    EventType? misting = typeFor('misting', SuggestionKind.misting) ?? watering;
     if (watering == null) return 0;
 
     int made = 0;
@@ -248,36 +255,52 @@ class RainPointService {
     for (RainPointDevice device in all.getOrThrow()) {
       RainPointReading? reading = device.reading;
       Set<int>? plants = linked[device.key];
-      DateTime? time = reading?.eventTime;
       if (device.kind != RainPointKind.valve ||
           plants == null ||
-          reading == null ||
-          time == null ||
-          reading.watering == true ||
-          (reading.lastWaterLiters ?? 0) <= 0) {
+          reading == null) {
         continue;
       }
-      int at = time.millisecondsSinceEpoch;
-      int? last = seen[device.key];
-      if (last != null && at <= last) continue;
-      seen[device.key] = at;
+      Map<String, dynamic> seen = state[device.key] ?? {};
+      if (reading.watering == true) {
+        // Running: its mode tells a misting from a watering
+        if ((reading.workMode ?? 0) > 0 && seen['mode'] != reading.workMode) {
+          state[device.key] = {...seen, 'mode': reading.workMode};
+          changed = true;
+        }
+        continue;
+      }
+      String signature = [
+        reading.eventTime?.millisecondsSinceEpoch,
+        reading.lastWaterLiters,
+        reading.durationSeconds,
+      ].join('|');
+      if (signature == '||' || seen['last'] == signature) continue;
+      String? previous = seen['last'];
+      int mode = (seen['mode'] as num?)?.toInt() ?? 1;
+      state[device.key] = {'last': signature};
       changed = true;
-      // The first check only remembers the last watering
-      if (last == null) continue;
+      // The first check only remembers the last session
+      if (previous == null) continue;
+      EventType type = mode == _mistMode ? misting! : watering;
+      List<String> details = [
+        if ((reading.lastWaterLiters ?? 0) > 0)
+          '${reading.lastWaterLiters!.toStringAsFixed(1)} l',
+        if ((reading.durationSeconds ?? 0) > 0)
+          '${(reading.durationSeconds! / 60).round()} min',
+      ];
       for (int plant in plants) {
         Result<int> event = await _eventRepository.insert(EventsCompanion(
-          type: Value(watering.id),
+          type: Value(type.id),
           plant: Value(plant),
-          date: Value(time.toLocal()),
-          note: Value('RainPoint ${device.name}: '
-              '${reading.lastWaterLiters!.toStringAsFixed(1)} l'),
+          date: Value((reading.eventTime ?? DateTime.now()).toLocal()),
+          note: Value(['RainPoint ${device.name}', ...details].join(' · ')),
         ));
         if (event.isSuccess()) made++;
       }
     }
     if (changed) {
       await _settings.put(
-          UserSettingsKeys.rainPointWaterings.key, json.encode(seen));
+          UserSettingsKeys.rainPointWaterings.key, json.encode(state));
     }
     return made;
   }

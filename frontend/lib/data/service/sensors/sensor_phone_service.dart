@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:drift/drift.dart';
 import 'package:logging/logging.dart';
 import 'package:plant_it/data/repository/collection_repository.dart';
+import 'package:plant_it/data/repository/event_repository.dart';
+import 'package:plant_it/data/repository/event_type_repository.dart';
 import 'package:plant_it/data/repository/user_setting_repository.dart';
 import 'package:plant_it/data/service/sensors/sensor_station.dart';
 import 'package:plant_it/database/database.dart';
@@ -83,6 +85,8 @@ class SensorPhoneService {
   final AppDatabase _db;
   final UserSettingRepository _settings;
   final CollectionRepository _collectionRepository;
+  final EventRepository _eventRepository;
+  final EventTypeRepository _eventTypeRepository;
   final Future<Map<String, dynamic>> Function(String address, String code,
       {DateTime? since}) _ask;
   final Logger _log = Logger('SensorPhoneService');
@@ -91,10 +95,14 @@ class SensorPhoneService {
     required AppDatabase db,
     required UserSettingRepository userSettingRepository,
     required CollectionRepository collectionRepository,
+    required EventRepository eventRepository,
+    required EventTypeRepository eventTypeRepository,
     Future<Map<String, dynamic>> Function(String address, String code,
             {DateTime? since})?
         ask,
   })  : _db = db,
+        _eventRepository = eventRepository,
+        _eventTypeRepository = eventTypeRepository,
         _settings = userSettingRepository,
         _collectionRepository = collectionRepository,
         _ask = ask ?? SensorProtocol.ask;
@@ -251,11 +259,141 @@ class SensorPhoneService {
       phone: phone,
       last: readings.isEmpty ? null : readings.last,
       todayDli: daily[today],
-      averageDli: past.isEmpty
-          ? null
-          : past.reduce((a, b) => a + b) / past.length,
+      averageDli:
+          past.isEmpty ? null : past.reduce((a, b) => a + b) / past.length,
       lastDay: samples.where((s) => s.time.isAfter(dayAgo)).toList(),
     );
+  }
+
+  static const String _lightEventsKey = 'sensor_light_events';
+  // Readings that make a day worth an event: eight hours of them
+  static const int _readingsPerDay = 96;
+
+  /// Records, for each plant linked to a sensor phone, a light event with
+  /// the light integral of each complete day measured since the last one.
+  /// [typeName] names the event type when it has to be created. Returns
+  /// how many events were made.
+  Future<int> recordLightEvents(String typeName) async {
+    List<SensorPhone> all = await phones();
+    if (all.isEmpty) return 0;
+    Map<String, Set<int>> linked = await linkedPlants();
+    Map<String, dynamic> done = {};
+    try {
+      String saved =
+          (await _settings.getOrDefault(_lightEventsKey, '')).getOrDefault('');
+      if (saved.isNotEmpty) done = json.decode(saved);
+    } catch (_) {}
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    EventType? type;
+    int made = 0;
+    for (SensorPhone phone in all) {
+      Set<int> plants = linked[phone.id] ?? const {};
+      if (plants.isEmpty) continue;
+      DateTime? last = DateTime.tryParse('${done[phone.id] ?? ''}');
+      List<SensorReading> readings = await (_db.select(_db.sensorReadings)
+            ..where((r) =>
+                r.device.equals(phone.id) &
+                r.time.isBiggerOrEqualValue(
+                    today.subtract(const Duration(days: 7))) &
+                r.time.isSmallerThanValue(today)))
+          .get();
+      Map<DateTime, List<LightSample>> byDay = {};
+      for (SensorReading r in readings) {
+        if (r.lux == null) continue;
+        DateTime t = r.time.toLocal();
+        byDay
+            .putIfAbsent(DateTime(t.year, t.month, t.day), () => [])
+            .add(LightSample(r.time, r.lux!));
+      }
+      List<DateTime> days = byDay.keys
+          .where((d) =>
+              (last == null || d.isAfter(last)) &&
+              byDay[d]!.length >= _readingsPerDay)
+          .toList()
+        ..sort();
+      for (DateTime day in days) {
+        type ??= await _lightType(typeName);
+        if (type == null) return made;
+        double dli = lightIntegral(byDay[day]!);
+        for (int plant in plants) {
+          Result<int> event = await _eventRepository.insert(EventsCompanion(
+            type: Value(type.id),
+            plant: Value(plant),
+            date: Value(DateTime(day.year, day.month, day.day, 21)),
+            note: Value('${dli.toStringAsFixed(1)} mol/m²·d · ${phone.name}'),
+          ));
+          if (event.isSuccess()) made++;
+        }
+        done[phone.id] = day.toIso8601String();
+      }
+    }
+    await _settings.put(_lightEventsKey, json.encode(done));
+    return made;
+  }
+
+  static const List<String> _lightNames = [
+    'light',
+    'luz',
+    'luce',
+    'lumiere',
+    'lumière',
+    'iluminacion',
+    'iluminación'
+  ];
+
+  /// The event type of the light, created with [name] if missing.
+  Future<EventType?> _lightType(String name) async {
+    List<EventType> types =
+        (await _eventTypeRepository.getAll()).getOrDefault([]);
+    EventType? found = types
+        .where((t) =>
+            t.name == name || _lightNames.contains(t.name.trim().toLowerCase()))
+        .firstOrNull;
+    if (found != null) return found;
+    Result<int> id = await _eventTypeRepository.insert(EventTypesCompanion(
+      name: Value(name),
+      icon: const Value('sun'),
+      color: const Value('#FFD54F'),
+    ));
+    if (id.isError()) return null;
+    return (await _eventTypeRepository.get(id.getOrThrow())).getOrNull();
+  }
+
+  static String spotDevice({int? plantId, int? groupId}) =>
+      plantId != null ? 'spot:p:$plantId' : 'spot:g:$groupId';
+
+  /// Saves a reading taken by hand with this phone next to a plant or a
+  /// group of plants.
+  Future<void> saveSpot(double lux, {int? plantId, int? groupId}) async {
+    await _db.into(_db.sensorReadings).insert(
+          SensorReadingsCompanion.insert(
+            device: spotDevice(plantId: plantId, groupId: groupId),
+            time: DateTime.now(),
+            lux: Value(lux),
+          ),
+          mode: InsertMode.insertOrIgnore,
+        );
+  }
+
+  /// The readings taken by hand, the last month, next to [plantId] or one
+  /// of its groups.
+  Future<List<LightSample>> spotSamplesOf(int plantId) async {
+    Set<int> groups =
+        (await _collectionRepository.getCollectionsOfPlant(plantId))
+            .getOrDefault({});
+    List<String> devices = [
+      spotDevice(plantId: plantId),
+      for (int g in groups) spotDevice(groupId: g),
+    ];
+    DateTime month = DateTime.now().subtract(const Duration(days: 30));
+    return [
+      for (SensorReading r in await (_db.select(_db.sensorReadings)
+            ..where((r) =>
+                r.device.isIn(devices) & r.time.isBiggerOrEqualValue(month)))
+          .get())
+        if (r.lux != null) LightSample(r.time, r.lux!)
+    ];
   }
 }
 

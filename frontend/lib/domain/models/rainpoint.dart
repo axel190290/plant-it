@@ -14,12 +14,15 @@ class RainPointDevice {
   final String model;
   final String name;
   final RainPointReading? reading;
+  // What the device reported, as received, to diagnose its decoding
+  final String? status;
 
   const RainPointDevice({
     required this.key,
     required this.model,
     required this.name,
     this.reading,
+    this.status,
   });
 
   RainPointKind get kind => kindOfModel(model);
@@ -41,6 +44,9 @@ class RainPointReading {
   final int? battery;
   final int? rssi;
   final bool? watering;
+  // What a water timer is doing: 0 idle, 1 watering, 2 misting, 3 cycle,
+  // 7 soak
+  final int? workMode;
   // Liters of the last (or current) watering session
   final double? lastWaterLiters;
   final int? durationSeconds;
@@ -54,6 +60,7 @@ class RainPointReading {
     this.battery,
     this.rssi,
     this.watering,
+    this.workMode,
     this.lastWaterLiters,
     this.durationSeconds,
     this.eventTime,
@@ -199,9 +206,11 @@ RainPointReading _decodeTlv(String model, String s) {
   }
 
   bool? watering;
+  int? workMode;
   _Entry? w = find(_workState);
   if (w != null && w.bytes.length >= 2) {
-    watering = (w.bytes[1] & 0x0F) != 0;
+    workMode = w.bytes[1] & 0x0F;
+    watering = workMode != 0;
   }
 
   int? duration = find(_duration)?.unsigned;
@@ -222,6 +231,7 @@ RainPointReading _decodeTlv(String model, String s) {
     battery: battery,
     rssi: rssi,
     watering: watering,
+    workMode: workMode,
     lastWaterLiters: liters,
     durationSeconds: duration,
     eventTime: eventTime,
@@ -271,12 +281,14 @@ RainPointReading? _decodeLegacy(RainPointKind kind, String s) {
     }
 
     int? state = field(0);
-    bool? watering = state == null ? null : (state & 0x0F) != 0;
+    int? workMode = state == null ? null : state & 0x0F;
+    bool? watering = workMode == null ? null : workMode != 0;
     int? volume = field(1);
     int? end = field(3);
     return RainPointReading(
       rssi: rssi,
       watering: watering,
+      workMode: workMode,
       lastWaterLiters: volume == null ? null : volume / 10,
       durationSeconds: field(4),
       eventTime: end != null && end > 1000000000

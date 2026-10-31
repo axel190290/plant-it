@@ -1954,4 +1954,50 @@ class LFr extends L {
 
   @override
   String get sensorPhone => 'Téléphone capteur';
+
+  @override
+  String get lightEvent => 'Lumière';
+
+  @override
+  String get measureLight => 'Mesurer la lumière';
+
+  @override
+  String get measureLightHint =>
+      'Tenez le téléphone près des feuilles, face vers le haut, sans couvrir le haut de l\'écran, où se trouve le capteur de lumière.';
+
+  @override
+  String get noLightSensor => 'Ce téléphone n\'a pas de capteur de lumière';
+
+  @override
+  String lightMeasured(String value) {
+    return 'Mesure enregistrée : $value lx';
+  }
+
+  @override
+  String get spotLight => 'Mesures ponctuelles';
+
+  @override
+  String spotEstimate(String value) {
+    return 'Lumière quotidienne estimée : $value mol/m²·jour';
+  }
+
+  @override
+  String spotCoverage(int count, int hours) {
+    return '$count mesures à $hours heures différentes. Mesurez à d\'autres heures pour l\'améliorer.';
+  }
+
+  @override
+  String get noSpotReadings =>
+      'Mesurez la lumière ici avec ce téléphone à différentes heures pour estimer combien elle en reçoit par jour.';
+
+  @override
+  String lightEventsRecorded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count événements de lumière enregistrés',
+      one: '1 événement de lumière enregistré',
+    );
+    return '$_temp0';
+  }
 }

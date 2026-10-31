@@ -144,6 +144,7 @@ class PlantViewModel extends ChangeNotifier {
   final SensorPhoneService _sensorPhoneService;
   List<RainPointDevice> _sensors = [];
   LightSummary? _light;
+  List<LightSample> _spotSamples = [];
   final SpeciesRepository _speciesRepository;
   final SpeciesCareRepository _speciesCareRepository;
   final ImageRepository _imageRepository;
@@ -182,6 +183,16 @@ class PlantViewModel extends ChangeNotifier {
 
   /// What the sensor phone linked to the plant measured, if any.
   LightSummary? get light => _light;
+
+  /// The readings taken by hand next to the plant or its groups.
+  List<LightSample> get spotSamples => _spotSamples;
+
+  /// Saves a reading taken by hand next to the plant.
+  Future<void> saveSpotLight(double lux) async {
+    await _sensorPhoneService.saveSpot(lux, plantId: id);
+    _spotSamples = await _sensorPhoneService.spotSamplesOf(id);
+    notifyListeners();
+  }
 
   /// The daily light integral the species wants, if known.
   (double, double)? get dliNeeded {

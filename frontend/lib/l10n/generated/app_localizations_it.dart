@@ -2053,4 +2053,50 @@ class LIt extends L {
 
   @override
   String get sensorPhone => 'Telefono sensore';
+
+  @override
+  String get lightEvent => 'Luce';
+
+  @override
+  String get measureLight => 'Misura luce';
+
+  @override
+  String get measureLightHint =>
+      'Tieni il telefono vicino alle foglie, a faccia in su, senza coprire la parte superiore dello schermo, dove c\'è il sensore di luce.';
+
+  @override
+  String get noLightSensor => 'Questo telefono non ha un sensore di luce';
+
+  @override
+  String lightMeasured(String value) {
+    return 'Misura salvata: $value lx';
+  }
+
+  @override
+  String get spotLight => 'Misure a mano';
+
+  @override
+  String spotEstimate(String value) {
+    return 'Luce giornaliera stimata: $value mol/m²·giorno';
+  }
+
+  @override
+  String spotCoverage(int count, int hours) {
+    return '$count misure in $hours ore diverse. Misura in altre ore del giorno per migliorarla.';
+  }
+
+  @override
+  String get noSpotReadings =>
+      'Misura la luce qui con questo telefono in ore diverse per stimare quanta ne riceve al giorno.';
+
+  @override
+  String lightEventsRecorded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eventi di luce registrati',
+      one: '1 evento di luce registrato',
+    );
+    return '$_temp0';
+  }
 }

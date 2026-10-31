@@ -1944,4 +1944,50 @@ class LEn extends L {
 
   @override
   String get sensorPhone => 'Sensor phone';
+
+  @override
+  String get lightEvent => 'Light';
+
+  @override
+  String get measureLight => 'Measure light';
+
+  @override
+  String get measureLightHint =>
+      'Hold the phone next to the leaves, face up, without covering the top of the screen, where the light sensor is.';
+
+  @override
+  String get noLightSensor => 'This phone has no light sensor';
+
+  @override
+  String lightMeasured(String value) {
+    return 'Reading saved: $value lx';
+  }
+
+  @override
+  String get spotLight => 'Readings by hand';
+
+  @override
+  String spotEstimate(String value) {
+    return 'Estimated daily light: $value mol/m²·day';
+  }
+
+  @override
+  String spotCoverage(int count, int hours) {
+    return '$count readings at $hours different hours. Measure at other hours of the day to improve it.';
+  }
+
+  @override
+  String get noSpotReadings =>
+      'Measure the light here with this phone at different hours to estimate how much it gets in a day.';
+
+  @override
+  String lightEventsRecorded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count light events recorded',
+      one: '1 light event recorded',
+    );
+    return '$_temp0';
+  }
 }

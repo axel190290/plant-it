@@ -14,6 +14,7 @@ import 'package:plant_it/ui/core/ui/care_value_dialog.dart';
 import 'package:plant_it/ui/core/ui/collection_dialogs.dart';
 import 'package:plant_it/ui/core/ui/rainpoint_format.dart';
 import 'package:plant_it/ui/core/ui/light_format.dart';
+import 'package:plant_it/ui/core/ui/light_measure_dialog.dart';
 import 'package:plant_it/data/service/sensors/sensor_phone_service.dart';
 import 'package:plant_it/domain/models/light.dart';
 import 'package:plant_it/domain/models/rainpoint.dart';
@@ -504,10 +505,50 @@ class _PlantScreenState extends State<PlantScreen> {
     );
   }
 
+  Future<void> _measureLight() async {
+    L l = L.of(context);
+    double? lux = await showLightMeasureDialog(context, l.measureLight);
+    if (lux == null || !mounted) return;
+    await widget.viewModel.saveSpotLight(lux);
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l.lightMeasured(oneDecimal(lux)))));
+  }
+
+  /// The light measured by hand with this phone, and the button to do it.
+  Widget _spotCard(L l) {
+    List<LightSample> samples = widget.viewModel.spotSamples;
+    double? estimate = estimatedDli(samples);
+    (double, double)? needed = widget.viewModel.dliNeeded;
+    bool low = needed != null &&
+        estimate != null &&
+        hoursCovered(samples) >= 3 &&
+        estimate < needed.$1;
+    return Card(
+      color: low ? Theme.of(context).colorScheme.errorContainer : null,
+      child: ListTile(
+        leading: const Icon(LucideIcons.sun_medium),
+        title: Text(l.spotLight),
+        subtitle: Text(estimate == null
+            ? l.noSpotReadings
+            : [
+                l.spotEstimate(oneDecimal(estimate)),
+                if (needed != null)
+                  l.dliNeeded(oneDecimal(needed.$1), oneDecimal(needed.$2)),
+                l.spotCoverage(samples.length, hoursCovered(samples)),
+              ].join('\n')),
+        trailing: IconButton(
+          tooltip: l.measureLight,
+          icon: const Icon(LucideIcons.scan_line),
+          onPressed: _measureLight,
+        ),
+      ),
+    );
+  }
+
   Widget _sensors(L l) {
     List<RainPointDevice> sensors = widget.viewModel.sensors;
     LightSummary? light = widget.viewModel.light;
-    if (sensors.isEmpty && light == null) return const SizedBox();
     double? min = widget.viewModel.soilMoistureMin ?? defaultSoilMoistureMin;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -519,6 +560,7 @@ class _PlantScreenState extends State<PlantScreen> {
             tooltip: sensors.isEmpty ? l.sensorPhones : l.rainPoint),
         const SizedBox(height: 8),
         if (light != null) _lightCard(l, light),
+        _spotCard(l),
         ...sensors.map((device) {
           double? moisture = device.reading?.soilMoisture;
           bool dry = moisture != null && moisture < min;

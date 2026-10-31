@@ -3115,6 +3115,66 @@ abstract class L {
   /// In en, this message translates to:
   /// **'Sensor phone'**
   String get sensorPhone;
+
+  /// No description provided for @lightEvent.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get lightEvent;
+
+  /// No description provided for @measureLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Measure light'**
+  String get measureLight;
+
+  /// No description provided for @measureLightHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Hold the phone next to the leaves, face up, without covering the top of the screen, where the light sensor is.'**
+  String get measureLightHint;
+
+  /// No description provided for @noLightSensor.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone has no light sensor'**
+  String get noLightSensor;
+
+  /// No description provided for @lightMeasured.
+  ///
+  /// In en, this message translates to:
+  /// **'Reading saved: {value} lx'**
+  String lightMeasured(String value);
+
+  /// No description provided for @spotLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Readings by hand'**
+  String get spotLight;
+
+  /// No description provided for @spotEstimate.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated daily light: {value} mol/m²·day'**
+  String spotEstimate(String value);
+
+  /// No description provided for @spotCoverage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} readings at {hours} different hours. Measure at other hours of the day to improve it.'**
+  String spotCoverage(int count, int hours);
+
+  /// No description provided for @noSpotReadings.
+  ///
+  /// In en, this message translates to:
+  /// **'Measure the light here with this phone at different hours to estimate how much it gets in a day.'**
+  String get noSpotReadings;
+
+  /// No description provided for @lightEventsRecorded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 light event recorded} other{{count} light events recorded}}'**
+  String lightEventsRecorded(int count);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

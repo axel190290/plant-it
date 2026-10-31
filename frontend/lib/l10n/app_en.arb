@@ -1012,5 +1012,46 @@
         "type": "String"
       }
     }
+  },
+  "lightEvent": "Light",
+  "measureLight": "Measure light",
+  "measureLightHint": "Hold the phone next to the leaves, face up, without covering the top of the screen, where the light sensor is.",
+  "noLightSensor": "This phone has no light sensor",
+  "lightMeasured": "Reading saved: {value} lx",
+  "spotLight": "Readings by hand",
+  "spotEstimate": "Estimated daily light: {value} mol/m²·day",
+  "spotCoverage": "{count} readings at {hours} different hours. Measure at other hours of the day to improve it.",
+  "noSpotReadings": "Measure the light here with this phone at different hours to estimate how much it gets in a day.",
+  "lightEventsRecorded": "{count, plural, =1{1 light event recorded} other{{count} light events recorded}}",
+  "@lightMeasured": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@spotEstimate": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "@spotCoverage": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "@lightEventsRecorded": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

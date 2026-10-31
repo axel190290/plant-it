@@ -1958,4 +1958,50 @@ class LEs extends L {
 
   @override
   String get sensorPhone => 'Teléfono sensor';
+
+  @override
+  String get lightEvent => 'Luz';
+
+  @override
+  String get measureLight => 'Medir luz';
+
+  @override
+  String get measureLightHint =>
+      'Pon el teléfono junto a las hojas, boca arriba, sin tapar la parte superior de la pantalla, donde está el sensor de luz.';
+
+  @override
+  String get noLightSensor => 'Este teléfono no tiene sensor de luz';
+
+  @override
+  String lightMeasured(String value) {
+    return 'Medición guardada: $value lx';
+  }
+
+  @override
+  String get spotLight => 'Mediciones puntuales';
+
+  @override
+  String spotEstimate(String value) {
+    return 'Luz diaria estimada: $value mol/m²·día';
+  }
+
+  @override
+  String spotCoverage(int count, int hours) {
+    return '$count mediciones en $hours horas distintas. Mide a otras horas del día para mejorarla.';
+  }
+
+  @override
+  String get noSpotReadings =>
+      'Mide la luz aquí con este teléfono a distintas horas para estimar cuánta recibe en el día.';
+
+  @override
+  String lightEventsRecorded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eventos de luz registrados',
+      one: '1 evento de luz registrado',
+    );
+    return '$_temp0';
+  }
 }

@@ -123,5 +123,17 @@ void main() {
     List<Event> events = await db.select(db.events).get();
     expect(events.single.plant, plant);
     expect(events.single.note, contains('2.5 l'));
+    expect(events.single.note, contains('10 min'));
+
+    // A misting is seen while it runs, and recorded as one when it ends
+    valveStatus = '1,-70,1;34,3,0,1775990000,120,0';
+    await rainPoint.devices(refresh: true);
+    expect(await rainPoint.recordWaterings(), 0);
+    valveStatus = '1,-70,1;0,3,0,1775990000,120,0';
+    await rainPoint.devices(refresh: true);
+    expect(await rainPoint.recordWaterings(), 1);
+    EventType misting = (await db.select(db.eventTypes).get())
+        .firstWhere((t) => t.name == 'misting');
+    expect((await db.select(db.events).get()).last.type, misting.id);
   });
 }

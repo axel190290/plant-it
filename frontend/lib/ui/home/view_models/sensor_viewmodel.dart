@@ -66,6 +66,13 @@ class SensorViewModel extends ChangeNotifier {
   List<DrySoilAlert> _alerts = [];
   List<LowLightAlert> _lowLight = [];
   int _recorded = 0;
+  int _lightRecorded = 0;
+
+  /// The name of the event type of the light, if it has to be created.
+  String lightTypeName = 'Light';
+
+  /// Light events recorded by the last load.
+  int get lightRecorded => _lightRecorded;
 
   List<DrySoilAlert> get alerts => _alerts;
   List<LowLightAlert> get lowLight => _lowLight;
@@ -76,6 +83,8 @@ class SensorViewModel extends ChangeNotifier {
   Future<void> _load() async {
     _recorded = 0;
     _lowLight = await _lowLightAlerts();
+    _lightRecorded = await _sensorPhoneService.recordLightEvents(lightTypeName);
+    if (_lightRecorded > 0) _streamController.add(StreamCode.insertEvent);
     if (!await _rainPointService.isConfigured()) {
       _alerts = [];
       notifyListeners();

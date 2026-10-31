@@ -602,5 +602,15 @@
   "noReading": "Sin lecturas todavía",
   "sensors": "Sensores",
   "drySoilAlert": "{plant}: humedad del suelo {value}% (mín. {min}%). Toca regar.",
-  "rainPointWateringsRecorded": "{count, plural, =1{1 riego registrado desde RainPoint} other{{count} riegos registrados desde RainPoint}}"
+  "rainPointWateringsRecorded": "{count, plural, =1{1 riego registrado desde RainPoint} other{{count} riegos registrados desde RainPoint}}",
+  "backup": "Copia de seguridad",
+  "backupSubtitle": "Guarda o recupera todos tus datos y fotos",
+  "createBackup": "Crear copia de seguridad",
+  "createBackupHint": "Guarda en un archivo tus plantas, cuidados, eventos, recordatorios, grupos, ajustes y fotos. Las claves y contraseñas no se incluyen.",
+  "restoreBackup": "Restaurar copia de seguridad",
+  "restoreBackupHint": "Reemplaza los datos de la app por los de un archivo de copia",
+  "restoreBackupConfirm": "Todas tus plantas, eventos, recordatorios y grupos se reemplazarán por los de la copia. ¿Continuar?",
+  "restore": "Restaurar",
+  "backupSaved": "Copia guardada",
+  "backupRestored": "Copia restaurada: {plants} plantas y {images} fotos. Cierra y vuelve a abrir la app para ver todos los cambios."
 }

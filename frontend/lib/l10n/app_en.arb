@@ -875,5 +875,25 @@
         "type": "int"
       }
     }
+  },
+  "backup": "Backup",
+  "backupSubtitle": "Save or bring back all your data and photos",
+  "createBackup": "Create a backup",
+  "createBackupHint": "Saves to a file your plants, care, events, reminders, groups, settings and photos. Keys and passwords are not included.",
+  "restoreBackup": "Restore a backup",
+  "restoreBackupHint": "Replaces the data of the app with the one of a backup file",
+  "restoreBackupConfirm": "All your plants, events, reminders and groups will be replaced by the ones of the backup. Continue?",
+  "restore": "Restore",
+  "backupSaved": "Backup saved",
+  "backupRestored": "Backup restored: {plants} plants and {images} photos. Close and open the app again to see every change.",
+  "@backupRestored": {
+    "placeholders": {
+      "plants": {
+        "type": "int"
+      },
+      "images": {
+        "type": "int"
+      }
+    }
   }
 }

@@ -1792,4 +1792,39 @@ class LEs extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get backup => 'Copia de seguridad';
+
+  @override
+  String get backupSubtitle => 'Guarda o recupera todos tus datos y fotos';
+
+  @override
+  String get createBackup => 'Crear copia de seguridad';
+
+  @override
+  String get createBackupHint =>
+      'Guarda en un archivo tus plantas, cuidados, eventos, recordatorios, grupos, ajustes y fotos. Las claves y contraseñas no se incluyen.';
+
+  @override
+  String get restoreBackup => 'Restaurar copia de seguridad';
+
+  @override
+  String get restoreBackupHint =>
+      'Reemplaza los datos de la app por los de un archivo de copia';
+
+  @override
+  String get restoreBackupConfirm =>
+      'Todas tus plantas, eventos, recordatorios y grupos se reemplazarán por los de la copia. ¿Continuar?';
+
+  @override
+  String get restore => 'Restaurar';
+
+  @override
+  String get backupSaved => 'Copia guardada';
+
+  @override
+  String backupRestored(int plants, int images) {
+    return 'Copia restaurada: $plants plantas y $images fotos. Cierra y vuelve a abrir la app para ver todos los cambios.';
+  }
 }

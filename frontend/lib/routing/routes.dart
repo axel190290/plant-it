@@ -23,6 +23,7 @@ abstract final class Routes {
   static String settingsCareFields = '/settings-careFields';
   static String settingsWeather = '/settings-weather';
   static String settingsRainPoint = '/settings-rainpoint';
+  static String settingsBackup = '/settings-backup';
 
   static final String _eventTypeRelative = 'eventType';
   static final String _eventTypesRelative = 'eventTypes';

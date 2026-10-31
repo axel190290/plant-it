@@ -602,5 +602,15 @@
   "noReading": "Pas encore de mesure",
   "sensors": "Capteurs",
   "drySoilAlert": "{plant} : humidité du sol {value} % (min. {min} %). Il faut arroser.",
-  "rainPointWateringsRecorded": "{count, plural, =1{1 arrosage enregistré depuis RainPoint} other{{count} arrosages enregistrés depuis RainPoint}}"
+  "rainPointWateringsRecorded": "{count, plural, =1{1 arrosage enregistré depuis RainPoint} other{{count} arrosages enregistrés depuis RainPoint}}",
+  "backup": "Sauvegarde",
+  "backupSubtitle": "Sauvegardez ou récupérez toutes vos données et photos",
+  "createBackup": "Créer une sauvegarde",
+  "createBackupHint": "Enregistre dans un fichier vos plantes, soins, événements, rappels, groupes, réglages et photos. Les clés et mots de passe ne sont pas inclus.",
+  "restoreBackup": "Restaurer une sauvegarde",
+  "restoreBackupHint": "Remplace les données de l'app par celles d'une sauvegarde",
+  "restoreBackupConfirm": "Toutes vos plantes, événements, rappels et groupes seront remplacés par ceux de la sauvegarde. Continuer ?",
+  "restore": "Restaurer",
+  "backupSaved": "Sauvegarde enregistrée",
+  "backupRestored": "Sauvegarde restaurée : {plants} plantes et {images} photos. Fermez et rouvrez l'app pour voir tous les changements."
 }

@@ -2,6 +2,7 @@ import 'package:go_router/go_router.dart';
 import 'package:plant_it/routing/routes.dart';
 import 'package:plant_it/ui/home/view_models/sensor_viewmodel.dart';
 import 'package:plant_it/ui/home/view_models/weather_viewmodel.dart';
+import 'package:plant_it/ui/settings/widgets/backup_screen.dart';
 import 'package:plant_it/ui/settings/widgets/rainpoint_settings_screen.dart';
 import 'package:plant_it/ui/settings/widgets/weather_settings_screen.dart';
 import 'package:plant_it/ui/settings/view_models/care_fields_viewmodel.dart';
@@ -293,6 +294,13 @@ GoRouter router() => GoRouter(
                 path: Routes.settingsWeather,
                 builder: (context, state) => WeatherSettingsScreen(
                   weatherService: context.read(),
+                  streamController: context.read(),
+                ),
+              ),
+              GoRoute(
+                path: Routes.settingsBackup,
+                builder: (context, state) => BackupScreen(
+                  backupService: context.read(),
                   streamController: context.read(),
                 ),
               ),

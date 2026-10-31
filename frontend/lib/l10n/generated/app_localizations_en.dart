@@ -1778,4 +1778,39 @@ class LEn extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get backupSubtitle => 'Save or bring back all your data and photos';
+
+  @override
+  String get createBackup => 'Create a backup';
+
+  @override
+  String get createBackupHint =>
+      'Saves to a file your plants, care, events, reminders, groups, settings and photos. Keys and passwords are not included.';
+
+  @override
+  String get restoreBackup => 'Restore a backup';
+
+  @override
+  String get restoreBackupHint =>
+      'Replaces the data of the app with the one of a backup file';
+
+  @override
+  String get restoreBackupConfirm =>
+      'All your plants, events, reminders and groups will be replaced by the ones of the backup. Continue?';
+
+  @override
+  String get restore => 'Restore';
+
+  @override
+  String get backupSaved => 'Backup saved';
+
+  @override
+  String backupRestored(int plants, int images) {
+    return 'Backup restored: $plants plants and $images photos. Close and open the app again to see every change.';
+  }
 }

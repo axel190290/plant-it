@@ -1787,4 +1787,40 @@ class LFr extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get backup => 'Sauvegarde';
+
+  @override
+  String get backupSubtitle =>
+      'Sauvegardez ou récupérez toutes vos données et photos';
+
+  @override
+  String get createBackup => 'Créer une sauvegarde';
+
+  @override
+  String get createBackupHint =>
+      'Enregistre dans un fichier vos plantes, soins, événements, rappels, groupes, réglages et photos. Les clés et mots de passe ne sont pas inclus.';
+
+  @override
+  String get restoreBackup => 'Restaurer une sauvegarde';
+
+  @override
+  String get restoreBackupHint =>
+      'Remplace les données de l\'app par celles d\'une sauvegarde';
+
+  @override
+  String get restoreBackupConfirm =>
+      'Toutes vos plantes, événements, rappels et groupes seront remplacés par ceux de la sauvegarde. Continuer ?';
+
+  @override
+  String get restore => 'Restaurer';
+
+  @override
+  String get backupSaved => 'Sauvegarde enregistrée';
+
+  @override
+  String backupRestored(int plants, int images) {
+    return 'Sauvegarde restaurée : $plants plantes et $images photos. Fermez et rouvrez l\'app pour voir tous les changements.';
+  }
 }

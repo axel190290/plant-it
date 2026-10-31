@@ -1887,4 +1887,39 @@ class LIt extends L {
     );
     return '$_temp0';
   }
+
+  @override
+  String get backup => 'Backup';
+
+  @override
+  String get backupSubtitle => 'Salva o recupera tutti i tuoi dati e foto';
+
+  @override
+  String get createBackup => 'Crea un backup';
+
+  @override
+  String get createBackupHint =>
+      'Salva in un file piante, cure, eventi, promemoria, gruppi, impostazioni e foto. Chiavi e password non sono incluse.';
+
+  @override
+  String get restoreBackup => 'Ripristina un backup';
+
+  @override
+  String get restoreBackupHint =>
+      'Sostituisce i dati dell\'app con quelli di un backup';
+
+  @override
+  String get restoreBackupConfirm =>
+      'Tutte le piante, gli eventi, i promemoria e i gruppi saranno sostituiti da quelli del backup. Continuare?';
+
+  @override
+  String get restore => 'Ripristina';
+
+  @override
+  String get backupSaved => 'Backup salvato';
+
+  @override
+  String backupRestored(int plants, int images) {
+    return 'Backup ripristinato: $plants piante e $images foto. Chiudi e riapri l\'app per vedere tutte le modifiche.';
+  }
 }

@@ -18,6 +18,7 @@ import 'package:plant_it/data/repository/user_setting_repository.dart';
 import 'package:plant_it/data/service/notification_service.dart';
 import 'package:plant_it/data/service/scheduling_service.dart';
 import 'package:plant_it/data/service/reminder_occurrence_service.dart';
+import 'package:plant_it/data/service/backup/backup_service.dart';
 import 'package:plant_it/data/service/care/ai_care_estimator.dart';
 import 'package:plant_it/data/service/care/open_plantbook_client.dart';
 import 'package:plant_it/data/service/care/reminder_suggestion_service.dart';
@@ -81,6 +82,9 @@ List<SingleChildWidget> get providersLocal {
     ),
     Provider(
       create: (context) => CollectionRepository(db: context.read()),
+    ),
+    Provider(
+      create: (context) => BackupService(db: context.read()),
     ),
     Provider(
       create: (context) => SpeciesSynonymsRepository(db: context.read()),

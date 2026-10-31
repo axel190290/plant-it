@@ -2845,6 +2845,66 @@ abstract class L {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 watering recorded from RainPoint} other{{count} waterings recorded from RainPoint}}'**
   String rainPointWateringsRecorded(int count);
+
+  /// No description provided for @backup.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup'**
+  String get backup;
+
+  /// No description provided for @backupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Save or bring back all your data and photos'**
+  String get backupSubtitle;
+
+  /// No description provided for @createBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a backup'**
+  String get createBackup;
+
+  /// No description provided for @createBackupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Saves to a file your plants, care, events, reminders, groups, settings and photos. Keys and passwords are not included.'**
+  String get createBackupHint;
+
+  /// No description provided for @restoreBackup.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore a backup'**
+  String get restoreBackup;
+
+  /// No description provided for @restoreBackupHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Replaces the data of the app with the one of a backup file'**
+  String get restoreBackupHint;
+
+  /// No description provided for @restoreBackupConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'All your plants, events, reminders and groups will be replaced by the ones of the backup. Continue?'**
+  String get restoreBackupConfirm;
+
+  /// No description provided for @restore.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restore;
+
+  /// No description provided for @backupSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup saved'**
+  String get backupSaved;
+
+  /// No description provided for @backupRestored.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup restored: {plants} plants and {images} photos. Close and open the app again to see every change.'**
+  String backupRestored(int plants, int images);
 }
 
 class _LDelegate extends LocalizationsDelegate<L> {

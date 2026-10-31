@@ -615,5 +615,15 @@
   "noReading": "Nessuna lettura",
   "sensors": "Sensori",
   "drySoilAlert": "{plant}: umidità del terreno {value}% (min. {min}%). È ora di annaffiare.",
-  "rainPointWateringsRecorded": "{count, plural, =1{1 irrigazione registrata da RainPoint} other{{count} irrigazioni registrate da RainPoint}}"
+  "rainPointWateringsRecorded": "{count, plural, =1{1 irrigazione registrata da RainPoint} other{{count} irrigazioni registrate da RainPoint}}",
+  "backup": "Backup",
+  "backupSubtitle": "Salva o recupera tutti i tuoi dati e foto",
+  "createBackup": "Crea un backup",
+  "createBackupHint": "Salva in un file piante, cure, eventi, promemoria, gruppi, impostazioni e foto. Chiavi e password non sono incluse.",
+  "restoreBackup": "Ripristina un backup",
+  "restoreBackupHint": "Sostituisce i dati dell'app con quelli di un backup",
+  "restoreBackupConfirm": "Tutte le piante, gli eventi, i promemoria e i gruppi saranno sostituiti da quelli del backup. Continuare?",
+  "restore": "Ripristina",
+  "backupSaved": "Backup salvato",
+  "backupRestored": "Backup ripristinato: {plants} piante e {images} foto. Chiudi e riapri l'app per vedere tutte le modifiche."
 }
